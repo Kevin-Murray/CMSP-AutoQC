@@ -95,7 +95,7 @@ public class MainPageController {
         task.run();
 
         lineChart.getData().clear();
-        lineChart.getData().add(task.getPlotData());
+        lineChart.getData().addAll(task.getPlotData());
 
         valueTable.getColumns().clear();
         valueTable.getItems().clear();

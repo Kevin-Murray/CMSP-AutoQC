@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.example.demo.PlotUtils.getLeveyData;
 import static com.example.demo.ReportFiles.getPath;
 //import static com.example.demo.ReportFilteringUtils.isShowable;
 import static com.example.demo.ReportFilteringUtils.isShowable;
@@ -26,7 +27,7 @@ import static com.example.demo.ReportFilteringUtils.isWithinDateRange;
 public class AutoQCTask {
 
     private Parameters parameters;
-    private XYChart.Series chart;
+    private ObservableList<XYChart.Series> chart;
     private List<DataEntry> globalEntries;
     private List<DataEntry> workingEntries;
 
@@ -34,6 +35,7 @@ public class AutoQCTask {
     public AutoQCTask(Parameters parameters) {
 
         this.parameters = parameters;
+        this.chart = FXCollections.observableArrayList();
     }
 
     public void run() {
@@ -100,12 +102,25 @@ public class AutoQCTask {
 
         XYChart.Series series = new XYChart.Series();
 
+        ArrayList<Double> reportItem = new ArrayList<>();
+
         for (DataEntry entry : this.workingEntries) {
+
+            reportItem.add(entry.getItem(parameters.report));
 
             series.getData().add(new XYChart.Data(entry.getDate(), entry.getItem(parameters.report)));
         }
 
-        this.chart = series;
+        this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
+
+//        switch (parameters.plotType) {
+//            case 1:
+//                this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
+//        }
+//
+//
+//
+//        this.chart.add(series);
     }
 
     public ArrayList<TableColumn> makeTable() {
@@ -126,7 +141,7 @@ public class AutoQCTask {
         return columns;
     }
 
-    public XYChart.Series getPlotData() {
+    public ObservableList<XYChart.Series> getPlotData() {
 
         return this.chart;
 

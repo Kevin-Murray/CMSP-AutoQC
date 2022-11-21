@@ -15,7 +15,7 @@ public class Parameters {
     public String report;
     private String plotScale;
 
-    private String plotType;
+    public int plotType;
 
     public LocalDate startDate;
     public LocalDate endDate;
@@ -49,13 +49,13 @@ public class Parameters {
         this.plotScale = yAxisBox.getSelectionModel().getSelectedItem().toString();
 
         if(leveyJenningsButton.isSelected()){
-            this.plotType = "Levey-Jennings";
+            this.plotType = 1;
         } else if (movingRangeButton.isSelected()) {
-            this.plotType = "Moving-Range";
+            this.plotType = 2;
         } else if (cusummButton.isSelected()) {
-            this.plotType = "CUSUMm";
+            this.plotType = 3;
         } else {
-            this.plotType = "CUSUMv";
+            this.plotType = 4;
         }
 
         this.startDate = startDatePicker.getValue();

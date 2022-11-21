@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.MainPageController">
+    <children>
+        <MenuBar VBox.vgrow="NEVER">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="New" />
+                        <MenuItem mnemonicParsing="false" text="Open…" />
+                        <Menu mnemonicParsing="false" text="Open Recent" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                        <MenuItem mnemonicParsing="false" text="Save" />
+                        <MenuItem mnemonicParsing="false" text="Save As…" />
+                        <MenuItem mnemonicParsing="false" text="Revert" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Preferences…" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Quit" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Undo" />
+                        <MenuItem mnemonicParsing="false" text="Redo" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Cut" />
+                        <MenuItem mnemonicParsing="false" text="Copy" />
+                        <MenuItem mnemonicParsing="false" text="Paste" />
+                        <MenuItem mnemonicParsing="false" text="Delete" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Select All" />
+                        <MenuItem mnemonicParsing="false" text="Unselect All" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <SplitPane dividerPositions="0.33" focusTraversable="false" prefHeight="197.0" prefWidth="1169.0">
+            <items>
+                <AnchorPane prefHeight="214.0" prefWidth="294.0" SplitPane.resizableWithParent="false">
+                    <children>
+                        <Label alignment="CENTER" minWidth="60.0" prefHeight="27.0" prefWidth="393.0" style="-fx-background-color: #ffcba4;" text="QC Report" textAlignment="CENTER" underline="true" wrapText="false">
+                            <font>
+                                <Font size="18.0" fx:id="x1" />
+                            </font>
+                        </Label>
+                        <ChoiceBox fx:id="instrumentBox" layoutX="222.0" layoutY="34.0" prefWidth="150.0" onAction="#instrumentBoxListener" />
+                        <ChoiceBox fx:id="configurationBox" layoutX="222.0" layoutY="65.0" prefWidth="150.0" />
+                        <ChoiceBox fx:id="matrixBox" layoutX="222.0" layoutY="96.0" prefWidth="150.0" onAction="#matrixBoxListener" />
+                        <Button fx:id="submitButton" disable="true" layoutX="226.0" layoutY="159.0" mnemonicParsing="false" onAction="#submitButtonClick" text="Submit">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Button>
+                        <Button fx:id="resetButton" layoutX="301.0" layoutY="159.0" mnemonicParsing="false" text="Reset" onAction="#setResetButton">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Button>
+                        <Label layoutX="15.0" layoutY="37.0" text="Instrument:">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="14.0" layoutY="66.0" text="Configuration:">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="16.0" layoutY="96.0" text="Matrix:">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="11.0" layoutY="126.0" text="Report Type:">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                        <ChoiceBox fx:id="reportBox" layoutX="222.0" layoutY="126.0" prefWidth="150.0" onAction="#reportBoxListener"/>
+                    </children>
+                </AnchorPane>
+                <AnchorPane prefHeight="195.0" prefWidth="691.0" SplitPane.resizableWithParent="false">
+                    <children>
+                        <Label alignment="CENTER" layoutX="-12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="811.0" style="-fx-background-color: #ffcba4;" text="Report Context" textAlignment="CENTER" textFill="#101010" underline="true" wrapText="false">
+                            <font>
+                                <Font size="18.0" fx:id="x11" />
+                            </font>
+                        </Label>
+                        <RadioButton fx:id="leveyJenningsButton" layoutX="25.0" layoutY="65.0" mnemonicParsing="false" selected="true" text="Levey-Jennings">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="plot" />
+                            </toggleGroup>
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </RadioButton>
+                        <RadioButton fx:id="movingRangeButton" layoutX="25.0" layoutY="95.0" mnemonicParsing="false" text="Moving Range" toggleGroup="$plot">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </RadioButton>
+                        <RadioButton fx:id="cusummButton" layoutX="25.0" layoutY="125.0" mnemonicParsing="false" text="CUSUMm" toggleGroup="$plot">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </RadioButton>
+                        <RadioButton fx:id="cusumvButton" layoutX="25.0" layoutY="155.0" mnemonicParsing="false" text="CUSUMv" toggleGroup="$plot">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </RadioButton>
+                        <ChoiceBox fx:id="dateRangeBox" layoutX="207.0" layoutY="69.0" prefHeight="25.0" prefWidth="235.0" onAction="#dataRangeListener"/>
+                        <ChoiceBox fx:id="yAxisBox" layoutX="536.0" layoutY="65.0" prefWidth="150.0" />
+                        <DatePicker fx:id="startDatePicker" disable="true" layoutX="207.0" layoutY="119.0" prefHeight="25.0" prefWidth="97.0" onAction="#datePickerListener"/>
+                        <DatePicker fx:id="endDatePicker" disable="true" layoutX="345.0" layoutY="119.0" prefHeight="25.0" prefWidth="97.0" onAction="#datePickerListener"/>
+                        <CheckBox fx:id="groupXAxisCheckBox" layoutX="537.0" layoutY="99.0" mnemonicParsing="false" text="Group X-Axis Values by Date">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </CheckBox>
+                        <CheckBox fx:id="showExcludedPointsCheckBox" layoutX="537.0" layoutY="125.0" mnemonicParsing="false" selected="true" text="Show Excluded Points">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </CheckBox>
+                        <CheckBox fx:id="annotationCheckBox" layoutX="207.0" layoutY="159.0" mnemonicParsing="false" selected="true" text="Show Annotations">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </CheckBox>
+                        <CheckBox fx:id="showGuideSetCheckBox" layoutX="536.0" layoutY="155.0" mnemonicParsing="false" text="Show Guide Set">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </CheckBox>
+                        <Label layoutX="701.0" layoutY="65.0" text="Y-Axis Scale">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="56.0" layoutY="31.0" text="Plot Type:" underline="true">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="276.0" layoutY="31.0" text="Plot Range:" underline="true">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="588.0" layoutY="31.0" text="View Options:" underline="true">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="317.0" layoutY="119.0" text="to">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </AnchorPane>
+            </items>
+        </SplitPane>
+        <AnchorPane prefHeight="575.0" prefWidth="1200.0">
+            <children>
+                <TabPane layoutX="365.0" layoutY="105.0" prefHeight="575.3333333333334" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <tabs>
+                        <Tab text="QC Plot">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <LineChart fx:id="lineChart" animated="false"  layoutX="193.0" layoutY="49.0" prefHeight="546.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <xAxis>
+                                                <CategoryAxis side="BOTTOM"  fx:id="xAxis"/>
+                                            </xAxis>
+                                            <yAxis>
+                                                <NumberAxis side="LEFT"  fx:id="yAxis" forceZeroInRange="false"/>
+                                            </yAxis>
+                                        </LineChart>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                        <Tab text="Summary Table">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <TableView fx:id="valueTable" layoutX="374.0" layoutY="143.0" prefHeight="546.0" prefWidth="1200.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columns>
+                                                <TableColumn prefWidth="75.0" text="File Name" />
+                                                <TableColumn prefWidth="75.0" text="Date" />
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                        <Tab text="Annotation Table">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <TableView fx:id="annotationTable" editable="true" layoutX="310.0" layoutY="118.0" prefHeight="546.0" prefWidth="1200.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columns>
+                                                <TableColumn prefWidth="75.0" text="Date" />
+                                                <TableColumn prefWidth="75.0" text="Annotation" />
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </children>
+        </AnchorPane>
+    </children>
+</VBox>

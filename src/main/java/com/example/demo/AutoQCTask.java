@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.example.demo.PlotUtils.getLeveyData;
+import static com.example.demo.PlotUtils.getMovingData;
 import static com.example.demo.ReportFiles.getPath;
 //import static com.example.demo.ReportFilteringUtils.isShowable;
 import static com.example.demo.ReportFilteringUtils.isShowable;
@@ -111,16 +112,17 @@ public class AutoQCTask {
             series.getData().add(new XYChart.Data(entry.getDate(), entry.getItem(parameters.report)));
         }
 
-        this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
+       // this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
 
-//        switch (parameters.plotType) {
-//            case 1:
-//                this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
-//        }
-//
-//
-//
-//        this.chart.add(series);
+        switch (parameters.plotType) {
+            case 1:
+                this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
+                break;
+
+            case 2:
+                this.chart.addAll(getMovingData(this.workingEntries, parameters.report));
+                break;
+        }
     }
 
     public ArrayList<TableColumn> makeTable() {

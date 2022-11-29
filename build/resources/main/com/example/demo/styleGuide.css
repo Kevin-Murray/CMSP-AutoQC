@@ -1,4 +1,22 @@
 
-#lineChart .chart-vertical-grid-lines {
--fx-stroke: transparent;
-}
+#lineChart .chart-vertical-grid-lines {-fx-stroke: transparent;}
+
+.chart-series-line {-fx-stroke-width: 2px; }
+
+.default-color0.chart-series-line { -fx-stroke: #050505; }
+.default-color1.chart-series-line { -fx-stroke: #666666; -fx-stroke-dash-array: 2 12 12 2;}
+.default-color2.chart-series-line { -fx-stroke: #40c943; }
+.default-color3.chart-series-line { -fx-stroke: #40c943; }
+.default-color4.chart-series-line { -fx-stroke: #f0b002; }
+.default-color5.chart-series-line { -fx-stroke: #f0b002; }
+.default-color6.chart-series-line { -fx-stroke: #cc2016; }
+.default-color7.chart-series-line { -fx-stroke: #cc2016; }
+
+.default-color0.chart-line-symbol {-fx-background-color: black, black;}
+.default-color1.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color2.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color3.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color4.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color5.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color6.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color7.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}

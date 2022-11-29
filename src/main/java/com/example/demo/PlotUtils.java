@@ -61,4 +61,39 @@ public class PlotUtils {
 
         return(plotData);
     }
+
+    public static ObservableList<XYChart.Series> getMovingData(List<DataEntry> reportItems, String reportType){
+
+        ObservableList<XYChart.Series> plotData = FXCollections.observableArrayList();
+
+        ArrayList<String> dateList = new ArrayList<>();
+        ArrayList<Double> itemList = new ArrayList<>();
+        XYChart.Series mainSeries = new XYChart.Series();
+
+        Double previousItem = reportItems.get(0).getItem(reportType);
+
+        for(DataEntry entry : reportItems){
+            dateList.add(entry.getDate());
+
+            Double newItem = Math.abs(entry.getItem(reportType) - previousItem);
+            itemList.add(newItem);
+            previousItem = entry.getItem(reportType);
+
+            mainSeries.getData().add(new XYChart.Data(entry.getDate(), newItem));
+        }
+
+        Double mean = calculateAverage(itemList);
+
+        XYChart.Series meanSeries = new XYChart.Series();
+
+        for(String date : dateList){
+
+            meanSeries.getData().add(new XYChart.Data(date, mean));
+        }
+
+        plotData.add(mainSeries);
+        plotData.add(meanSeries);
+
+        return plotData;
+    }
 }

@@ -36,18 +36,18 @@ public class AutoQCTask {
     public AutoQCTask(Parameters parameters) {
 
         this.parameters = parameters;
-        this.chart = FXCollections.observableArrayList();
+
+        if(parameters.validSelection()){
+            Path path = getPath(this.parameters);
+            this.globalEntries = readReport(path);
+        }
     }
 
     public void run() {
 
-        Path path = getPath(this.parameters);
-        this.globalEntries = readReport(path);
         this.workingEntries = getFilteredData();
 
-        getFilteredData();
         makePlotData();
-        //makeTableData();
     }
 
     private List<DataEntry> readReport(Path path) {
@@ -100,6 +100,8 @@ public class AutoQCTask {
     }
 
     private void makePlotData() {
+
+        this.chart = FXCollections.observableArrayList();
 
         XYChart.Series series = new XYChart.Series();
 
@@ -157,7 +159,6 @@ public class AutoQCTask {
         int col = entry.size();
         String[] keys = entry.getKeySet().toArray(new String[0]);
 
-
         for (DataEntry data : this.workingEntries) {
 
             Map<Integer, String> dataRow = new HashMap<>();
@@ -169,5 +170,23 @@ public class AutoQCTask {
         }
 
         return alldata;
+    }
+
+    public void updateParams(Parameters newParams){
+        this.parameters = newParams;
+    }
+
+    public DataEntry getDataEntry(XYChart.Data data){
+
+        String date = data.getXValue().toString();
+
+        for(DataEntry entry : this.workingEntries){
+
+            if(entry.getDate().equals(date)){
+                return entry;
+            }
+        }
+
+        return null;
     }
 }

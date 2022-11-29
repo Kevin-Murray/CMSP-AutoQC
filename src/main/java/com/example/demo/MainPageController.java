@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -8,12 +9,14 @@ import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -59,8 +62,16 @@ public class MainPageController {
     @FXML public TableView valueTable;
     @FXML public TableView annotationTable;
 
+    private Parameters mainParameters;
+    private AutoQCTask mainTask;
+
+    public DataEntry selectedDataPoint;
+
 
     public void initialize() {
+
+        mainParameters = new Parameters();
+        mainTask = new AutoQCTask(mainParameters);
 
         lineChart.getData().clear();
         lineChart.setLegendVisible(false);
@@ -86,21 +97,36 @@ public class MainPageController {
     @FXML
     protected void submitButtonClick() {
 
-        Parameters AutoQCParameters = new Parameters(instrumentBox, configurationBox, matrixBox, reportBox,
+        Parameters selectParams = new Parameters(instrumentBox, configurationBox, matrixBox, reportBox,
                 yAxisBox, leveyJenningsButton, movingRangeButton, cusummButton, cusumvButton, startDatePicker,
                 endDatePicker, annotationCheckBox, groupXAxisCheckBox, showExcludedPointsCheckBox,
                 showGuideSetCheckBox);
 
-        AutoQCTask task = new AutoQCTask(AutoQCParameters);
-        task.run();
+        if(mainParameters.diffReportSelection(selectParams)){
+            mainParameters = selectParams;
+            mainTask = new AutoQCTask(mainParameters);
+        } else {
+            mainParameters = selectParams;
+            mainTask.updateParams(mainParameters);
+        }
+
+        mainTask.run();
 
         lineChart.getData().clear();
-        lineChart.getData().addAll(task.getPlotData());
+
+        ObservableList<XYChart.Series> plotData = mainTask.getPlotData();
+        lineChart.getData().addAll(plotData);
+
+        XYChart.Series mainSeries = plotData.get(0);
+        ObservableList<XYChart.Data> seriesData = mainSeries.getData();
+        for(XYChart.Data data : seriesData){
+            data.getNode().setOnMouseClicked(e -> showSampleInfo(data));
+        }
 
         valueTable.getColumns().clear();
         valueTable.getItems().clear();
-        valueTable.getColumns().addAll(task.makeTable());
-        valueTable.getItems().addAll(task.getTableData());
+        valueTable.getColumns().addAll(mainTask.makeTable());
+        valueTable.getItems().addAll(mainTask.getTableData());
 
     }
 
@@ -224,5 +250,30 @@ public class MainPageController {
                 }
             }
         }
+    }
+
+    protected void showSampleInfo(XYChart.Data data){
+
+        DataEntry selectedEntry = this.mainTask.getDataEntry(data);
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("popup.fxml"));
+            Parent root = fxmlLoader.load();
+            SamplePageController controller = fxmlLoader.<SamplePageController>getController();
+            controller.setDataEntry(selectedEntry);
+
+            Stage stage = new Stage();
+            stage.setTitle("QC Information");
+            stage.setResizable(false);
+
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.showAndWait();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

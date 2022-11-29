@@ -25,6 +25,23 @@ public class Parameters {
     public Boolean showExcluded;
     private Boolean showGuide;
 
+    public Parameters() {
+
+        instrument = null;
+        configuration = null;
+        matrix = null;
+        report = null;
+        plotScale = null;
+        plotType = 0;
+        startDate = null;
+        endDate = null;
+        showAnnotation = null;
+        groupAxis = null;
+        showExcluded = null;
+        showGuide = null;
+
+    }
+
     public Parameters(ChoiceBox instrumentBox,
                       ChoiceBox configurationBox,
                       ChoiceBox matrixBox,
@@ -67,4 +84,21 @@ public class Parameters {
         this.showGuide = showGuideSetCheckBox.isSelected();
     }
 
+    public boolean validSelection() {
+        return !(this.instrument == null &&
+                this.configuration == null &&
+                this.matrix == null &&
+                this.report == null);
+    }
+
+    public boolean diffReportSelection(Parameters newParam){
+
+        if(this.validSelection()) {
+            return !(this.instrument.equals(newParam.instrument) &&
+                    this.configuration.equals(newParam.configuration) &&
+                    this.matrix.equals(newParam.matrix));
+        } else {
+            return true;
+        }
+    }
 }

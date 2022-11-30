@@ -80,6 +80,12 @@ public class AutoQCTask {
         return dataEntries;
     }
 
+    private void writeReport() {
+
+        // TODO - do this.
+
+    }
+
     private List<DataEntry> getFilteredData() {
 
         List<DataEntry> newList = new ArrayList<>();
@@ -176,7 +182,7 @@ public class AutoQCTask {
         this.parameters = newParams;
     }
 
-    public DataEntry getDataEntry(XYChart.Data data){
+    public DataEntry getDataEntry(XYChart.Data data) {
 
         String date = data.getXValue().toString();
 
@@ -188,5 +194,21 @@ public class AutoQCTask {
         }
 
         return null;
+    }
+
+    public void setDataEntryInclusion(DataEntry selectedEntry) {
+
+        String date = selectedEntry.getDate();
+
+        for(DataEntry entry : this.globalEntries){
+
+            if(entry.getDate().equals(date)){
+
+                entry.setExcluded();
+            }
+
+        }
+
+        writeReport();
     }
 }

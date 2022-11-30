@@ -59,4 +59,16 @@ public class DataEntry {
         return this.entries;
     }
 
+    public void setExcluded(){
+
+        String exclusion = this.entries.get("Show");
+
+        if(exclusion.equals("Include")){
+            this.entries.put("Show", "Exclude");
+        } else {
+            this.entries.put("Show", "Include");
+        }
+
+    }
+
 }

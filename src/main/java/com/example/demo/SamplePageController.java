@@ -17,7 +17,19 @@ public class SamplePageController {
     @FXML private RadioButton includeButton;
     @FXML private TableView sampleTable;
 
+    private DataEntry selectedEntry;
+
+    private boolean changedInclusion;
+
+    @FXML
+    protected void inclusionGroupListener() {
+
+        changedInclusion = true;
+    }
+
     public void setDataEntry(DataEntry selectedEntry){
+
+        this.selectedEntry = selectedEntry;
 
         if(selectedEntry.excludeData()){
             excludeButton.setSelected(true);
@@ -51,6 +63,15 @@ public class SamplePageController {
         }
 
         return sampleTableList;
+    }
+
+    public boolean getChangedInclusion() {
+
+        if(this.changedInclusion){
+            return this.selectedEntry.excludeData() != this.excludeButton.isSelected();
+        } else {
+            return false;
+        }
     }
 
 }

@@ -59,7 +59,7 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <RadioButton fx:id="includeButton" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="185.0" text="Include in QC Plot">
+                  <RadioButton fx:id="includeButton" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="185.0" text="Include in QC Plot" onAction="#inclusionGroupListener">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -67,7 +67,7 @@
                         <ToggleGroup fx:id="exclude" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="excludeButton" layoutX="14.0" layoutY="73.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="152.0" text="Exclude in QC Plot" textAlignment="CENTER" toggleGroup="$exclude">
+                  <RadioButton fx:id="excludeButton" layoutX="14.0" layoutY="73.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="152.0" text="Exclude in QC Plot" textAlignment="CENTER" toggleGroup="$exclude" onAction="#inclusionGroupListener">
                      <font>
                         <Font size="14.0" />
                      </font>

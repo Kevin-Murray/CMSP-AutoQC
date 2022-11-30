@@ -273,7 +273,11 @@ public class MainPageController {
 
             stage.showAndWait();
 
+            if(controller.getChangedInclusion()){
 
+                this.mainTask.setDataEntryInclusion(selectedEntry);
+                submitButtonClick();
+            }
 
         } catch(Exception e) {
             e.printStackTrace();

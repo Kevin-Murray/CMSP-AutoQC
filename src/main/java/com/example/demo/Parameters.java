@@ -5,6 +5,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 
 public class Parameters {
@@ -24,6 +26,8 @@ public class Parameters {
     private Boolean groupAxis;
     public Boolean showExcluded;
     private Boolean showGuide;
+
+    public Path databasePath;
 
     public Parameters() {
 
@@ -56,7 +60,8 @@ public class Parameters {
                       CheckBox annotationCheckBox,
                       CheckBox groupXAxisCheckBox,
                       CheckBox showExcludedCheckBox,
-                      CheckBox showGuideSetCheckBox) {
+                      CheckBox showGuideSetCheckBox,
+                      Path databasePath) {
 
 
         this.instrument = instrumentBox.getSelectionModel().getSelectedItem().toString();
@@ -82,6 +87,8 @@ public class Parameters {
         this.groupAxis = groupXAxisCheckBox.isSelected();
         this.showExcluded = showExcludedCheckBox.isSelected();
         this.showGuide = showGuideSetCheckBox.isSelected();
+
+        this.databasePath = databasePath;
     }
 
     public boolean validSelection() {

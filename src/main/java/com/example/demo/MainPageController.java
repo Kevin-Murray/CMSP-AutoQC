@@ -11,16 +11,16 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -64,8 +64,7 @@ public class MainPageController {
 
     private Parameters mainParameters;
     private AutoQCTask mainTask;
-
-    public DataEntry selectedDataPoint;
+    private Path databasePath;
 
 
     public void initialize() {
@@ -97,10 +96,14 @@ public class MainPageController {
     @FXML
     protected void submitButtonClick() {
 
+        if(databasePath == null){
+            showMissingDatabaseDialog();
+        }
+
         Parameters selectParams = new Parameters(instrumentBox, configurationBox, matrixBox, reportBox,
                 yAxisBox, leveyJenningsButton, movingRangeButton, cusummButton, cusumvButton, startDatePicker,
                 endDatePicker, annotationCheckBox, groupXAxisCheckBox, showExcludedPointsCheckBox,
-                showGuideSetCheckBox);
+                showGuideSetCheckBox, databasePath);
 
         if(mainParameters.diffReportSelection(selectParams)){
             mainParameters = selectParams;
@@ -127,7 +130,6 @@ public class MainPageController {
         valueTable.getItems().clear();
         valueTable.getColumns().addAll(mainTask.makeTable());
         valueTable.getItems().addAll(mainTask.getTableData());
-
     }
 
     @FXML
@@ -264,6 +266,56 @@ public class MainPageController {
 
             Stage stage = new Stage();
             stage.setTitle("QC Information");
+            stage.setResizable(false);
+
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.showAndWait();
+
+
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @FXML
+    protected void menuSetUpListener(){
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("SetUpPage.fxml"));
+            Parent root = fxmlLoader.load();
+            SetUpPageController controller = fxmlLoader.<SetUpPageController>getController();
+            controller.setDatabaseFolder(this.databasePath);
+
+            Stage stage = new Stage();
+            stage.setTitle("AutoQC Set Up...");
+            stage.setResizable(false);
+
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.showAndWait();
+
+            this.databasePath = controller.getDatabaseFolder();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML protected void showMissingDatabaseDialog() {
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ErrorPage.fxml"));
+            Parent root = fxmlLoader.load();
+            ErrorPageController controller = fxmlLoader.<ErrorPageController>getController();
+            controller.setErrorMessage("Database path not set properly.\n Please set in - Files > Set Up...");
+
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.setResizable(false);
 
             stage.setScene(new Scene(root));

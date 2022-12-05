@@ -276,6 +276,7 @@ public class MainPageController {
             if(controller.getChangedInclusion()){
 
                 this.mainTask.setDataEntryInclusion(selectedEntry);
+                this.mainTask.writeReport();
                 submitButtonClick();
             }
 

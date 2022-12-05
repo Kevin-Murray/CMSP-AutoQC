@@ -1,7 +1,5 @@
 package com.example.demo;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class DataEntry {
@@ -18,13 +16,8 @@ public class DataEntry {
 
         for(int i = 0; i < items.length; i++){
 
-            if(header[i].equals("Date")){
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-                LocalDateTime dateTime = LocalDateTime.parse(items[i], formatter);
-                entries.put(header[i], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(dateTime));
-            } else {
-                entries.put(header[i], items[i]);
-            }
+            entries.put(header[i], items[i]);
+
         }
     }
 
@@ -69,6 +62,21 @@ public class DataEntry {
             this.entries.put("Show", "Include");
         }
 
+    }
+
+    public List<String> getValues() {
+
+        List<String> values = new ArrayList<>();
+
+        Set<String> keys = this.getKeySet();
+
+        for(String key : keys) {
+
+            values.add(this.getValue(key));
+
+        }
+
+        return(values);
     }
 
 }

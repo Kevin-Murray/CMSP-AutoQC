@@ -8,19 +8,18 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.MapValueFactory;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.example.demo.PlotUtils.getLeveyData;
 import static com.example.demo.PlotUtils.getMovingData;
-import static com.example.demo.ReportFiles.getPath;
-//import static com.example.demo.ReportFilteringUtils.isShowable;
+import static com.example.demo.ReportFiles.getPath;;
 import static com.example.demo.ReportFilteringUtils.isShowable;
 import static com.example.demo.ReportFilteringUtils.isWithinDateRange;
 
@@ -32,14 +31,16 @@ public class AutoQCTask {
     private List<DataEntry> globalEntries;
     private List<DataEntry> workingEntries;
 
+    private Path databasePath;
+
 
     public AutoQCTask(Parameters parameters) {
 
         this.parameters = parameters;
 
         if(parameters.validSelection()){
-            Path path = getPath(this.parameters);
-            this.globalEntries = readReport(path);
+            this.databasePath = getPath(this.parameters);
+            this.globalEntries = readReport();
         }
     }
 
@@ -50,12 +51,12 @@ public class AutoQCTask {
         makePlotData();
     }
 
-    private List<DataEntry> readReport(Path path) {
+    private List<DataEntry> readReport() {
 
         List<DataEntry> dataEntries = new ArrayList<>();
 
         // Create an instance of BufferedReader
-        try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.US_ASCII)) {
+        try (BufferedReader br = Files.newBufferedReader(this.databasePath, StandardCharsets.US_ASCII)) {
 
             String line = br.readLine();
             line = line.replace("\"", "");
@@ -80,10 +81,29 @@ public class AutoQCTask {
         return dataEntries;
     }
 
-    private void writeReport() {
+    public void writeReport() {
+        try {
 
-        // TODO - do this.
+            BufferedWriter writer = Files.newBufferedWriter(this.databasePath);
 
+            List<String> header = new ArrayList<>(this.globalEntries.get(0).getKeySet());
+
+            writer.write(String.join(",", header));
+            writer.newLine();
+
+            // write all records
+            for (DataEntry entry: this.globalEntries) {
+
+                writer.write(String.join(",", entry.getValues()));
+                writer.newLine();
+            }
+
+            //close the writer
+            writer.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private List<DataEntry> getFilteredData() {

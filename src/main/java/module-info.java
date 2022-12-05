@@ -1,8 +1,8 @@
-module com.example.demo {
+module cmsp.autoqc.visualizer {
     requires javafx.controls;
     requires javafx.fxml;
 
 
-    opens com.example.demo to javafx.fxml;
-    exports com.example.demo;
+    opens cmsp.autoqc.visualizer to javafx.fxml;
+    exports cmsp.autoqc.visualizer;
 }

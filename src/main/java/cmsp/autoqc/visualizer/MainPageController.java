@@ -21,10 +21,13 @@ import javafx.stage.StageStyle;
 
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+
+import java.util.prefs.Preferences;
 
 public class MainPageController {
 
@@ -66,6 +69,8 @@ public class MainPageController {
     private AutoQCTask mainTask;
     private Path databasePath;
 
+    private Preferences prefs;
+
 
     public void initialize() {
 
@@ -85,6 +90,8 @@ public class MainPageController {
         endDatePicker.setValue(null);
         startDatePicker.setDisable(true);
         endDatePicker.setDisable(true);
+
+        getPreferences();
 
         instrumentBox.getItems().addAll(Arrays.asList(InstrumentTypes.values())); // Init instrument types
         dateRangeBox.getItems().addAll(Arrays.asList(DateRangeType.values()));
@@ -130,6 +137,8 @@ public class MainPageController {
         valueTable.getItems().clear();
         valueTable.getColumns().addAll(mainTask.makeTable());
         valueTable.getItems().addAll(mainTask.getTableData());
+
+        setPreferences();
     }
 
     @FXML
@@ -333,4 +342,75 @@ public class MainPageController {
         }
 
     }
+
+
+
+    public void setPreferences() {
+
+        // This will define a node in which the preferences can be stored
+        prefs = Preferences.userRoot().node(this.getClass().getName());
+
+        String ID1 = "Database Path";
+        String ID2 = "Instrument";
+        String ID3 = "Configuration";
+        String ID4 = "Matrix";
+        String ID5 = "Report";
+
+        prefs.put(ID1, this.mainParameters.databasePath.toString());
+        prefs.put(ID2, this.mainParameters.instrument);
+        prefs.put(ID3, this.mainParameters.configuration);
+        prefs.put(ID4, this.mainParameters.matrix);
+        prefs.put(ID5, this.mainParameters.report);
+    }
+
+    @FXML
+    protected void getPreferences() {
+
+        prefs = Preferences.userRoot().node(this.getClass().getName());
+
+        String ID1 = "Database Path";
+        String ID2 = "Instrument";
+        String ID3 = "Configuration";
+        String ID4 = "Matrix";
+        String ID5 = "Report";
+
+        String databasePath = prefs.get(ID1, null);
+        String instrument = prefs.get(ID2, null);
+        String config = prefs.get(ID3, null);
+        String matrix = prefs.get(ID4, null);
+        String report = prefs.get(ID5, null);
+
+        if(databasePath != null) {
+            this.databasePath = Paths.get(databasePath);
+        }
+
+        if(instrument != null) {
+
+            instrumentBox.setValue(instrument);
+
+            instrument = InstrumentTypes.getInstrument(instrument);
+
+            String[] configurationOptions = ConfigurationTypes.getConfiguration(instrument);
+            String[] matrixOptions = MatrixTypes.getMatrix(instrument);
+
+            // Add new options
+            configurationBox.getItems().addAll(Arrays.asList(configurationOptions));
+            matrixBox.getItems().addAll(Arrays.asList(matrixOptions ));
+        }
+
+        if(config != null) {
+            configurationBox.setValue(config);
+        }
+
+        if(matrix != null) {
+            matrixBox.setValue(matrix);
+            matrixBoxListener();
+        }
+
+        if(report != null) {
+            reportBox.setValue(report);
+            reportBoxListener();
+        }
+    }
+
 }

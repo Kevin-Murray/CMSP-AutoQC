@@ -5,8 +5,14 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Parameters {
 
@@ -105,6 +111,35 @@ public class Parameters {
                     this.matrix.equals(newParam.matrix));
         } else {
             return true;
+        }
+    }
+
+    public void writePreference(Path path){
+
+        try {
+
+            BufferedWriter writer = Files.newBufferedWriter(path);
+
+            writer.write(this.databasePath.toString());
+            writer.newLine();
+
+            writer.write(this.instrument);
+            writer.newLine();
+
+            writer.write(this.configuration);
+            writer.newLine();
+
+            writer.write(this.matrix);
+            writer.newLine();
+
+            writer.write(this.report);
+            writer.newLine();
+
+            //close the writer
+            writer.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 }

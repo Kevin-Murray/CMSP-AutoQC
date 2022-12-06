@@ -85,37 +85,37 @@
                         <ChoiceBox fx:id="instrumentBox" layoutX="222.0" layoutY="34.0" prefWidth="150.0" onAction="#instrumentBoxListener" />
                         <ChoiceBox fx:id="configurationBox" layoutX="222.0" layoutY="65.0" prefWidth="150.0" />
                         <ChoiceBox fx:id="matrixBox" layoutX="222.0" layoutY="96.0" prefWidth="150.0" onAction="#matrixBoxListener" />
-                        <Button fx:id="submitButton" disable="true" layoutX="226.0" layoutY="159.0" mnemonicParsing="false" onAction="#submitButtonClick" text="Submit">
+                        <Button fx:id="submitButton" disable="true" layoutX="14.0" layoutY="158.0" mnemonicParsing="false" onAction="#submitButtonClick" text="Submit">
                             <font>
                                 <Font size="14.0" />
                             </font>
                         </Button>
-                        <Button fx:id="resetButton" layoutX="301.0" layoutY="159.0" mnemonicParsing="false" text="Reset" onAction="#setResetButton">
+                        <Button fx:id="resetButton" layoutX="94.0" layoutY="158.0" prefWidth="62.6666" mnemonicParsing="false" text="Reset" onAction="#setResetButton">
                             <font>
                                 <Font size="14.0" />
                             </font>
                         </Button>
-                        <Label layoutX="15.0" layoutY="37.0" text="Instrument:">
+                        <Label layoutX="14.0" layoutY="34.0" text="Instrument:">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="14.0" layoutY="66.0" text="Configuration:">
+                        <Label layoutX="14.0" layoutY="65.0" text="Configuration:">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="16.0" layoutY="96.0" text="Matrix:">
+                        <Label layoutX="14.0" layoutY="96.0" text="Matrix:">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="11.0" layoutY="126.0" text="Report Type:">
+                        <Label layoutX="14.0" layoutY="126.0" text="Report Type:">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </Label>
-                        <ChoiceBox fx:id="reportBox" layoutX="222.0" layoutY="126.0" prefWidth="150.0" onAction="#reportBoxListener"/>
+                        <ChoiceBox fx:id="reportBox" layoutX="222.0" layoutY="127.0" prefWidth="150.0" onAction="#reportBoxListener"/>
                     </children>
                 </AnchorPane>
                 <AnchorPane prefHeight="195.0" prefWidth="691.0" SplitPane.resizableWithParent="false">

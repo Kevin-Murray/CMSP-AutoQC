@@ -1,4 +1,3 @@
 Manifest-Version: 1.0
-Implementation-Title: AutoQC
-Main-Class: cmsp.autoqc.visualizer.Launcher
+Class-Path: /libs/a.jar
 

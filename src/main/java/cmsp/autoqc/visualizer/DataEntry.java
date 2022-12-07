@@ -4,7 +4,7 @@ import java.util.*;
 
 public class DataEntry {
 
-    private LinkedHashMap<String, String> entries;
+    final private LinkedHashMap<String, String> entries;
 
     public DataEntry(String[] header, String[] entry){
 
@@ -45,11 +45,6 @@ public class DataEntry {
 
     public int size(){
         return this.entries.size();
-    }
-
-    public LinkedHashMap getEntry(){
-
-        return this.entries;
     }
 
     public void setExcluded(){

@@ -19,20 +19,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.ResourceBundle;
 
 import java.util.prefs.Preferences;
 
 public class MainPageController {
-
-    @FXML private URL location;
-    @FXML private ResourceBundle resources;
 
     @FXML public ChoiceBox instrumentBox;
     @FXML public ChoiceBox configurationBox;
@@ -254,7 +249,7 @@ public class MainPageController {
 
         String dateRange = dateRangeBox.getSelectionModel().getSelectedItem().toString();
 
-        if(dateRange != "Custom Date Range"){ return; }
+        if(!dateRange.equals("Custom Date Range")) { return; }
 
         if(startDatePicker.getValue() != null && endDatePicker.getValue() != null){
 
@@ -407,7 +402,7 @@ public class MainPageController {
         String matrix = prefs.get(ID4, null);
         String report = prefs.get(ID5, null);
         String dateRange = prefs.get(ID6, null);
-        Boolean showExcluded = prefs.getBoolean(ID7, true);
+        boolean showExcluded = prefs.getBoolean(ID7, true);
 
         if(databasePath != null) {
             this.databasePath = Paths.get(databasePath);

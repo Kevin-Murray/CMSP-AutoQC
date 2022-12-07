@@ -1,6 +1,5 @@
 package cmsp.autoqc.visualizer;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -13,7 +12,7 @@ public class ErrorPageController {
     @FXML private TextArea errorMessageField;
 
     @FXML
-    void closeButtonClicked(ActionEvent event) {
+    void closeButtonClicked() {
 
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();

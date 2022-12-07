@@ -1,16 +1,13 @@
 package cmsp.autoqc.visualizer;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.util.Objects;
 
 public class AutoQCMain extends Application {
 
@@ -21,10 +18,9 @@ public class AutoQCMain extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainPageGui.fxml"));
         Parent mainPage = fxmlLoader.load();
-        MainPageController controller = fxmlLoader.<MainPageController>getController();
 
         Scene main = new Scene(mainPage);
-        main.getStylesheets().add(getClass().getResource("styleGuide.css").toString());
+        main.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styleGuide.css")).toString());
 
         stage.setResizable(false);
         stage.setScene(main);

@@ -71,6 +71,8 @@ public class MainPageController {
 
     private Preferences prefs;
 
+    private Boolean reset = false;
+
 
     public void initialize() {
 
@@ -82,22 +84,31 @@ public class MainPageController {
         yAxis.setLabel("Value");
 
         instrumentBox.getItems().clear();
+        instrumentBox.valueProperty().setValue(null);
         configurationBox.getItems().clear();
         matrixBox.getItems().clear();
         reportBox.getItems().clear();
         dateRangeBox.getItems().clear();
+        dateRangeBox.valueProperty().setValue(null);
         startDatePicker.setValue(null);
         endDatePicker.setValue(null);
         startDatePicker.setDisable(true);
         endDatePicker.setDisable(true);
 
-        getPreferences();
+        if(!reset){
+            getPreferences();
+        } else {
+            dateRangeBox.setValue("All Dates");
+            reset = false;
+        }
 
         instrumentBox.getItems().addAll(Arrays.asList(InstrumentTypes.values())); // Init instrument types
         dateRangeBox.getItems().addAll(Arrays.asList(DateRangeType.values()));
-        dateRangeBox.setValue("All Dates");
+
         yAxisBox.getItems().addAll(Arrays.asList(yAxisScaleTypes.values()));
         yAxisBox.setValue("Linear");
+
+
     }
 
     @FXML
@@ -108,7 +119,7 @@ public class MainPageController {
         }
 
         Parameters selectParams = new Parameters(instrumentBox, configurationBox, matrixBox, reportBox,
-                yAxisBox, leveyJenningsButton, movingRangeButton, cusummButton, cusumvButton, startDatePicker,
+                yAxisBox, dateRangeBox, leveyJenningsButton, movingRangeButton, cusummButton, cusumvButton, startDatePicker,
                 endDatePicker, annotationCheckBox, groupXAxisCheckBox, showExcludedPointsCheckBox,
                 showGuideSetCheckBox, databasePath);
 
@@ -142,7 +153,10 @@ public class MainPageController {
     }
 
     @FXML
-    protected void setResetButton(){ initialize(); }
+    protected void setResetButton(){
+        this.reset = true;
+        initialize();
+    }
 
     @FXML
     protected void instrumentBoxListener() {
@@ -200,18 +214,18 @@ public class MainPageController {
 
         String dateRange = dateRangeBox.getSelectionModel().getSelectedItem().toString();
 
-        if(dateRange == "All Dates"){
+        if(dateRange.equals("All Dates")) {
 
             startDatePicker.setDisable(true);
             endDatePicker.setDisable(true);
 
-            startDatePicker.getEditor().clear();
-            endDatePicker.getEditor().clear();
+            startDatePicker.setValue(null);
+            endDatePicker.setValue(null);
 
-        } else if (dateRange == "Custom Date Range") {
+        } else if (dateRange.equals("Custom Date Range")) {
 
-            startDatePicker.getEditor().clear();
-            endDatePicker.getEditor().clear();
+            startDatePicker.setValue(null);
+            endDatePicker.setValue(null);
 
             startDatePicker.setDisable(false);
             endDatePicker.setDisable(false);
@@ -362,12 +376,16 @@ public class MainPageController {
         String ID3 = "Configuration";
         String ID4 = "Matrix";
         String ID5 = "Report";
+        String ID6 = "Date Range";
+        String ID7 = "Show Excluded";
 
         prefs.put(ID1, this.mainParameters.databasePath.toString());
         prefs.put(ID2, this.mainParameters.instrument);
         prefs.put(ID3, this.mainParameters.configuration);
         prefs.put(ID4, this.mainParameters.matrix);
         prefs.put(ID5, this.mainParameters.report);
+        prefs.put(ID6, this.mainParameters.dateRange);
+        prefs.putBoolean(ID7, this.mainParameters.showExcluded);
     }
 
     @FXML
@@ -380,12 +398,16 @@ public class MainPageController {
         String ID3 = "Configuration";
         String ID4 = "Matrix";
         String ID5 = "Report";
+        String ID6 = "Date Range";
+        String ID7 = "Show Excluded";
 
         String databasePath = prefs.get(ID1, null);
         String instrument = prefs.get(ID2, null);
         String config = prefs.get(ID3, null);
         String matrix = prefs.get(ID4, null);
         String report = prefs.get(ID5, null);
+        String dateRange = prefs.get(ID6, null);
+        Boolean showExcluded = prefs.getBoolean(ID7, true);
 
         if(databasePath != null) {
             this.databasePath = Paths.get(databasePath);
@@ -418,6 +440,46 @@ public class MainPageController {
             reportBox.setValue(report);
             reportBoxListener();
         }
+
+        if(dateRange != null) {
+
+            //TODO - Merge this with dateRangeListener function
+
+            dateRangeBox.setValue(dateRange);
+
+            if(dateRange.equals("All Dates")) {
+
+                startDatePicker.setDisable(true);
+                endDatePicker.setDisable(true);
+
+                startDatePicker.setValue(null);
+                endDatePicker.setValue(null);
+
+            } else if (dateRange.equals("Custom Date Range")) {
+
+                startDatePicker.setValue(null);
+                endDatePicker.setValue(null);
+
+                startDatePicker.setDisable(false);
+                endDatePicker.setDisable(false);
+
+            } else {
+
+                LocalDate endDate = LocalDate.now();
+                LocalDate startDate = endDate.minus(DateRangeType.getDateRange(dateRange), ChronoUnit.DAYS);
+
+                startDatePicker.setDisable(true);
+                endDatePicker.setDisable(true);
+
+                startDatePicker.setValue(null);
+                endDatePicker.setValue(null);
+
+                startDatePicker.setValue(startDate);
+                endDatePicker.setValue(endDate);
+            }
+        }
+
+        showExcludedPointsCheckBox.setSelected(showExcluded);
     }
 
 }

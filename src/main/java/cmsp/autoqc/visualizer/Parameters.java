@@ -21,6 +21,7 @@ public class Parameters {
     public String matrix;
     public String report;
     private String plotScale;
+    public String dateRange;
 
     public int plotType;
 
@@ -56,6 +57,7 @@ public class Parameters {
                       ChoiceBox matrixBox,
                       ChoiceBox reportBox,
                       ChoiceBox yAxisBox,
+                      ChoiceBox dateRangeBox,
                       RadioButton leveyJenningsButton,
                       RadioButton movingRangeButton,
                       RadioButton cusummButton,
@@ -68,12 +70,12 @@ public class Parameters {
                       CheckBox showGuideSetCheckBox,
                       Path databasePath) {
 
-
         this.instrument = instrumentBox.getSelectionModel().getSelectedItem().toString();
         this.configuration = configurationBox.getSelectionModel().getSelectedItem().toString();
         this.matrix = matrixBox.getSelectionModel().getSelectedItem().toString();
         this.report = reportBox.getSelectionModel().getSelectedItem().toString();
         this.plotScale = yAxisBox.getSelectionModel().getSelectedItem().toString();
+        this.dateRange = dateRangeBox.getSelectionModel().getSelectedItem().toString();
 
         if(leveyJenningsButton.isSelected()){
             this.plotType = 1;

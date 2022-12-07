@@ -289,6 +289,13 @@ public class MainPageController {
                 submitButtonClick();
             }
 
+            if(controller.getChangedComment()) {
+
+                this.mainTask.setDataEntryComment(selectedEntry, controller.getComment());
+                this.mainTask.writeReport();
+                submitButtonClick();
+            }
+
         } catch(Exception e) {
             e.printStackTrace();
         }

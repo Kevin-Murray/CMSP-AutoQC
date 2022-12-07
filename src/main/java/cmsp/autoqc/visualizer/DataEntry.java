@@ -64,6 +64,11 @@ public class DataEntry {
 
     }
 
+    public void setComment(String comment) {
+
+        this.entries.put("Comment", comment);
+    }
+
     public List<String> getValues() {
 
         List<String> values = new ArrayList<>();

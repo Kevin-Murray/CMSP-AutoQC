@@ -229,4 +229,21 @@ public class AutoQCTask {
 
         writeReport();
     }
+
+    public void setDataEntryComment(DataEntry selectedEntry, String comment) {
+
+        String date = selectedEntry.getDate();
+
+        for(DataEntry entry : this.globalEntries){
+
+            if(entry.getDate().equals(date)){
+
+                entry.setComment(comment);
+            }
+
+        }
+
+        writeReport();
+
+    }
 }

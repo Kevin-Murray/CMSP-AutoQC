@@ -49,6 +49,8 @@ public class SamplePageController {
         ObservableList<SampleEntry> sampleEntries = makeSampleTable(selectedEntry);
 
         sampleTable.getItems().addAll(sampleEntries);
+
+        this.commentBox.setText(this.selectedEntry.getValue("Comment"));
     }
 
     private ObservableList<SampleEntry> makeSampleTable(DataEntry entry){
@@ -71,6 +73,16 @@ public class SamplePageController {
         } else {
             return false;
         }
+    }
+
+    public boolean getChangedComment(){
+
+        return !(this.selectedEntry.getValue("Comment").equals(this.commentBox.getText()));
+
+    }
+
+    public String getComment() {
+        return this.commentBox.getText();
     }
 
 }

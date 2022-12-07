@@ -129,25 +129,14 @@ public class AutoQCTask {
 
         XYChart.Series series = new XYChart.Series();
 
-        ArrayList<Double> reportItem = new ArrayList<>();
-
         for (DataEntry entry : this.workingEntries) {
-
-            reportItem.add(entry.getItem(parameters.report));
 
             series.getData().add(new XYChart.Data(entry.getDate(), entry.getItem(parameters.report)));
         }
 
-       // this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
-
         switch (parameters.plotType) {
-            case 1:
-                this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
-                break;
-
-            case 2:
-                this.chart.addAll(getMovingData(this.workingEntries, parameters.report));
-                break;
+            case 1 -> this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
+            case 2 -> this.chart.addAll(getMovingData(this.workingEntries, parameters.report));
         }
     }
 

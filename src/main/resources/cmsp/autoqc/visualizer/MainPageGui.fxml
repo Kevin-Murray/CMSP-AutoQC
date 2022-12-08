@@ -77,9 +77,9 @@
             <items>
                 <AnchorPane prefHeight="214.0" prefWidth="294.0" SplitPane.resizableWithParent="false">
                     <children>
-                        <Label alignment="CENTER" minWidth="60.0" prefHeight="27.0" prefWidth="393.0" style="-fx-background-color: #ffcba4;" text="QC Report" textAlignment="CENTER" underline="true" wrapText="false">
+                        <Label alignment="CENTER" minWidth="60.0" prefHeight="27.0" prefWidth="393.0" style="-fx-background-color: #7A0019; -fx-border-color: #000000;" text="QC Report" textAlignment="CENTER" textFill="#ffcc33" wrapText="false">
                             <font>
-                                <Font size="18.0" fx:id="x1" />
+                                <Font name="Arial Black" size="18.0" fx:id="x1" />
                             </font>
                         </Label>
                         <ChoiceBox fx:id="instrumentBox" layoutX="222.0" layoutY="34.0" prefWidth="150.0" onAction="#instrumentBoxListener" />
@@ -120,9 +120,9 @@
                 </AnchorPane>
                 <AnchorPane prefHeight="195.0" prefWidth="691.0" SplitPane.resizableWithParent="false">
                     <children>
-                        <Label alignment="CENTER" layoutX="-12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="811.0" style="-fx-background-color: #ffcba4;" text="Report Context" textAlignment="CENTER" textFill="#101010" underline="true" wrapText="false">
+                        <Label alignment="CENTER" layoutX="-12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="811.0" style="-fx-background-color: #FFCC33; -fx-border-color: #000000;" text="Report Context" textAlignment="CENTER" textFill="#7a0019" wrapText="false">
                             <font>
-                                <Font size="18.0" fx:id="x11" />
+                                <Font name="Arial Black" size="18.0" fx:id="x11" />
                             </font>
                         </Label>
                         <RadioButton fx:id="leveyJenningsButton" layoutX="25.0" layoutY="65.0" mnemonicParsing="false" selected="true" text="Levey-Jennings">
@@ -138,21 +138,21 @@
                                 <Font size="16.0" />
                             </font>
                         </RadioButton>
-                        <RadioButton fx:id="cusummButton" layoutX="25.0" layoutY="125.0" mnemonicParsing="false" text="CUSUMm" toggleGroup="$plot">
+                        <RadioButton fx:id="cusummButton" disable="true" layoutX="25.0" layoutY="125.0" mnemonicParsing="false" text="CUSUMm" toggleGroup="$plot">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </RadioButton>
-                        <RadioButton fx:id="cusumvButton" layoutX="25.0" layoutY="155.0" mnemonicParsing="false" text="CUSUMv" toggleGroup="$plot">
+                        <RadioButton fx:id="cusumvButton" disable="true" layoutX="25.0" layoutY="155.0" mnemonicParsing="false" text="CUSUMv" toggleGroup="$plot">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </RadioButton>
-                        <ChoiceBox fx:id="dateRangeBox" layoutX="207.0" layoutY="69.0" prefHeight="25.0" prefWidth="235.0" onAction="#dataRangeListener"/>
-                        <ChoiceBox fx:id="yAxisBox" layoutX="536.0" layoutY="65.0" prefWidth="150.0" />
-                        <DatePicker fx:id="startDatePicker" disable="true" layoutX="207.0" layoutY="119.0" prefHeight="25.0" prefWidth="97.0" onAction="#datePickerListener"/>
-                        <DatePicker fx:id="endDatePicker" disable="true" layoutX="345.0" layoutY="119.0" prefHeight="25.0" prefWidth="97.0" onAction="#datePickerListener"/>
-                        <CheckBox fx:id="groupXAxisCheckBox" layoutX="537.0" layoutY="99.0" mnemonicParsing="false" text="Group X-Axis Values by Date">
+                        <ChoiceBox fx:id="dateRangeBox" layoutX="235.0" layoutY="65.0" prefHeight="25.0" prefWidth="235.0" onAction="#dataRangeListener"/>
+                        <ChoiceBox fx:id="yAxisBox" layoutX="537.0" layoutY="65.0" prefWidth="150.0" />
+                        <DatePicker fx:id="startDatePicker" disable="true" layoutX="235.0" layoutY="105.0" prefHeight="25.0" prefWidth="97.0" onAction="#datePickerListener"/>
+                        <DatePicker fx:id="endDatePicker" disable="true" layoutX="373.0" layoutY="105.0" prefHeight="25.0" prefWidth="97.0" onAction="#datePickerListener"/>
+                        <CheckBox fx:id="groupXAxisCheckBox" disable="true" layoutX="537.0" layoutY="95.0" mnemonicParsing="false" text="Group X-Axis Values by Date">
                             <font>
                                 <Font size="16.0" />
                             </font>
@@ -162,37 +162,37 @@
                                 <Font size="16.0" />
                             </font>
                         </CheckBox>
-                        <CheckBox fx:id="annotationCheckBox" layoutX="207.0" layoutY="159.0" mnemonicParsing="false" selected="true" text="Show Annotations">
+                        <CheckBox fx:id="annotationCheckBox" disable="true" layoutX="235.0" layoutY="145.0" mnemonicParsing="false" selected="true" text="Show Annotations">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </CheckBox>
-                        <CheckBox fx:id="showGuideSetCheckBox" layoutX="536.0" layoutY="155.0" mnemonicParsing="false" text="Show Guide Set">
+                        <CheckBox fx:id="showGuideSetCheckBox" disable="true" layoutX="537.0" layoutY="155.0" mnemonicParsing="false" text="Show Guide Set">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </CheckBox>
-                        <Label layoutX="701.0" layoutY="65.0" text="Y-Axis Scale">
+                        <Label layoutX="693.0" layoutY="65.0" text="Y-Axis Scale">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="56.0" layoutY="31.0" text="Plot Type:" underline="true">
+                        <Label layoutX="58.0" layoutY="31.0" text="Plot Type:" underline="true">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="276.0" layoutY="31.0" text="Plot Range:" underline="true">
+                        <Label layoutX="312.0" layoutY="31.0" text="Plot Range:" underline="true">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="588.0" layoutY="31.0" text="View Options:" underline="true">
+                        <Label layoutX="604.0" layoutY="31.0" text="View Options:" underline="true">
                             <font>
                                 <Font size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="317.0" layoutY="119.0" text="to">
+                        <Label layoutX="345.0" layoutY="105.0" text="to">
                             <font>
                                 <Font size="16.0" />
                             </font>
@@ -239,7 +239,7 @@
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
-                                        <TableView fx:id="annotationTable" editable="true" layoutX="310.0" layoutY="118.0" prefHeight="546.0" prefWidth="1200.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <TableView fx:id="annotationTable" disable="true" editable="true" layoutX="310.0" layoutY="118.0" prefHeight="546.0" prefWidth="1200.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                                 <TableColumn prefWidth="75.0" text="Date" />
                                                 <TableColumn prefWidth="75.0" text="Annotation" />

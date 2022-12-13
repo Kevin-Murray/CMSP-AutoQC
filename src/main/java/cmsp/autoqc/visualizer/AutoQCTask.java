@@ -64,8 +64,15 @@ public class AutoQCTask {
 
             while (line != null) {
 
-                line = line.replace("\"", "");
-                String[] attributes = line.split(",");
+                //line = line.replace("\"", "");
+                //String[] attributes = line.split(",");
+
+                // TODO - evaluate a more efficient way to handle commas in comment field.
+                String[] attributes = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                for(int i = 0; i < attributes.length; i++) {
+                    attributes[i] = attributes[i].replace("\"", "");
+                }
+
                 DataEntry entry = new DataEntry(header, attributes);
 
                 dataEntries.add(entry);
@@ -92,7 +99,7 @@ public class AutoQCTask {
             // write all records
             for (DataEntry entry: this.globalEntries) {
 
-                writer.write(String.join(",", entry.getValues()));
+                writer.write(String.join(",", entry.writeValues()));
                 writer.newLine();
             }
 

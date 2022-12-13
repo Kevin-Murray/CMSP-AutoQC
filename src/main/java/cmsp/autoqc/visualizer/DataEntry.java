@@ -79,4 +79,19 @@ public class DataEntry {
         return(values);
     }
 
+    public List<String> writeValues() {
+
+        List<String> values = new ArrayList<>();
+
+        Set<String> keys = this.getKeySet();
+
+        for(String key : keys) {
+
+            values.add("\"" + this.getValue(key) + "\"");
+
+        }
+
+        return(values);
+    };
+
 }

@@ -15,6 +15,7 @@ public class ReportFiles {
         reportMap.put(hashCode("Thermo Eclipse", "Non-FAIMS", "HeLa Protein Digest"), Paths.get("CMSP_Eclipse-nonFAIMS_HeLa_QC-Report.csv"));
 
         reportMap.put(hashCode("Thermo Fusion", "N/A", "iRT Standard Mix"), Paths.get("CMSP_Fusion_iRT_QC-Report.csv"));
+        reportMap.put(hashCode("Thermo Eclipse", "FAIMS", "iRT Standard Mix"), Paths.get("CMSP_Eclipse_iRT_QC-Report.csv"));
     }
 
     private static int hashCode(String instrument, String config, String matrix){

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PlotUtils {
 
-    public static ObservableList<XYChart.Series> getLeveyData(List<DataEntry> reportItems, String reportType){
+    public static ObservableList<XYChart.Series> getLeveyData(List<DataEntry> reportItems, String reportType, String plotScale){
 
         ObservableList<XYChart.Series> plotData = FXCollections.observableArrayList();
 
@@ -19,11 +19,12 @@ public class PlotUtils {
 
         for(DataEntry entry : reportItems){
             dateList.add(entry.getDate());
-            itemList.add(entry.getItem(reportType));
-            mainSeries.getData().add(new XYChart.Data(entry.getDate(), entry.getItem(reportType)));
+
+            itemList.add(entry.getItem(reportType, plotScale));
+            mainSeries.getData().add(new XYChart.Data(entry.getDate(), entry.getItem(reportType, plotScale)));
         }
 
-        Double mean = MathUtils.calculateAverage(itemList);
+        double mean = MathUtils.calculateAverage(itemList);
         Double standardDev = MathUtils.calculateStandardDeviation(itemList);
 
         XYChart.Series meanSeries = new XYChart.Series();

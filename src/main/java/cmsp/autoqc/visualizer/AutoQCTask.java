@@ -142,7 +142,7 @@ public class AutoQCTask {
         }
 
         switch (parameters.plotType) {
-            case 1 -> this.chart.addAll(getLeveyData(this.workingEntries, parameters.report));
+            case 1 -> this.chart.addAll(getLeveyData(this.workingEntries, parameters.report, parameters.plotScale));
             case 2 -> this.chart.addAll(getMovingData(this.workingEntries, parameters.report));
         }
     }

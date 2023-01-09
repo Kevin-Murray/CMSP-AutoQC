@@ -31,4 +31,10 @@ public class MathUtils {
                 .average()
                 .orElse(0.0);
     }
+
+    public static Double log2(Double N) {
+
+        return (Math.log(N) / Math.log(2));
+    }
+
 }

@@ -14,7 +14,7 @@ public class Parameters {
     public String configuration;
     public String matrix;
     public String report;
-    private String plotScale;
+    public String plotScale;
     public String dateRange;
 
     public int plotType;

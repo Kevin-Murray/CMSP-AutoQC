@@ -3,9 +3,9 @@ package cmsp.autoqc.visualizer;
 public enum yAxisScaleTypes {
 
     LINEAR("Linear"),
-    LOG2("Log2"),
-    PERCENT("Percent of Mean"),
-    DEVIATIONS("Standard Deviations");
+    LOG2("Log2");
+    //PERCENT("Percent of Mean"),
+    //DEVIATIONS("Standard Deviations");
 
     private final String label;
 

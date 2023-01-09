@@ -2,7 +2,7 @@ package cmsp.autoqc.visualizer;
 
 public enum MatrixTypes {
 
-    VELOS(new String[] {"HeLa Protein Digest", "iRT Standard Mix"}),
+    VELOS(new String[] {"HeLa Protein Digest", "BSA Digest - DDA"}),
     FUSION(new String[] {"HeLa Protein Digest", "iRT Standard Mix"}),
     ECLIPSE(new String[] {"HeLa Protein Digest", "iRT Standard Mix"});
 

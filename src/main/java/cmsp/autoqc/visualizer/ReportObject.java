@@ -20,6 +20,27 @@ public class ReportObject {
                         "Mass Error (PPM) - SSAAPPPPPR", "Mass Error (PPM) - TASEFDSAIAQDK",
                         "RT - ELGQSGVDTYLQTK", "RT - GILFVGSGVSGGEEGAR", "RT - HVLTSIGEK",
                         "RT - SSAAPPPPPR", "RT - TASEFDSAIAQDK"});
+        reportMap.put("BSA Digest - DDA",
+                new String[] {"Area - HADICTLPDTEK",
+                        "Area - HLVDEPQNLIK",
+                        "Area - LVNELTEFAK",
+                        "Area - TCVADESHAGCEK",
+                        "Area - YICDNQDTISSK",
+                        "FWHM - HADICTLPDTEK",
+                        "FWHM - HLVDEPQNLIK",
+                        "FWHM - LVNELTEFAK",
+                        "FWHM - TCVADESHAGCEK",
+                        "FWHM - YICDNQDTISSK",
+                        "Mass Error (PPM) - HADICTLPDTEK",
+                        "Mass Error (PPM) - HLVDEPQNLIK",
+                        "Mass Error (PPM) - LVNELTEFAK",
+                        "Mass Error (PPM) - TCVADESHAGCEK",
+                        "Mass Error (PPM) - YICDNQDTISSK",
+                        "RT - HADICTLPDTEK",
+                        "RT - HLVDEPQNLIK",
+                        "RT - LVNELTEFAK",
+                        "RT - TCVADESHAGCEK",
+                        "RT - YICDNQDTISSK"});
     }
 
     ReportObject(String matrix){

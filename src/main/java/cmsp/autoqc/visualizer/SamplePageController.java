@@ -50,7 +50,7 @@ public class SamplePageController {
 
         sampleTable.getItems().addAll(sampleEntries);
 
-        this.commentBox.setText(this.selectedEntry.getValue("Comment"));
+        this.commentBox.setText(this.selectedEntry.getComment());
     }
 
     private ObservableList<SampleEntry> makeSampleTable(DataEntry entry){

@@ -2,6 +2,8 @@ package cmsp.autoqc.visualizer;
 
 import java.util.*;
 
+import static cmsp.autoqc.visualizer.MathUtils.log2;
+
 public class DataEntry {
 
     final private LinkedHashMap<String, String> entries;
@@ -34,6 +36,19 @@ public class DataEntry {
         return Double.parseDouble(entries.get(key));
     }
 
+    public Double getItem(String key, String scale){
+
+        Double value = null;
+
+        switch (scale) {
+            case "Linear" -> value = this.getItem(key);
+            case "Log2" -> value = log2(this.getItem(key));
+        }
+
+
+        return value;
+    }
+
     public String getValue(String key){
         return entries.get(key);
     }
@@ -61,7 +76,11 @@ public class DataEntry {
 
     public void setComment(String comment) {
 
-        this.entries.put("Comment", comment);
+        this.entries.put("Comment", comment.replace("\n", "\\n"));
+    }
+
+    public String getComment() {
+        return(this.entries.get("Comment").replace("\\n", "\n"));
     }
 
     public List<String> getValues() {

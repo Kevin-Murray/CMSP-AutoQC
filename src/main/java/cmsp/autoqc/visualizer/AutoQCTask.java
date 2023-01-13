@@ -242,4 +242,8 @@ public class AutoQCTask {
         writeReport();
 
     }
+
+    public int getWorkingEntrySize(){
+        return this.workingEntries.size();
+    }
 }

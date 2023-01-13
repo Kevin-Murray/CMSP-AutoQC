@@ -111,7 +111,10 @@ public class MainPageController {
 
         if(databasePath == null){
             showMissingDatabaseDialog();
+            return;
         }
+
+        lineChart.getData().clear();
 
         Parameters selectParams = new Parameters(instrumentBox, configurationBox, matrixBox, reportBox,
                 yAxisBox, dateRangeBox, leveyJenningsButton, movingRangeButton, cusummButton, cusumvButton, startDatePicker,
@@ -128,7 +131,12 @@ public class MainPageController {
 
         mainTask.run();
 
-        lineChart.getData().clear();
+        // No entries in date range
+        if(mainTask.getWorkingEntrySize() == 0){
+            showNoDataInRangeDialog();
+            return;
+        }
+
 
         ObservableList<XYChart.Series> plotData = mainTask.getPlotData();
         lineChart.getData().addAll(plotData);
@@ -342,7 +350,30 @@ public class MainPageController {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ErrorPage.fxml"));
             Parent root = fxmlLoader.load();
             ErrorPageController controller = fxmlLoader.<ErrorPageController>getController();
-            controller.setErrorMessage("Database path not set properly.\n Please set in - Files > Set Up...");
+            controller.setErrorMessage("Database path not set properly.\nPlease set in - Files > Set Up...");
+
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setResizable(false);
+
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.showAndWait();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @FXML protected void showNoDataInRangeDialog() {
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ErrorPage.fxml"));
+            Parent root = fxmlLoader.load();
+            ErrorPageController controller = fxmlLoader.<ErrorPageController>getController();
+            controller.setErrorMessage("No QC entries in date range.\nPlease adjust the range and try again.");
 
             Stage stage = new Stage();
             stage.initStyle(StageStyle.UNDECORATED);

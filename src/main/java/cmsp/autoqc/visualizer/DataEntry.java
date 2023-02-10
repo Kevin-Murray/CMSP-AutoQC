@@ -111,6 +111,6 @@ public class DataEntry {
         }
 
         return(values);
-    };
+    }
 
 }

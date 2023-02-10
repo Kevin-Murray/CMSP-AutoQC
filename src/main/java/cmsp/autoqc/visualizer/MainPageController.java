@@ -1,6 +1,7 @@
 package cmsp.autoqc.visualizer;
 
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -11,6 +12,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -67,7 +69,6 @@ public class MainPageController {
     private Preferences prefs;
 
     private Boolean reset = false;
-
 
     public void initialize() {
 
@@ -137,7 +138,6 @@ public class MainPageController {
             return;
         }
 
-
         ObservableList<XYChart.Series> plotData = mainTask.getPlotData();
         lineChart.getData().addAll(plotData);
 
@@ -151,6 +151,14 @@ public class MainPageController {
         valueTable.getItems().clear();
         valueTable.getColumns().addAll(mainTask.makeTable());
         valueTable.getItems().addAll(mainTask.getTableData());
+
+        annotationTable.getColumns().clear();
+        annotationTable.getItems().clear();
+        annotationTable.getColumns().addAll(mainTask.makeAnnotationTable());
+
+        if(mainTask.getWorkingAnnotationSize() != 0){
+            annotationTable.getItems().addAll(mainTask.getAnnotationData());
+        }
 
         setPreferences();
     }
@@ -390,8 +398,6 @@ public class MainPageController {
 
     }
 
-
-
     public void setPreferences() {
 
         // This will define a node in which the preferences can be stored
@@ -506,6 +512,123 @@ public class MainPageController {
         }
 
         showExcludedPointsCheckBox.setSelected(showExcluded);
+    }
+
+    @FXML
+    protected void annotationClickListener(MouseEvent event){
+
+        int index = annotationTable.getSelectionModel().selectedIndexProperty().get();
+
+        if(event.getButton().toString() == "SECONDARY"){
+
+            ContextMenu contextMenu = new ContextMenu();
+            SeparatorMenuItem sep1 = new SeparatorMenuItem();
+            SeparatorMenuItem sep2 = new SeparatorMenuItem();
+
+            MenuItem menuItem1 = new MenuItem("Export Annotation Table");
+            MenuItem menuItem2 = new MenuItem("Add Annotation");
+            MenuItem menuItem3 = new MenuItem("Edit Annotation");
+            MenuItem menuItem4 = new MenuItem("Delete Annotation");
+
+            Annotation annotation = null;
+
+            if(annotationTable.getSelectionModel().isEmpty()){
+                menuItem3.setDisable(true);
+                menuItem4.setDisable(true);
+            } else {
+                annotation = mainTask.getSelectedAnnotation(index);
+            }
+
+            Annotation selectedAnnotation = annotation;
+
+            contextMenu.getItems().add(menuItem1);
+            contextMenu.getItems().add(sep1);
+            contextMenu.getItems().add(menuItem2);
+            contextMenu.getItems().add(menuItem3);
+            contextMenu.getItems().add(sep2);
+            contextMenu.getItems().add(menuItem4);
+
+
+            menuItem1.setOnAction((ActionEvent e) -> {
+                System.out.println("Action 1");
+            });
+            menuItem2.setOnAction((ActionEvent e) -> {
+                addAnnotation();
+            });
+            menuItem3.setOnAction((ActionEvent e) -> {
+                editAnnotation(selectedAnnotation);
+            });
+            menuItem4.setOnAction((ActionEvent e) -> {
+                deleteAnnotation(selectedAnnotation);
+            });
+
+            annotationTable.setContextMenu(contextMenu);
+        }
+    }
+
+    @FXML
+    private void addAnnotation(){
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("AnnotationPage.fxml"));
+            Parent root = fxmlLoader.load();
+            AnnotationPageController controller = fxmlLoader.<AnnotationPageController>getController();
+
+            Stage stage = new Stage();
+            stage.setResizable(false);
+            stage.setTitle("Add Annotation");
+
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            mainTask.addAnnotation(controller.getAnnotation());
+            mainTask.sortAnnotations();
+            mainTask.writeAnnotationReport();
+
+            submitButtonClick();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    @FXML
+    private void editAnnotation(Annotation annotation){
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("AnnotationPage.fxml"));
+            Parent root = fxmlLoader.load();
+            AnnotationPageController controller = fxmlLoader.<AnnotationPageController>getController();
+            controller.setAnnotation(annotation);
+
+            Stage stage = new Stage();
+            stage.setResizable(false);
+            stage.setTitle("Edit Annotation");
+
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            mainTask.editAnnotation(annotation, controller.getAnnotation());
+            mainTask.sortAnnotations();
+            mainTask.writeAnnotationReport();
+
+            submitButtonClick();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @FXML
+    private void deleteAnnotation(Annotation annotation){
+
+        mainTask.deleteAnnotation(annotation);
+        mainTask.writeAnnotationReport();
+
+        submitButtonClick();
     }
 
 }

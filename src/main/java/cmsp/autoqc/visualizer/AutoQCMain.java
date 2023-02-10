@@ -14,7 +14,7 @@ public class AutoQCMain extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        stage.setTitle("CMSP - QuickQC Visualizer (v. 1.0.3)");
+        stage.setTitle("CMSP - QuickQC Visualizer (v. 1.1.0)");
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainPageGui.fxml"));
         Parent mainPage = fxmlLoader.load();

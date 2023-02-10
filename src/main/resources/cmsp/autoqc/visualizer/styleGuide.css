@@ -20,3 +20,7 @@
 .default-color5.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
 .default-color6.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
 .default-color7.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+
+#annotationTable .table-column {
+  -fx-alignment: CENTER;
+}

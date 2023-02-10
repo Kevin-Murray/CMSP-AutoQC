@@ -1,6 +1,5 @@
 package cmsp.autoqc.visualizer;
 
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
@@ -19,7 +18,8 @@ import java.util.*;
 
 import static cmsp.autoqc.visualizer.PlotUtils.getLeveyData;
 import static cmsp.autoqc.visualizer.PlotUtils.getMovingData;
-import static cmsp.autoqc.visualizer.ReportFiles.getPath;;
+import static cmsp.autoqc.visualizer.ReportFiles.getAnnotationPath;
+import static cmsp.autoqc.visualizer.ReportFiles.getPath;
 
 
 public class AutoQCTask {
@@ -28,8 +28,11 @@ public class AutoQCTask {
     private ObservableList<XYChart.Series> chart;
     private List<DataEntry> globalEntries;
     private List<DataEntry> workingEntries;
+    private List<Annotation> annotationDatabase;
+    private List<Annotation> workingAnnotations;
 
     private Path databasePath;
+    private Path annotationPath;
 
 
     public AutoQCTask(Parameters parameters) {
@@ -38,13 +41,16 @@ public class AutoQCTask {
 
         if(parameters.validSelection()){
             this.databasePath = getPath(this.parameters);
+            this.annotationPath = getAnnotationPath(this.parameters);
             this.globalEntries = readReport();
+            this.annotationDatabase = readAnnotation();
         }
     }
 
     public void run() {
 
         this.workingEntries = getFilteredData();
+        this.workingAnnotations = getFilteredAnnotation();
 
         makePlotData();
     }
@@ -86,6 +92,41 @@ public class AutoQCTask {
         return dataEntries;
     }
 
+    private ObservableList<Annotation> readAnnotation() {
+
+        ObservableList<Annotation> annotationList = FXCollections.observableArrayList();
+
+        // Create an instance of BufferedReader
+        try (BufferedReader br = Files.newBufferedReader(this.annotationPath, StandardCharsets.US_ASCII)) {
+
+            String line = br.readLine();
+            line = line.replace("\"", "");
+            String[] header = line.split(",");
+
+            line = br.readLine();
+
+            while (line != null) {
+
+                // TODO - evaluate a more efficient way to handle commas in comment field.
+                String[] attributes = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                for(int i = 0; i < attributes.length; i++) {
+                    attributes[i] = attributes[i].replace("\"", "");
+                }
+
+                Annotation annotation = new Annotation(attributes[0], attributes[1], attributes[2],
+                        attributes[3], attributes[4], attributes[5]);
+
+                annotationList.add(annotation);
+
+                line = br.readLine();
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        return annotationList;
+    }
+
     public void writeReport() {
         try {
 
@@ -111,6 +152,31 @@ public class AutoQCTask {
         }
     }
 
+    public void writeAnnotationReport() {
+        try {
+
+            BufferedWriter writer = Files.newBufferedWriter(this.annotationPath);
+
+            List<String> header = new ArrayList<>(this.annotationDatabase.get(0).getKeySet());
+
+            writer.write(String.join(",", header));
+            writer.newLine();
+
+            // write all records
+            for (Annotation annotation: this.annotationDatabase) {
+
+                writer.write(String.join(",", annotation.writeValues()));
+                writer.newLine();
+            }
+
+            //close the writer
+            writer.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private List<DataEntry> getFilteredData() {
 
         List<DataEntry> newList = new ArrayList<>();
@@ -121,9 +187,28 @@ public class AutoQCTask {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDate dateTime = LocalDate.parse(date, formatter);
 
-            if (ReportFilteringUtils.isWithinDateRange(dateTime, parameters.startDate, parameters.endDate) &
+            if (ReportFilteringUtils.isWithinDateRange(dateTime, parameters.startDate, parameters.endDate) &&
                     ReportFilteringUtils.isShowable(parameters.showExcluded, entry.excludeData())) {
                 newList.add(entry);
+            }
+        }
+
+        return newList;
+    }
+
+    private List<Annotation> getFilteredAnnotation() {
+
+        List<Annotation> newList = new ArrayList<>();
+
+        for (Annotation annotation : this.annotationDatabase) {
+
+            String date = annotation.getDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDate dateTime = LocalDate.parse(date, formatter);
+
+            if (ReportFilteringUtils.isWithinDateRange(dateTime, parameters.startDate, parameters.endDate) &&
+                    ReportFilteringUtils.filteredAnnotation(parameters, annotation)) {
+                newList.add(annotation);
             }
         }
 
@@ -192,6 +277,51 @@ public class AutoQCTask {
         return alldata;
     }
 
+    public ArrayList<TableColumn> makeAnnotationTable() {
+
+        ArrayList<TableColumn> columns = new ArrayList<>();
+
+        Annotation annotation = this.annotationDatabase.get(0);
+        int col = annotation.size();
+        String[] keys = annotation.getKeySet().toArray(new String[0]);
+
+        for (int i = 0; i < col; i++) {
+            String name = keys[i];
+            TableColumn<Map<Integer, String>, String> tableColumn = new TableColumn<>(name);
+            tableColumn.setCellValueFactory(new MapValueFactory(i));
+
+            if(name == "Comment"){
+                tableColumn.setMinWidth(400);
+            }
+
+            columns.add(tableColumn);
+        }
+
+        return columns;
+    }
+
+    public ObservableList<Map<Integer, String>> getAnnotationData() {
+
+        ObservableList<Map<Integer, String>> alldata = FXCollections.observableArrayList();
+
+        Annotation annotation = this.workingAnnotations.get(0);
+        int col = annotation.size();
+        String[] keys = annotation.getKeySet().toArray(new String[0]);
+
+        for (Annotation entry : this.workingAnnotations) {
+
+            Map<Integer, String> dataRow = new HashMap<>();
+            for (int i = 0; i < col; i++) {
+
+                dataRow.put(i, entry.getValue(keys[i]));
+            }
+
+            alldata.add(dataRow);
+        }
+
+        return alldata;
+    }
+
     public void updateParams(Parameters newParams){
         this.parameters = newParams;
     }
@@ -246,4 +376,40 @@ public class AutoQCTask {
     public int getWorkingEntrySize(){
         return this.workingEntries.size();
     }
+
+    public int getWorkingAnnotationSize(){ return this.workingAnnotations.size();}
+
+    public List<Annotation> getAnnotationDatabase(){ return this.annotationDatabase;}
+
+    public void addAnnotation(Annotation annotation){
+
+        this.annotationDatabase.add(annotation);
+
+    }
+
+    public Annotation getSelectedAnnotation(int index){
+        return this.workingAnnotations.get(index);
+    }
+
+    public void editAnnotation(Annotation oldAnnotation, Annotation newAnnotation){
+
+        for(int i = 0; i < annotationDatabase.size(); i++){
+
+            if(annotationDatabase.get(i).equals(oldAnnotation)){
+                annotationDatabase.set(i, newAnnotation);
+                break;
+            }
+        }
+    }
+
+    public void sortAnnotations(){
+
+        Collections.sort(this.annotationDatabase, Comparator.comparing(Annotation::getDate));
+
+    }
+
+    public void deleteAnnotation(Annotation annotation){
+        this.annotationDatabase.remove(annotation);
+    }
+
 }

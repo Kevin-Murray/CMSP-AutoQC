@@ -4,7 +4,8 @@ public enum MatrixTypes {
 
     VELOS(new String[] {"HeLa Protein Digest", "BSA Digest - DDA"}),
     FUSION(new String[] {"HeLa Protein Digest", "iRT Standard Mix"}),
-    ECLIPSE(new String[] {"HeLa Protein Digest", "iRT Standard Mix"});
+    ECLIPSE(new String[] {"HeLa Protein Digest", "iRT Standard Mix"}),
+    A6495C(new String[] {"iRT Mix - MRM"});
 
     private final String[] label;
 

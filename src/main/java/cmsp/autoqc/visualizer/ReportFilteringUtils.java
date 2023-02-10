@@ -18,4 +18,12 @@ public class ReportFilteringUtils {
         return !showExcluded ? !exclude : showExcluded;
     }
 
+    public static boolean filteredAnnotation(Parameters parameters, Annotation annotation){
+
+        return (parameters.instrument.equals(annotation.getInstrument()) &&
+                (parameters.configuration.equals(annotation.getConfig()) || annotation.getConfig().equals("All")) &&
+                (parameters.matrix.equals(annotation.getMatrix()) || annotation.getMatrix().equals("All")));
+
+    }
+
 }

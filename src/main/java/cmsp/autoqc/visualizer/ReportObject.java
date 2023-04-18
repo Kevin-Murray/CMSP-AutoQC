@@ -79,6 +79,33 @@ public class ReportObject {
                         "Pressure - Max",
                         "Pressure - Min",
                         "Pressure - Avg"});
+        reportMap.put("Retention Index (n-Alkane)",
+                new String[] {"Area - Decane",
+                        "Area - Dodecane",
+                        "Area - Pentadecane",
+                        "Area - Nonadecane",
+                        "Area - Docosane",
+                        "FWHM - Decane",
+                        "FWHM - Dodecane",
+                        "FWHM - Pentadecane",
+                        "FWHM - Nonadecane",
+                        "FWHM - Docosane",
+                        "Height - Decane",
+                        "Height - Dodecane",
+                        "Height - Pentadecane",
+                        "Height - Nonadecane",
+                        "Height - Docosane",
+                        "RT - Decane",
+                        "RT - Dodecane",
+                        "RT - Pentadecane",
+                        "RT - Nonadecane",
+                        "RT - Docosane",
+                        "Mass Error (PPM) - Decane",
+                        "Mass Error (PPM) - Dodecane",
+                        "Mass Error (PPM) - Pentadecane",
+                        "Mass Error (PPM) - Nonadecane",
+                        "Mass Error (PPM) - Docosane",
+                        });
     }
 
     ReportObject(String matrix){

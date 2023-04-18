@@ -5,7 +5,8 @@ public enum InstrumentTypes {
     VELOS("Thermo Velos"),
     FUSION("Thermo Fusion"),
     ECLIPSE("Thermo Eclipse"),
-    A6495C("Agilent 6495C");
+    A6495C("Agilent 6495C"),
+    A7200("Agilent 7200 GC-QTOF");
 
     private final String label;
 

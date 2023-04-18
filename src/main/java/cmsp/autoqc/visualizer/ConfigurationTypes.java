@@ -5,7 +5,8 @@ public enum ConfigurationTypes {
     VELOS(new String[] {"N/A"}),
     FUSION(new String[] {"N/A"}),
     ECLIPSE(new String[] {"FAIMS", "Non-FAIMS"}),
-    A6495C(new String[] {"C18 Column"});
+    A6495C(new String[] {"C18 Column"}),
+    A7200(new String[] {"HP-5 MS UI"});
 
     private final String[] label;
 

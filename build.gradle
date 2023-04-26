@@ -6,7 +6,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-group 'cmsp.autoqc'
+group 'cmsp.quickqc'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -25,9 +25,9 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-    mainModule = 'cmsp.autoqc.visualizer'
-    mainClass = 'cmsp.autoqc.visualizer.Launcher'
-    applicationName = "AutoQC"
+    mainModule = 'cmsp.quickqc.visualizer'
+    mainClass = 'cmsp.quickqc.visualizer.Launcher'
+    applicationName = "QuickQC"
 }
 
 javafx {
@@ -53,7 +53,7 @@ jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'cmsp.autoqc.visualizer'
+        name = 'cmsp.quickqc.visualizer'
     }
 }
 

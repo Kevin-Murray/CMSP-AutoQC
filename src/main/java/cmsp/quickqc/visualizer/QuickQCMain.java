@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Objects;
 
-public class AutoQCMain extends Application {
+public class QuickQCMain extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {

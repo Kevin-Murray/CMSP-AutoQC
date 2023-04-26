@@ -27,7 +27,7 @@ import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getAnnotation
 import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getPath;
 
 
-public class AutoQCTask {
+public class QuickQCTask {
 
     private Parameters parameters;
     private ObservableList<XYChart.Series> chart;
@@ -40,7 +40,7 @@ public class AutoQCTask {
     private Path annotationPath;
 
 
-    public AutoQCTask(Parameters parameters) {
+    public QuickQCTask(Parameters parameters) {
 
         this.parameters = parameters;
 

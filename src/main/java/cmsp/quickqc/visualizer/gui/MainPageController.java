@@ -70,7 +70,7 @@ public class MainPageController {
     @FXML public TableView annotationTable;
 
     private Parameters mainParameters;
-    private AutoQCTask mainTask;
+    private QuickQCTask mainTask;
     private Path databasePath;
 
     private Preferences prefs;
@@ -80,7 +80,7 @@ public class MainPageController {
     public void initialize() {
 
         mainParameters = new Parameters();
-        mainTask = new AutoQCTask(mainParameters);
+        mainTask = new QuickQCTask(mainParameters);
 
         lineChart.getData().clear();
         lineChart.setLegendVisible(false);
@@ -131,7 +131,7 @@ public class MainPageController {
 
         if(mainParameters.diffReportSelection(selectParams)){
             mainParameters = selectParams;
-            mainTask = new AutoQCTask(mainParameters);
+            mainTask = new QuickQCTask(mainParameters);
         } else {
             mainParameters = selectParams;
             mainTask.updateParams(mainParameters);

@@ -1,5 +1,8 @@
 package cmsp.quickqc.visualizer;
 
+import cmsp.quickqc.visualizer.datamodel.DataEntry;
+import cmsp.quickqc.visualizer.utils.ReportFilteringUtils;
+import cmsp.quickqc.visualizer.utils.annotations.Annotation;
 import cmsp.quickqc.visualizer.parameters.*;
 
 import javafx.collections.FXCollections;
@@ -18,8 +21,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static cmsp.quickqc.visualizer.PlotUtils.getLeveyData;
-import static cmsp.quickqc.visualizer.PlotUtils.getMovingData;
+import static cmsp.quickqc.visualizer.utils.plotUtils.PlotUtils.getLeveyData;
+import static cmsp.quickqc.visualizer.utils.plotUtils.PlotUtils.getMovingData;
 import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getAnnotationPath;
 import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getPath;
 

@@ -1,8 +1,8 @@
-package cmsp.quickqc.visualizer;
+package cmsp.quickqc.visualizer.datamodel;
 
 import java.util.*;
 
-import static cmsp.quickqc.visualizer.MathUtils.log2;
+import static cmsp.quickqc.visualizer.utils.MathUtils.log2;
 
 public class DataEntry {
 

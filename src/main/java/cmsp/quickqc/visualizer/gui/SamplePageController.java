@@ -1,7 +1,7 @@
 package cmsp.quickqc.visualizer.gui;
 
-import cmsp.quickqc.visualizer.DataEntry;
-import cmsp.quickqc.visualizer.SampleEntry;
+import cmsp.quickqc.visualizer.datamodel.DataEntry;
+import cmsp.quickqc.visualizer.datamodel.SampleEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

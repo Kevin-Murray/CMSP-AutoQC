@@ -1,9 +1,12 @@
 package cmsp.quickqc.visualizer.gui;
 
 import cmsp.quickqc.visualizer.*;
+import cmsp.quickqc.visualizer.datamodel.DataEntry;
 import cmsp.quickqc.visualizer.parameters.*;
 
 import cmsp.quickqc.visualizer.parameters.types.*;
+import cmsp.quickqc.visualizer.utils.annotations.Annotation;
+import cmsp.quickqc.visualizer.utils.plotUtils.yAxisScaleTypes;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

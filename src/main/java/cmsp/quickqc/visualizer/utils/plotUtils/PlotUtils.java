@@ -1,5 +1,7 @@
-package cmsp.quickqc.visualizer;
+package cmsp.quickqc.visualizer.utils.plotUtils;
 
+import cmsp.quickqc.visualizer.datamodel.DataEntry;
+import cmsp.quickqc.visualizer.utils.MathUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;

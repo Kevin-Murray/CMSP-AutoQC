@@ -1,4 +1,4 @@
-package cmsp.quickqc.visualizer;
+package cmsp.quickqc.visualizer.utils.annotations;
 
 public enum AnnotationTypes {
 

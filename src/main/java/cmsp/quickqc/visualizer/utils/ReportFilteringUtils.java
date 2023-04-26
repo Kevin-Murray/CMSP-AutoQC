@@ -1,6 +1,7 @@
-package cmsp.quickqc.visualizer;
+package cmsp.quickqc.visualizer.utils;
 
 import cmsp.quickqc.visualizer.parameters.*;
+import cmsp.quickqc.visualizer.utils.annotations.Annotation;
 
 import java.time.LocalDate;
 

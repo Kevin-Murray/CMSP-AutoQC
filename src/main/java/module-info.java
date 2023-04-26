@@ -3,7 +3,6 @@ module cmsp.quickqc.visualizer {
     requires javafx.fxml;
     requires java.prefs;
 
-
-    opens cmsp.quickqc.visualizer to javafx.fxml;
+    opens cmsp.quickqc.visualizer.gui to javafx.fxml;
     exports cmsp.quickqc.visualizer;
 }

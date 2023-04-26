@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" style="-fx-border-color: black;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.quickqc.visualizer.ErrorPageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" style="-fx-border-color: black;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.quickqc.visualizer.gui.ErrorPageController">
    <children>
       <TextArea fx:id="errorMessageField" editable="false" layoutX="15.0" layoutY="14.0" mouseTransparent="true" prefHeight="109.0" prefWidth="270.0" wrapText="true" />
       <Button fx:id="closeButton" layoutX="124.0" layoutY="144.0" mnemonicParsing="false" onAction="#closeButtonClicked" text="Close">

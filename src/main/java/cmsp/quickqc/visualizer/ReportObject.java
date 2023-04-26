@@ -108,7 +108,7 @@ public class ReportObject {
                         });
     }
 
-    ReportObject(String matrix){
+    public ReportObject(String matrix){
 
         this.matrix = matrix;
     }

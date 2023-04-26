@@ -1,4 +1,4 @@
-package cmsp.quickqc.visualizer;
+package cmsp.quickqc.visualizer.parameters.types;
 
 import java.util.HashMap;
 

@@ -1,6 +1,9 @@
 package cmsp.quickqc.visualizer.gui;
 
 import cmsp.quickqc.visualizer.*;
+import cmsp.quickqc.visualizer.parameters.types.ConfigurationTypes;
+import cmsp.quickqc.visualizer.parameters.types.InstrumentTypes;
+import cmsp.quickqc.visualizer.parameters.types.MatrixTypes;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;

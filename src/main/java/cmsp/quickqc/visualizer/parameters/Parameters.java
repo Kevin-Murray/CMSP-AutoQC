@@ -1,4 +1,4 @@
-package cmsp.quickqc.visualizer;
+package cmsp.quickqc.visualizer.parameters;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;

@@ -1,6 +1,9 @@
 package cmsp.quickqc.visualizer.gui;
 
 import cmsp.quickqc.visualizer.*;
+import cmsp.quickqc.visualizer.parameters.*;
+
+import cmsp.quickqc.visualizer.parameters.types.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

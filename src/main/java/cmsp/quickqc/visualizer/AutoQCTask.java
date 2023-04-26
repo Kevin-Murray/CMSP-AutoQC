@@ -1,5 +1,7 @@
 package cmsp.quickqc.visualizer;
 
+import cmsp.quickqc.visualizer.parameters.*;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
@@ -18,8 +20,8 @@ import java.util.*;
 
 import static cmsp.quickqc.visualizer.PlotUtils.getLeveyData;
 import static cmsp.quickqc.visualizer.PlotUtils.getMovingData;
-import static cmsp.quickqc.visualizer.ReportFiles.getAnnotationPath;
-import static cmsp.quickqc.visualizer.ReportFiles.getPath;
+import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getAnnotationPath;
+import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getPath;
 
 
 public class AutoQCTask {

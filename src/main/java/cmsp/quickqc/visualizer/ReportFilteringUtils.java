@@ -1,5 +1,7 @@
 package cmsp.quickqc.visualizer;
 
+import cmsp.quickqc.visualizer.parameters.*;
+
 import java.time.LocalDate;
 
 public class ReportFilteringUtils {

@@ -1,4 +1,6 @@
-package cmsp.quickqc.visualizer;
+package cmsp.quickqc.visualizer.parameters.types;
+
+import cmsp.quickqc.visualizer.parameters.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

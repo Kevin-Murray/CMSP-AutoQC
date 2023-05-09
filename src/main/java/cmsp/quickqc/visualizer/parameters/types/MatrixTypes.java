@@ -6,7 +6,8 @@ public enum MatrixTypes {
     FUSION(new String[] {"HeLa Protein Digest", "iRT Standard Mix"}),
     ECLIPSE(new String[] {"HeLa Protein Digest", "iRT Standard Mix"}),
     A6495C(new String[] {"iRT Mix - MRM"}),
-    A7200(new String[] {"Retention Index (n-Alkane)"});
+    A7200(new String[] {"Retention Index (n-Alkane)"}),
+    SCIEX5500(new String[] {"BSA Digest - Sciex"});
 
     private final String[] label;
 

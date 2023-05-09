@@ -106,6 +106,27 @@ public class ReportObject {
                         "Mass Error (PPM) - Nonadecane",
                         "Mass Error (PPM) - Docosane",
                         });
+        reportMap.put("BSA Digest - Sciex",
+                new String[] {"Area - HADICTLPDTEK",
+                        "Area - HLVDEPQNLIK",
+                        "Area - LVNELTEFAK",
+                        "Area - TCVADESHAGCEK",
+                        "Area - YICDNQDTISSK",
+                        "FWHM - HADICTLPDTEK",
+                        "FWHM - HLVDEPQNLIK",
+                        "FWHM - LVNELTEFAK",
+                        "FWHM - TCVADESHAGCEK",
+                        "FWHM - YICDNQDTISSK",
+                        "Height - HADICTLPDTEK",
+                        "Height - HLVDEPQNLIK",
+                        "Height - LVNELTEFAK",
+                        "Height - TCVADESHAGCEK",
+                        "Height - YICDNQDTISSK",
+                        "RT - HADICTLPDTEK",
+                        "RT - HLVDEPQNLIK",
+                        "RT - LVNELTEFAK",
+                        "RT - TCVADESHAGCEK",
+                        "RT - YICDNQDTISSK"});
     }
 
     public ReportObject(String matrix){

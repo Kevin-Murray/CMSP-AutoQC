@@ -6,7 +6,8 @@ public enum InstrumentTypes {
     FUSION("Thermo Fusion"),
     ECLIPSE("Thermo Eclipse"),
     A6495C("Agilent 6495C"),
-    A7200("Agilent 7200 GC-QTOF");
+    A7200("Agilent 7200 GC-QTOF"),
+    SCIEX5500("Sciex 5500");
 
     private final String label;
 

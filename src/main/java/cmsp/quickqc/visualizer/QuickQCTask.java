@@ -26,7 +26,6 @@ import static cmsp.quickqc.visualizer.utils.plotUtils.PlotUtils.getMovingData;
 import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getAnnotationPath;
 import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getPath;
 
-
 public class QuickQCTask {
 
     private Parameters parameters;

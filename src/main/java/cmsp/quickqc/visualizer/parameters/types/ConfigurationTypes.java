@@ -6,7 +6,8 @@ public enum ConfigurationTypes {
     FUSION(new String[] {"N/A"}),
     ECLIPSE(new String[] {"FAIMS", "Non-FAIMS"}),
     A6495C(new String[] {"C18 Column"}),
-    A7200(new String[] {"HP-5 MS UI"});
+    A7200(new String[] {"HP-5 MS UI"}),
+    SCIEX5500(new String[] {"BEH18 50 mm (186002350)"});
 
     private final String[] label;
 

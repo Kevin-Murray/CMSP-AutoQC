@@ -300,7 +300,7 @@ public class MainPageController {
         DataEntry selectedEntry = this.mainTask.getDataEntry(data);
 
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("SamplePage.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("SamplePage.fxml"));
             Parent root = fxmlLoader.load();
             SamplePageController controller = fxmlLoader.<SamplePageController>getController();
             controller.setDataEntry(selectedEntry);

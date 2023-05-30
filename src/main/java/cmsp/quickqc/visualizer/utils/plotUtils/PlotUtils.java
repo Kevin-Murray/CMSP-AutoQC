@@ -5,6 +5,7 @@ import cmsp.quickqc.visualizer.utils.MathUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +21,10 @@ public class PlotUtils {
         XYChart.Series mainSeries = new XYChart.Series();
 
         for(DataEntry entry : reportItems){
-            dateList.add(entry.getDate());
-
-            itemList.add(entry.getItem(reportType, plotScale));
+            if(!entry.isAnnotation()){
+                dateList.add(entry.getDate());
+                itemList.add(entry.getItem(reportType, plotScale));
+            }
             mainSeries.getData().add(new XYChart.Data(entry.getDate(), entry.getItem(reportType, plotScale)));
         }
 

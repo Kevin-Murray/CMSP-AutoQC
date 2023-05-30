@@ -7,5 +7,7 @@ module cmsp.quickqc.visualizer {
     opens cmsp.quickqc.visualizer.datamodel to javafx.fxml;
 
     exports cmsp.quickqc.visualizer;
+    exports cmsp.quickqc.visualizer.parameters;
     exports cmsp.quickqc.visualizer.datamodel;
+    exports cmsp.quickqc.visualizer.utils.plotUtils;
 }

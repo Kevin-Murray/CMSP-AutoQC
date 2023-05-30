@@ -7,11 +7,14 @@ import static cmsp.quickqc.visualizer.utils.MathUtils.log2;
 public class DataEntry {
 
     final private LinkedHashMap<String, String> entries;
+    final private String type;
 
-    public DataEntry(String[] header, String[] entry){
+    public DataEntry(String[] header, String[] entry, String type){
 
         this.entries = new LinkedHashMap<>();
         addItems(header, entry);
+
+        this.type = type;
     }
 
     public void addItems(String[] header, String[] items){
@@ -21,6 +24,10 @@ public class DataEntry {
             entries.put(header[i], items[i]);
 
         }
+    }
+
+    public void replaceItem(String key, String value){
+        entries.put(key, value);
     }
 
     public String getDate(){
@@ -111,6 +118,15 @@ public class DataEntry {
         }
 
         return(values);
+    }
+
+    public String getType() {
+
+        return this.type;
+    }
+
+    public Boolean isAnnotation() {
+        return !this.type.equals("Sample");
     }
 
 }

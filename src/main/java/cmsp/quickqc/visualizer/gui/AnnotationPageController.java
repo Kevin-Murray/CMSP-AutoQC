@@ -72,7 +72,7 @@ public class AnnotationPageController {
             annotationTimePicker.valueProperty().setValue("PM");
         }
 
-        annotationTimeField.setText(hour + ":" + min);
+        annotationTimeField.setText(hour + ":" + String.format("%02d", min));
         annotationDate.valueProperty().setValue(dateTime.toLocalDate());
 
         String instrument = InstrumentTypes.getInstrument(annotation.getInstrument());

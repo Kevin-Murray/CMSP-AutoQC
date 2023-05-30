@@ -56,6 +56,10 @@ public class QuickQCTask {
         this.workingEntries = getFilteredData();
         this.workingAnnotations = getFilteredAnnotation();
 
+        if(parameters.showAnnotation){
+            mergePlotData();
+        }
+
         makePlotData();
     }
 
@@ -83,7 +87,7 @@ public class QuickQCTask {
                     attributes[i] = attributes[i].replace("\"", "");
                 }
 
-                DataEntry entry = new DataEntry(header, attributes);
+                DataEntry entry = new DataEntry(header, attributes, "Sample");
 
                 dataEntries.add(entry);
 
@@ -157,6 +161,7 @@ public class QuickQCTask {
     }
 
     public void writeAnnotationReport() {
+
         try {
 
             BufferedWriter writer = Files.newBufferedWriter(this.annotationPath);
@@ -223,6 +228,9 @@ public class QuickQCTask {
 
         this.chart = FXCollections.observableArrayList();
 
+        // Sort entries by date
+        Collections.sort(this.workingEntries, Comparator.comparing(p -> p.getDate()));
+
         XYChart.Series series = new XYChart.Series();
 
         for (DataEntry entry : this.workingEntries) {
@@ -233,6 +241,62 @@ public class QuickQCTask {
         switch (parameters.plotType) {
             case 1 -> this.chart.addAll(getLeveyData(this.workingEntries, parameters.report, parameters.plotScale));
             case 2 -> this.chart.addAll(getMovingData(this.workingEntries, parameters.report));
+        }
+    }
+
+    private void mergePlotData() {
+
+        // Add annotations to entry list, set report value to zero.
+        for(Annotation annotation : this.workingAnnotations){
+
+            String[] header = {"Date", parameters.report, "Comment"};
+            String[] entry = {annotation.getDate(), "0.0", annotation.getComment()};
+
+            this.workingEntries.add(new DataEntry(header, entry, annotation.getType()));
+        }
+
+        // Sort entries by date, annotations should appear between sample entries.
+        Collections.sort(this.workingEntries, Comparator.comparing(p -> p.getDate()));
+
+        for (int i = 0; i < this.workingEntries.size(); i++){
+
+            if(this.workingEntries.get(i).getItem(parameters.report) == 0.0){
+
+                Double firstValue = 0.0;
+                Double nextValue = 0.0;
+
+                int j = i - 1;
+                int k = i + 1;
+
+                // Find first earlier non-zero value entry
+                while(j >= 0){
+
+                    if(this.workingEntries.get(j).getItem(parameters.report) != 0.0) {
+                        firstValue = this.workingEntries.get(j).getItem(parameters.report);
+                        break;
+                    }
+
+                    j = j - 1;
+                }
+
+                // Find first older non-zero value entry
+                while(k < this.workingEntries.size()){
+
+                    if(this.workingEntries.get(k).getItem(parameters.report) != 0.0) {
+                        nextValue = this.workingEntries.get(k).getItem(parameters.report);
+                        break;
+                    }
+
+                    k = k + 1;
+                }
+
+                // Replace annotation zero value with mean or nearest non-zero value.
+                if(firstValue == 0.0 ){
+                    this.workingEntries.get(i).replaceItem(parameters.report, String.valueOf(nextValue));
+                }  else {
+                    this.workingEntries.get(i).replaceItem(parameters.report, String.valueOf(firstValue));
+                }
+            }
         }
     }
 
@@ -385,6 +449,8 @@ public class QuickQCTask {
 
     public List<Annotation> getAnnotationDatabase(){ return this.annotationDatabase;}
 
+    public List<Annotation> getWorkingAnnotations(){ return this.workingAnnotations;}
+
     public void addAnnotation(Annotation annotation){
 
         this.annotationDatabase.add(annotation);
@@ -414,6 +480,22 @@ public class QuickQCTask {
 
     public void deleteAnnotation(Annotation annotation){
         this.annotationDatabase.remove(annotation);
+    }
+
+    public Boolean isAnnotation(int index){
+        return this.workingEntries.get(index).isAnnotation();
+    }
+
+    public Boolean isExcluded(int index){
+        return this.workingEntries.get(index).excludeData();
+    }
+
+    public Boolean hasComment(int index){
+        return !this.workingEntries.get(index).getComment().equals("NA");
+    }
+
+    public String getAnnotationType(int index){
+        return this.workingEntries.get(index).getType();
     }
 
 }

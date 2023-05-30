@@ -25,6 +25,7 @@ public class ReportFiles {
         reportMap.put(hashCode("Agilent 6495C", "C18 Column", "iRT Mix - MRM"), Paths.get("CMSP_6495C_iRT_QC-Report.csv"));
 
         reportMap.put(hashCode("Agilent 7200 GC-QTOF", "HP-5 MS UI", "Retention Index (n-Alkane)"), Paths.get("CMSP_7200_RI-alkane_QC-Report.csv"));
+        reportMap.put(hashCode("Agilent 7200 GC-QTOF", "FATWAX UI", "Retention Index (n-Alkane)"), Paths.get("CMSP_7200_RI-alkane_FATWAX_QC-Report.csv"));
 
         reportMap.put(hashCode("Sciex 5500", "BEH18 50 mm (186002350)", "BSA Digest - Sciex"), Paths.get("CMSP_Sciex5500_BehC18-50mm_BSA_QC-Report.csv"));
     }

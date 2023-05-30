@@ -6,12 +6,15 @@ import cmsp.quickqc.visualizer.parameters.*;
 
 import cmsp.quickqc.visualizer.parameters.types.*;
 import cmsp.quickqc.visualizer.utils.annotations.Annotation;
+import cmsp.quickqc.visualizer.utils.annotations.AnnotationStyles;
+import cmsp.quickqc.visualizer.utils.annotations.AnnotationTypes;
 import cmsp.quickqc.visualizer.utils.plotUtils.yAxisScaleTypes;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
@@ -32,8 +35,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 
+import java.util.Set;
 import java.util.prefs.Preferences;
 
 public class MainPageController {
@@ -46,7 +51,6 @@ public class MainPageController {
     @FXML public ChoiceBox yAxisBox;
 
     @FXML public Button submitButton;
-
     @FXML public Button resetButton;
 
     @FXML public RadioButton leveyJenningsButton;
@@ -150,8 +154,37 @@ public class MainPageController {
 
         XYChart.Series mainSeries = plotData.get(0);
         ObservableList<XYChart.Data> seriesData = mainSeries.getData();
-        for(XYChart.Data data : seriesData){
+        for(XYChart.Data data : seriesData) {
             data.getNode().setOnMouseClicked(e -> showSampleInfo(data));
+        }
+
+        Set<Node> node = lineChart.lookupAll(".default-color0.chart-line-symbol.series0.");
+        ArrayList<Node> tmp = new ArrayList<>(node);
+
+        for(int i = 0; i < tmp.size(); i++){
+
+            if(mainTask.isAnnotation(i)){
+
+                String type = AnnotationTypes.getAnnotationType(mainTask.getAnnotationType(i));
+                tmp.get(i).setStyle(AnnotationStyles.valueOf(type).toString());
+
+            } else {
+
+                if(mainTask.isExcluded(i)){
+                    if(mainTask.hasComment(i)){
+                        tmp.get(i).setStyle("-fx-background-color: red, black;\n"
+                                + "    -fx-background-insets: 0, 2;\n"
+                                + "    -fx-background-radius: 0;\n"
+                                + "    -fx-padding: 5px;");
+                    } else {
+                        tmp.get(i).setStyle("-fx-background-color: red, black;\n"
+                                + "    -fx-background-insets: 0, 2;\n"
+                                + "    -fx-background-radius: 5px;\n"
+                                + "    -fx-padding: 5px;");
+                    }
+
+                }
+            }
         }
 
         valueTable.getColumns().clear();
@@ -298,6 +331,8 @@ public class MainPageController {
     protected void showSampleInfo(XYChart.Data data){
 
         DataEntry selectedEntry = this.mainTask.getDataEntry(data);
+
+        if(selectedEntry == null) return;
 
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("SamplePage.fxml"));

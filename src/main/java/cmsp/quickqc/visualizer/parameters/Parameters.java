@@ -22,7 +22,7 @@ public class Parameters {
     public LocalDate startDate;
     public LocalDate endDate;
 
-    private Boolean showAnnotation;
+    public Boolean showAnnotation;
     private Boolean groupAxis;
     public Boolean showExcluded;
     private Boolean showGuide;

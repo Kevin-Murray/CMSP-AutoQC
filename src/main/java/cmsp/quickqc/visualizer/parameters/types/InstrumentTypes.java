@@ -2,12 +2,13 @@ package cmsp.quickqc.visualizer.parameters.types;
 
 public enum InstrumentTypes {
 
-    VELOS("Thermo Velos"),
     FUSION("Thermo Fusion"),
     ECLIPSE("Thermo Eclipse"),
+    QEXACTIVE("Thermo Q Exactive"),
     A6495C("Agilent 6495C"),
-    A7200("Agilent 7200 GC-QTOF"),
-    SCIEX5500("Sciex 5500");
+    A7200("Agilent 7200"),
+    SCIEX5500("Sciex 5500"),
+    SCIEX6500("Sciex 6500");
 
     private final String label;
 

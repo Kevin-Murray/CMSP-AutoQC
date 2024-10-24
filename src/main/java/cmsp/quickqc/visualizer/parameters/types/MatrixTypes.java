@@ -2,12 +2,13 @@ package cmsp.quickqc.visualizer.parameters.types;
 
 public enum MatrixTypes {
 
-    VELOS(new String[] {"HeLa Protein Digest", "BSA Digest - DDA"}),
     FUSION(new String[] {"HeLa Protein Digest", "iRT Standard Mix"}),
     ECLIPSE(new String[] {"HeLa Protein Digest", "iRT Standard Mix"}),
+    QEXACTIVE(new String[] {"NIST Plasma"}),
     A6495C(new String[] {"iRT Mix - MRM"}),
-    A7200(new String[] {"Retention Index (n-Alkane)"}),
-    SCIEX5500(new String[] {"BSA Digest - Sciex"});
+    A7200(new String[] {"SST (SCFA)", "SST (Bleed)"}),
+    SCIEX5500(new String[] {"BSA Digest - Sciex"}),
+    SCIEX6500(new String[] {"BSA Digest - Sciex"});
 
     private final String[] label;
 

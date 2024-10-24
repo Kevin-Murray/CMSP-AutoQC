@@ -4,9 +4,9 @@ import java.util.HashMap;
 
 public class ReportObject {
 
-    private String matrix;
+    private final String matrix;
 
-    private static HashMap<String, String[]> reportMap = new HashMap<>();
+    private final static HashMap<String, String[]> reportMap = new HashMap<>();
 
     static {
         reportMap.put("HeLa Protein Digest",
@@ -127,6 +127,44 @@ public class ReportObject {
                         "RT - LVNELTEFAK",
                         "RT - TCVADESHAGCEK",
                         "RT - YICDNQDTISSK"});
+        reportMap.put("SST (SCFA)",
+                new String[] {
+                        "Area (Raw) - Acetic Acid",
+                        "Area (Raw) - Propionic Acid",
+                        "Area (Raw) - Butyric Acid",
+                        "Area (Raw) - Valeric Acid",
+                        "Area (Raw) - 2-Ethylbutyric Acid",
+                        "Area (Norm) - Acetic Acid",
+                        "Area (Norm) - Propionic Acid",
+                        "Area (Norm) - Butyric Acid",
+                        "Area (Norm) - Valeric Acid",
+                        "Area (Norm) - 2-Ethylbutyric Acid",
+                        "Height - Acetic Acid",
+                        "Height - Propionic Acid",
+                        "Height - Butyric Acid",
+                        "Height - Valeric Acid",
+                        "Height - 2-Ethylbutyric Acid",
+                        "RT - Acetic Acid",
+                        "RT - Propionic Acid",
+                        "RT - Butyric Acid",
+                        "RT - Valeric Acid",
+                        "RT - 2-Ethylbutyric Acid",
+                        "FWHM - Acetic Acid",
+                        "FWHM - Propionic Acid",
+                        "FWHM - Butyric Acid",
+                        "FWHM - Valeric Acid",
+                        "FWHM - 2-Ethylbutyric Acid",
+                        "Dot Product - Acetic Acid",
+                        "Dot Product - Propionic Acid",
+                        "Dot Product - Butyric Acid",
+                        "Dot Product - Valeric Acid",
+                        "Dot Product - 2-Ethylbutyric Acid",
+                        "Mass Error (PPM) - Acetic Acid",
+                        "Mass Error (PPM) - Propionic Acid",
+                        "Mass Error (PPM) - Butyric Acid",
+                        "Mass Error (PPM) - Valeric Acid",
+                        "Mass Error (PPM) - 2-Ethylbutyric Acid",
+});
     }
 
     public ReportObject(String matrix){

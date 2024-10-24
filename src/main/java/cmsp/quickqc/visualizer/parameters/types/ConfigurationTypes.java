@@ -2,12 +2,13 @@ package cmsp.quickqc.visualizer.parameters.types;
 
 public enum ConfigurationTypes {
 
-    VELOS(new String[] {"N/A"}),
     FUSION(new String[] {"N/A"}),
     ECLIPSE(new String[] {"FAIMS", "Non-FAIMS"}),
+    QEXACTIVE(new String[] {"HILIC"}),
     A6495C(new String[] {"C18 Column"}),
-    A7200(new String[] {"HP-5 MS UI", "FATWAX UI"}),
-    SCIEX5500(new String[] {"BEH18 50 mm (186002350)"});
+    A7200(new String[] {"FATWAX UI"}),
+    SCIEX5500(new String[] {"BEH18 50 mm (186002350)"}),
+    SCIEX6500(new String[] {"BEH18 50 mm (186002350)"});
 
     private final String[] label;
 

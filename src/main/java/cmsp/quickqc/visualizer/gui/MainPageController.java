@@ -11,6 +11,7 @@ import cmsp.quickqc.visualizer.utils.annotations.AnnotationTypes;
 import cmsp.quickqc.visualizer.utils.plotUtils.yAxisScaleTypes;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -22,6 +23,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -34,7 +36,6 @@ import javafx.stage.StageStyle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -128,10 +129,23 @@ public class MainPageController {
 
         lineChart.getData().clear();
 
-        Parameters selectParams = new Parameters(instrumentBox, configurationBox, matrixBox, reportBox,
-                yAxisBox, dateRangeBox, leveyJenningsButton, movingRangeButton, cusummButton, cusumvButton, startDatePicker,
-                endDatePicker, annotationCheckBox, groupXAxisCheckBox, showExcludedPointsCheckBox,
-                showGuideSetCheckBox, databasePath);
+        Parameters selectParams = new Parameters(instrumentBox,
+                configurationBox,
+                matrixBox,
+                reportBox,
+                yAxisBox,
+                dateRangeBox,
+                leveyJenningsButton,
+                movingRangeButton,
+                cusummButton,
+                cusumvButton,
+                startDatePicker,
+                endDatePicker,
+                annotationCheckBox,
+                groupXAxisCheckBox,
+                showExcludedPointsCheckBox,
+                showGuideSetCheckBox,
+                databasePath);
 
         if(mainParameters.diffReportSelection(selectParams)){
             mainParameters = selectParams;
@@ -152,6 +166,21 @@ public class MainPageController {
         ObservableList<XYChart.Series> plotData = mainTask.getPlotData();
         lineChart.getData().addAll(plotData);
 
+        /*
+        Remove symbol visibility of statistical series from plot
+        TODO - Find better way to handle this.
+         */
+        for(int i = 1; i < plotData.size(); i++){
+            XYChart.Series meanSeries = plotData.get(i);
+            ObservableList<XYChart.Data> meanData = meanSeries.getData();
+            for(XYChart.Data data : meanData) {
+                data.getNode().setVisible(false);
+            }
+        }
+
+        lineChart.setLegendVisible(true);
+
+        // Make main series clickable
         XYChart.Series mainSeries = plotData.get(0);
         ObservableList<XYChart.Data> seriesData = mainSeries.getData();
         for(XYChart.Data data : seriesData) {
@@ -172,15 +201,17 @@ public class MainPageController {
 
                 if(mainTask.isExcluded(i)){
                     if(mainTask.hasComment(i)){
-                        tmp.get(i).setStyle("-fx-background-color: red, black;\n"
-                                + "    -fx-background-insets: 0, 2;\n"
-                                + "    -fx-background-radius: 0;\n"
-                                + "    -fx-padding: 5px;");
+                        tmp.get(i).setStyle("""
+                                -fx-background-color: red, black;
+                                    -fx-background-insets: 0, 2;
+                                    -fx-background-radius: 0;
+                                    -fx-padding: 5px;""");
                     } else {
-                        tmp.get(i).setStyle("-fx-background-color: red, black;\n"
-                                + "    -fx-background-insets: 0, 2;\n"
-                                + "    -fx-background-radius: 5px;\n"
-                                + "    -fx-padding: 5px;");
+                        tmp.get(i).setStyle("""
+                                -fx-background-color: red, black;
+                                    -fx-background-insets: 0, 2;
+                                    -fx-background-radius: 5px;
+                                    -fx-padding: 5px;""");
                     }
 
                 }
@@ -247,16 +278,18 @@ public class MainPageController {
         reportBox.getItems().addAll(Arrays.asList(reports.getReports()));
     }
 
+    /**
+     * Disable submit button if report context not specified.
+     */
     @FXML
     protected void reportBoxListener() {
 
-        if(reportBox.getSelectionModel().isEmpty()){
-            submitButton.setDisable(true);
-        } else {
-            submitButton.setDisable(false);
-        }
+        submitButton.setDisable(reportBox.getSelectionModel().isEmpty());
     }
 
+    /**
+     * Handles new selections to date range menu
+     */
     @FXML
     protected void dataRangeListener() {
 
@@ -284,7 +317,7 @@ public class MainPageController {
         } else {
 
             LocalDate endDate = LocalDate.now();
-            LocalDate startDate = endDate.minus(DateRangeType.getDateRange(dateRange), ChronoUnit.DAYS);
+            LocalDate startDate = endDate.minusDays(DateRangeType.getDateRange(dateRange));
 
             startDatePicker.setDisable(true);
             endDatePicker.setDisable(true);
@@ -540,7 +573,7 @@ public class MainPageController {
             } else {
 
                 LocalDate endDate = LocalDate.now();
-                LocalDate startDate = endDate.minus(DateRangeType.getDateRange(dateRange), ChronoUnit.DAYS);
+                LocalDate startDate = endDate.minusDays(DateRangeType.getDateRange(dateRange));
 
                 startDatePicker.setDisable(true);
                 endDatePicker.setDisable(true);
@@ -557,11 +590,155 @@ public class MainPageController {
     }
 
     @FXML
+    protected void plotClickListener(MouseEvent event){
+
+        // TODO - This is being handled wrong -  class input event is not being used. User has to right click twice.
+
+        //Make LineChart context menu settings
+        ContextMenu contextMenu = new ContextMenu();
+
+        // Normal Menu Items
+        MenuItem meanMenu = new MenuItem("Set Series Mean...");
+        meanMenu.setDisable(true);
+
+        MenuItem copyPlot = new MenuItem("Copy Plot");
+        copyPlot.setDisable(true);
+
+        MenuItem copyData = new MenuItem("Copy Data");
+        copyData.setDisable(true);
+
+        MenuItem saveImage = new MenuItem("Save Image As...");
+        saveImage.setDisable(true);
+
+
+        // Plot variability lines as Radio Buttons, default RSD selected
+        ToggleGroup varToggle = new ToggleGroup();
+
+        RadioButton vg1 = new RadioButton("Standard Deviations");
+        vg1.setToggleGroup(varToggle);
+        vg1.setStyle("-fx-text-fill: -fx-text-base-color");
+        CustomMenuItem var1 = new CustomMenuItem(vg1);
+        var1.setHideOnClick(false);
+
+        RadioButton vg2 = new RadioButton("Relative Std. Dev. (RSD)");
+        vg2.setToggleGroup(varToggle);
+        vg2.setSelected(true);
+        vg2.setStyle("-fx-text-fill: -fx-text-base-color");
+        CustomMenuItem var2 = new CustomMenuItem(vg2);
+        var2.setHideOnClick(false);
+
+        RadioButton vg3 = new RadioButton("Custom...");
+        vg3.setToggleGroup(varToggle);
+        vg3.setStyle("-fx-text-fill: -fx-text-base-color");
+        CustomMenuItem var3 = new CustomMenuItem(vg3);
+        var3.setHideOnClick(false);
+
+        Menu varGuides = new Menu("Variability Guides");
+        varGuides.getItems().addAll(var1, var2, var3);
+
+
+        // Plot annotation menu as CheckBox Menu, default all selected
+        CheckBox am1 = new CheckBox("New Stock Solution");
+        am1.setSelected(true);
+        am1.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #1B9E77");
+        CustomMenuItem ann1 = new CustomMenuItem(am1);
+        ann1.setHideOnClick(false);
+
+        CheckBox am2 = new CheckBox("Column Change");
+        am2.setSelected(true);
+        am2.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #D95F02");
+        CustomMenuItem ann2 = new CustomMenuItem(am2);
+        ann2.setHideOnClick(false);
+
+        CheckBox am3 = new CheckBox("Mobile Phase Change");
+        am3.setSelected(true);
+        am3.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #A6CAEC");
+        CustomMenuItem ann3 = new CustomMenuItem(am3);
+        ann3.setHideOnClick(false);
+
+        CheckBox am4 = new CheckBox("New Tune / Calibration");
+        am4.setSelected(true);
+        am4.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #E7298A");
+        CustomMenuItem ann4 = new CustomMenuItem(am4);
+        ann4.setHideOnClick(false);
+
+        CheckBox am5 = new CheckBox("Instrument Maintenance");
+        am5.setSelected(true);
+        am5.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #C8A2C8");
+        CustomMenuItem ann5 = new CustomMenuItem(am5);
+        ann5.setHideOnClick(false);
+
+        CheckBox am6 = new CheckBox("Other");
+        am6.setSelected(true);
+        am6.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #E6AB02");
+        CustomMenuItem ann6 = new CustomMenuItem(am6);
+        ann6.setHideOnClick(false);
+
+        Menu annotMenu = new Menu("Show Annotations");
+        annotMenu.getItems().addAll(ann1, ann2, ann3, ann4, ann5, ann6);
+
+        // Other check box items
+        CheckBox lg2 = new CheckBox("Log2 Values");
+        lg2.setSelected(false);
+        lg2.setStyle("-fx-text-fill: -fx-text-base-color");
+        CustomMenuItem logMenu = new CustomMenuItem(lg2);
+        logMenu.setHideOnClick(false);
+
+        CheckBox slg = new CheckBox("Show Legend");
+        slg.setSelected(true);
+        slg.setStyle("-fx-text-fill: -fx-text-base-color");
+        CustomMenuItem legendMenu = new CustomMenuItem(slg);
+        legendMenu.setHideOnClick(false);
+
+        CheckBox sgd = new CheckBox("Show Guide");
+        sgd.setSelected(false);
+        sgd.setDisable(true);
+        sgd.setStyle("-fx-text-fill: -fx-text-base-color");
+        CustomMenuItem guideMenu = new CustomMenuItem(sgd);
+        guideMenu.setHideOnClick(false);
+        guideMenu.setDisable(true);
+
+        CheckBox sxp = new CheckBox("Show Excluded Points");
+        sxp.setSelected(false);
+        sxp.setStyle("-fx-text-fill: -fx-text-base-color");
+        CustomMenuItem excludedMenu = new CustomMenuItem(sxp);
+        excludedMenu.setHideOnClick(false);
+
+
+        // Make complete context menu
+        contextMenu.getItems().add(meanMenu);
+        contextMenu.getItems().add(new SeparatorMenuItem());
+        contextMenu.getItems().addAll(varGuides, annotMenu, logMenu, legendMenu, guideMenu, excludedMenu);
+        contextMenu.getItems().add(new SeparatorMenuItem());
+        contextMenu.getItems().addAll(copyPlot, copyData, saveImage);
+
+        contextMenu.setAutoHide(true);
+
+        // Handle LineChart Mouse Click
+        lineChart.addEventHandler(MouseEvent.MOUSE_CLICKED,
+                new EventHandler<>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                            varGuides.hide();
+                            annotMenu.hide();
+                            contextMenu.show(lineChart, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+
+                        }
+                        if (mouseEvent.getButton() == MouseButton.PRIMARY & mouseEvent.getClickCount() >= 2) {
+                            contextMenu.hide();
+                        }
+
+                    }
+                });
+    }
+
+    @FXML
     protected void annotationClickListener(MouseEvent event){
 
         int index = annotationTable.getSelectionModel().selectedIndexProperty().get();
 
-        if(event.getButton().toString() == "SECONDARY"){
+        if(event.getButton() == MouseButton.SECONDARY){
 
             ContextMenu contextMenu = new ContextMenu();
             SeparatorMenuItem sep1 = new SeparatorMenuItem();
@@ -591,18 +768,10 @@ public class MainPageController {
             contextMenu.getItems().add(menuItem4);
 
 
-            menuItem1.setOnAction((ActionEvent e) -> {
-                System.out.println("Action 1");
-            });
-            menuItem2.setOnAction((ActionEvent e) -> {
-                addAnnotation();
-            });
-            menuItem3.setOnAction((ActionEvent e) -> {
-                editAnnotation(selectedAnnotation);
-            });
-            menuItem4.setOnAction((ActionEvent e) -> {
-                deleteAnnotation(selectedAnnotation);
-            });
+            menuItem1.setOnAction((ActionEvent e) -> System.out.println("Action 1"));
+            menuItem2.setOnAction((ActionEvent e) -> addAnnotation());
+            menuItem3.setOnAction((ActionEvent e) -> editAnnotation(selectedAnnotation));
+            menuItem4.setOnAction((ActionEvent e) -> deleteAnnotation(selectedAnnotation));
 
             annotationTable.setContextMenu(contextMenu);
         }
@@ -614,7 +783,7 @@ public class MainPageController {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("AnnotationPage.fxml"));
             Parent root = fxmlLoader.load();
-            AnnotationPageController controller = fxmlLoader.<AnnotationPageController>getController();
+            AnnotationPageController controller = fxmlLoader.getController();
 
             Stage stage = new Stage();
             stage.setResizable(false);
@@ -642,7 +811,7 @@ public class MainPageController {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("AnnotationPage.fxml"));
             Parent root = fxmlLoader.load();
-            AnnotationPageController controller = fxmlLoader.<AnnotationPageController>getController();
+            AnnotationPageController controller = fxmlLoader.getController();
             controller.setAnnotation(annotation);
 
             Stage stage = new Stage();

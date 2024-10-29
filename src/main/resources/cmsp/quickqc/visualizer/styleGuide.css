@@ -12,15 +12,47 @@
 .default-color6.chart-series-line { -fx-stroke: #cc2016; }
 .default-color7.chart-series-line { -fx-stroke: #cc2016; }
 
+/*
+Display every other series symbol in legend
+TODO - Figure out a better way to handle this
+*/
 .default-color0.chart-line-symbol {-fx-background-color: black, black;}
 .default-color1.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
-.default-color2.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color2.chart-line-symbol {-fx-background-color: #40c943, #40c943;}
 .default-color3.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
-.default-color4.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color4.chart-line-symbol {-fx-background-color: #f0b002, #f0b002;}
 .default-color5.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
-.default-color6.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
+.default-color6.chart-line-symbol {-fx-background-color: #cc2016, #cc2016;}
 .default-color7.chart-line-symbol {-fx-background-radius: 0.0px; -fx-padding: 0.0px;}
 
 #annotationTable .table-column {
   -fx-alignment: CENTER;
+}
+
+.context-menu {-fx-effect: null;}
+
+/*
+Check Box Styling
+*/
+.check-box {
+    /* default properties */
+    selected-box-color: #D9D9D9;
+    box-color: #D9D9D9;
+    mark-color: black;
+}
+
+.check-box:selected > .box {
+    /* background color for selected checkbox */
+    -fx-background-color: selected-box-color;
+}
+
+.check-box > .box {
+    /* background color of unselected checkbox */
+    -fx-background-color: box-color;
+}
+
+.check-box:selected > .box > .mark,
+.check-box:indeterminate  > .box > .mark {
+    /* modify mark color */
+    -fx-background-color: mark-color;
 }

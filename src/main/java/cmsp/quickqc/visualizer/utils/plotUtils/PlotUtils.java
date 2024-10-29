@@ -5,7 +5,7 @@ import cmsp.quickqc.visualizer.utils.MathUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
-import javafx.util.Pair;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,38 +28,48 @@ public class PlotUtils {
             mainSeries.getData().add(new XYChart.Data(entry.getDate(), entry.getItem(reportType, plotScale)));
         }
 
+        mainSeries.setName("Main Series");
+
         double mean = MathUtils.calculateAverage(itemList);
-        Double standardDev = MathUtils.calculateStandardDeviation(itemList);
+        double rsd05 = 0.05 * mean;
+        double rsd10 = 0.10 * mean;
+        double rsd20 = 0.20 * mean;
 
         XYChart.Series meanSeries = new XYChart.Series();
-        XYChart.Series dev1pSeries = new XYChart.Series();
-        XYChart.Series dev2pSeries = new XYChart.Series();
-        XYChart.Series dev3pSeries = new XYChart.Series();
-        XYChart.Series dev1nSeries = new XYChart.Series();
-        XYChart.Series dev2nSeries = new XYChart.Series();
-        XYChart.Series dev3nSeries = new XYChart.Series();
+        XYChart.Series rsd05pSeries = new XYChart.Series();
+        XYChart.Series rsd10pSeries = new XYChart.Series();
+        XYChart.Series rsd20pSeries = new XYChart.Series();
+        XYChart.Series rsd05nSeries = new XYChart.Series();
+        XYChart.Series rsd10nSeries = new XYChart.Series();
+        XYChart.Series rsd20nSeries = new XYChart.Series();
+
 
         for(String date : dateList){
 
             meanSeries.getData().add(new XYChart.Data(date, mean));
 
-            dev1pSeries.getData().add(new XYChart.Data(date, mean + 1 * standardDev));
-            dev2pSeries.getData().add(new XYChart.Data(date, mean + 2 * standardDev));
-            dev3pSeries.getData().add(new XYChart.Data(date, mean + 3 * standardDev));
+            rsd05pSeries.getData().add(new XYChart.Data(date, mean + rsd05));
+            rsd10pSeries.getData().add(new XYChart.Data(date, mean + rsd10));
+            rsd20pSeries.getData().add(new XYChart.Data(date, mean + rsd20));
 
-            dev1nSeries.getData().add(new XYChart.Data(date, mean - 1 * standardDev));
-            dev2nSeries.getData().add(new XYChart.Data(date, mean - 2 * standardDev));
-            dev3nSeries.getData().add(new XYChart.Data(date, mean - 3 * standardDev));
+            rsd05nSeries.getData().add(new XYChart.Data(date, mean - rsd05));
+            rsd10nSeries.getData().add(new XYChart.Data(date, mean - rsd10));
+            rsd20nSeries.getData().add(new XYChart.Data(date, mean - rsd20));
+
+            rsd05pSeries.setName("RSD 5%");
+            rsd10pSeries.setName("RSD 10%");
+            rsd20pSeries.setName("RSD 20%");
+
         }
 
         plotData.add(mainSeries);
         plotData.add(meanSeries);
-        plotData.add(dev1pSeries);
-        plotData.add(dev1nSeries);
-        plotData.add(dev2pSeries);
-        plotData.add(dev2nSeries);
-        plotData.add(dev3pSeries);
-        plotData.add(dev3nSeries);
+        plotData.add(rsd05pSeries);
+        plotData.add(rsd05nSeries);
+        plotData.add(rsd10pSeries);
+        plotData.add(rsd10nSeries);
+        plotData.add(rsd20pSeries);
+        plotData.add(rsd20nSeries);
 
         return(plotData);
     }
@@ -83,6 +93,8 @@ public class PlotUtils {
 
             mainSeries.getData().add(new XYChart.Data(entry.getDate(), newItem));
         }
+
+        mainSeries.setName("Main Series");
 
         Double mean = MathUtils.calculateAverage(itemList);
 

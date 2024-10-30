@@ -8,7 +8,7 @@ import cmsp.quickqc.visualizer.parameters.types.*;
 import cmsp.quickqc.visualizer.utils.annotations.Annotation;
 import cmsp.quickqc.visualizer.utils.annotations.AnnotationStyles;
 import cmsp.quickqc.visualizer.utils.annotations.AnnotationTypes;
-import cmsp.quickqc.visualizer.utils.plotUtils.yAxisScaleTypes;
+import cmsp.quickqc.visualizer.utils.plotUtils.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,10 +36,8 @@ import javafx.stage.StageStyle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
-import java.util.Set;
 import java.util.prefs.Preferences;
 
 public class MainPageController {
@@ -78,6 +76,12 @@ public class MainPageController {
     private QuickQCTask mainTask;
     private Path databasePath;
 
+    private Map<String, Boolean> annotationMap;
+    private Boolean logScale;
+    private Boolean showExcluded;
+    private Boolean showLegend;
+    private String varType;
+
     private Preferences prefs;
 
     private Boolean reset = false;
@@ -102,6 +106,16 @@ public class MainPageController {
         endDatePicker.setValue(null);
         startDatePicker.setDisable(true);
         endDatePicker.setDisable(true);
+
+        showLegend = true;
+        showExcluded = false;
+        logScale = false;
+        varType = VariabilityTypes.RSD.toString();
+
+        annotationMap = new HashMap<>();
+        for(AnnotationTypes type : AnnotationTypes.values()){
+            annotationMap.put(type.toString(), true);
+        }
 
         if(!reset){
             getPreferences();
@@ -133,7 +147,6 @@ public class MainPageController {
                 configurationBox,
                 matrixBox,
                 reportBox,
-                yAxisBox,
                 dateRangeBox,
                 leveyJenningsButton,
                 movingRangeButton,
@@ -143,7 +156,10 @@ public class MainPageController {
                 endDatePicker,
                 annotationCheckBox,
                 groupXAxisCheckBox,
-                showExcludedPointsCheckBox,
+                varType,
+                annotationMap,
+                logScale,
+                showExcluded,
                 showGuideSetCheckBox,
                 databasePath);
 
@@ -178,7 +194,7 @@ public class MainPageController {
             }
         }
 
-        lineChart.setLegendVisible(true);
+        lineChart.setLegendVisible(showLegend);
 
         // Make main series clickable
         XYChart.Series mainSeries = plotData.get(0);
@@ -187,6 +203,7 @@ public class MainPageController {
             data.getNode().setOnMouseClicked(e -> showSampleInfo(data));
         }
 
+        // TODO - Pull by main series name?
         Set<Node> node = lineChart.lookupAll(".default-color0.chart-line-symbol.series0.");
         ArrayList<Node> tmp = new ArrayList<>(node);
 
@@ -602,10 +619,10 @@ public class MainPageController {
         meanMenu.setDisable(true);
 
         MenuItem copyPlot = new MenuItem("Copy Plot");
-        copyPlot.setDisable(true);
+        copyPlot.setOnAction((ActionEvent e) -> PlotUtils.copyChartToClipboard(lineChart));
 
         MenuItem copyData = new MenuItem("Copy Data");
-        copyData.setDisable(true);
+        copyData.setOnAction((ActionEvent e) -> PlotUtils.copyChartDataToClipboard(lineChart));
 
         MenuItem saveImage = new MenuItem("Save Image As...");
         saveImage.setDisable(true);
@@ -616,19 +633,23 @@ public class MainPageController {
 
         RadioButton vg1 = new RadioButton("Standard Deviations");
         vg1.setToggleGroup(varToggle);
+        vg1.setSelected(varType.equals(vg1.getText()));
+        vg1.setOnAction((ActionEvent e) -> {this.varType = vg1.getText(); submitButtonClick();});
         vg1.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem var1 = new CustomMenuItem(vg1);
         var1.setHideOnClick(false);
 
         RadioButton vg2 = new RadioButton("Relative Std. Dev. (RSD)");
         vg2.setToggleGroup(varToggle);
-        vg2.setSelected(true);
+        vg2.setSelected(varType.equals(vg2.getText()));
+        vg2.setOnAction((ActionEvent e) -> {this.varType = vg2.getText(); submitButtonClick();});
         vg2.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem var2 = new CustomMenuItem(vg2);
         var2.setHideOnClick(false);
 
         RadioButton vg3 = new RadioButton("Custom...");
         vg3.setToggleGroup(varToggle);
+        vg3.setDisable(true);
         vg3.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem var3 = new CustomMenuItem(vg3);
         var3.setHideOnClick(false);
@@ -639,37 +660,43 @@ public class MainPageController {
 
         // Plot annotation menu as CheckBox Menu, default all selected
         CheckBox am1 = new CheckBox("New Stock Solution");
-        am1.setSelected(true);
+        am1.setSelected(annotationMap.get(am1.getText()));
+        am1.setOnAction((ActionEvent e) -> {annotationMap.put(am1.getText(), am1.isSelected()); submitButtonClick();});
         am1.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #1B9E77");
         CustomMenuItem ann1 = new CustomMenuItem(am1);
         ann1.setHideOnClick(false);
 
         CheckBox am2 = new CheckBox("Column Change");
-        am2.setSelected(true);
+        am2.setSelected(annotationMap.get(am2.getText()));
+        am2.setOnAction((ActionEvent e) -> {annotationMap.put(am2.getText(), am2.isSelected()); submitButtonClick();});
         am2.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #D95F02");
         CustomMenuItem ann2 = new CustomMenuItem(am2);
         ann2.setHideOnClick(false);
 
         CheckBox am3 = new CheckBox("Mobile Phase Change");
-        am3.setSelected(true);
+        am3.setSelected(annotationMap.get(am3.getText()));
+        am3.setOnAction((ActionEvent e) -> {annotationMap.put(am3.getText(), am3.isSelected()); submitButtonClick();});
         am3.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #A6CAEC");
         CustomMenuItem ann3 = new CustomMenuItem(am3);
         ann3.setHideOnClick(false);
 
         CheckBox am4 = new CheckBox("New Tune / Calibration");
-        am4.setSelected(true);
+        am4.setSelected(annotationMap.get(am4.getText()));
+        am4.setOnAction((ActionEvent e) -> {annotationMap.put(am4.getText(), am4.isSelected()); submitButtonClick();});
         am4.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #E7298A");
         CustomMenuItem ann4 = new CustomMenuItem(am4);
         ann4.setHideOnClick(false);
 
         CheckBox am5 = new CheckBox("Instrument Maintenance");
-        am5.setSelected(true);
+        am5.setSelected(annotationMap.get(am5.getText()));
+        am5.setOnAction((ActionEvent e) -> {annotationMap.put(am5.getText(), am5.isSelected()); submitButtonClick();});
         am5.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #C8A2C8");
         CustomMenuItem ann5 = new CustomMenuItem(am5);
         ann5.setHideOnClick(false);
 
         CheckBox am6 = new CheckBox("Other");
-        am6.setSelected(true);
+        am6.setSelected(annotationMap.get(am6.getText()));
+        am6.setOnAction((ActionEvent e) -> {annotationMap.put(am6.getText(), am6.isSelected()); submitButtonClick();});
         am6.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #E6AB02");
         CustomMenuItem ann6 = new CustomMenuItem(am6);
         ann6.setHideOnClick(false);
@@ -680,12 +707,14 @@ public class MainPageController {
         // Other check box items
         CheckBox lg2 = new CheckBox("Log2 Values");
         lg2.setSelected(false);
+        lg2.setOnAction((ActionEvent e) -> {logScale = lg2.isSelected(); submitButtonClick();});
         lg2.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem logMenu = new CustomMenuItem(lg2);
         logMenu.setHideOnClick(false);
 
         CheckBox slg = new CheckBox("Show Legend");
         slg.setSelected(true);
+        slg.setOnAction((ActionEvent e) -> {showLegend = slg.isSelected(); submitButtonClick();});
         slg.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem legendMenu = new CustomMenuItem(slg);
         legendMenu.setHideOnClick(false);
@@ -700,6 +729,7 @@ public class MainPageController {
 
         CheckBox sxp = new CheckBox("Show Excluded Points");
         sxp.setSelected(false);
+        sxp.setOnAction((ActionEvent e) -> {this.showExcluded = sxp.isSelected(); submitButtonClick();});
         sxp.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem excludedMenu = new CustomMenuItem(sxp);
         excludedMenu.setHideOnClick(false);

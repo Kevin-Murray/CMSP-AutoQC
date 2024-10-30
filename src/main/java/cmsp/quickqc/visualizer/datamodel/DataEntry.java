@@ -43,15 +43,15 @@ public class DataEntry {
         return Double.parseDouble(entries.get(key));
     }
 
-    public Double getItem(String key, String scale){
+    public Double getItem(String key, Boolean logScale){
 
-        Double value = null;
+        Double value;
 
-        switch (scale) {
-            case "Linear" -> value = this.getItem(key);
-            case "Log2" -> value = log2(this.getItem(key));
+        if(logScale){
+            value = log2(this.getItem(key));
+        } else {
+            value = this.getItem(key);
         }
-
 
         return value;
     }

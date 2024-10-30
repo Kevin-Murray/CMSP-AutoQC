@@ -7,6 +7,7 @@ import javafx.scene.control.RadioButton;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.Map;
 
 public class Parameters {
 
@@ -22,8 +23,12 @@ public class Parameters {
     public LocalDate startDate;
     public LocalDate endDate;
 
+    public Map<String, Boolean> annotationMap;
+
+    public String varType;
     public Boolean showAnnotation;
     private Boolean groupAxis;
+    public Boolean logScale;
     public Boolean showExcluded;
     private Boolean showGuide;
 
@@ -39,8 +44,11 @@ public class Parameters {
         plotType = 0;
         startDate = null;
         endDate = null;
+        varType = null;
+        annotationMap = null;
         showAnnotation = null;
         groupAxis = null;
+        logScale = null;
         showExcluded = null;
         showGuide = null;
 
@@ -50,7 +58,6 @@ public class Parameters {
                       ChoiceBox configurationBox,
                       ChoiceBox matrixBox,
                       ChoiceBox reportBox,
-                      ChoiceBox yAxisBox,
                       ChoiceBox dateRangeBox,
                       RadioButton leveyJenningsButton,
                       RadioButton movingRangeButton,
@@ -60,7 +67,10 @@ public class Parameters {
                       DatePicker endDatePicker,
                       CheckBox annotationCheckBox,
                       CheckBox groupXAxisCheckBox,
-                      CheckBox showExcludedCheckBox,
+                      String varType,
+                      Map<String, Boolean> annotationMap,
+                      Boolean logScale,
+                      Boolean showExcluded,
                       CheckBox showGuideSetCheckBox,
                       Path databasePath) {
 
@@ -68,7 +78,6 @@ public class Parameters {
         this.configuration = configurationBox.getSelectionModel().getSelectedItem().toString();
         this.matrix = matrixBox.getSelectionModel().getSelectedItem().toString();
         this.report = reportBox.getSelectionModel().getSelectedItem().toString();
-        this.plotScale = yAxisBox.getSelectionModel().getSelectedItem().toString();
         this.dateRange = dateRangeBox.getSelectionModel().getSelectedItem().toString();
 
         if(leveyJenningsButton.isSelected()){
@@ -81,12 +90,16 @@ public class Parameters {
             this.plotType = 4;
         }
 
+        this.varType = varType;
+        this.annotationMap = annotationMap;
+
         this.startDate = startDatePicker.getValue();
         this.endDate = endDatePicker.getValue();
 
         this.showAnnotation = annotationCheckBox.isSelected();
         this.groupAxis = groupXAxisCheckBox.isSelected();
-        this.showExcluded = showExcludedCheckBox.isSelected();
+        this.logScale = logScale;
+        this.showExcluded = showExcluded;
         this.showGuide = showGuideSetCheckBox.isSelected();
 
         this.databasePath = databasePath;

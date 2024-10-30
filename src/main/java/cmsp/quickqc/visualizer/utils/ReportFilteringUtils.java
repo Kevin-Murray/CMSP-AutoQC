@@ -25,7 +25,8 @@ public class ReportFilteringUtils {
 
         return (parameters.instrument.equals(annotation.getInstrument()) &&
                 (parameters.configuration.equals(annotation.getConfig()) || annotation.getConfig().equals("All")) &&
-                (parameters.matrix.equals(annotation.getMatrix()) || annotation.getMatrix().equals("All")));
+                (parameters.matrix.equals(annotation.getMatrix()) || annotation.getMatrix().equals("All")) &&
+                (parameters.annotationMap.get(annotation.getType())));
 
     }
 

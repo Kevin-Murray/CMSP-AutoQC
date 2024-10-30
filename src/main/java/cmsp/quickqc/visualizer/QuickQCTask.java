@@ -239,7 +239,7 @@ public class QuickQCTask {
         }
 
         switch (parameters.plotType) {
-            case 1 -> this.chart.addAll(getLeveyData(this.workingEntries, parameters.report, parameters.plotScale));
+            case 1 -> this.chart.addAll(getLeveyData(this.workingEntries, parameters.report, parameters.logScale, parameters.varType));
             case 2 -> this.chart.addAll(getMovingData(this.workingEntries, parameters.report));
         }
     }

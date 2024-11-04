@@ -1,3 +1,4 @@
+
 package cmsp.quickqc.visualizer.utils.annotations;
 
 import java.util.ArrayList;
@@ -5,19 +6,28 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Annotation class. Stores instrument event information to be displayed along QC data.
+ * Annotations include events such as column changes, instrument maintenance, or other potentially impactful events.
+ */
 public class Annotation {
 
-    private String date;
-    private String instrument;
-    private String config;
-    private String matrix;
-    private String type;
-    private String comment;
+    private final String date;
+    private final String instrument;
+    private final String config;
+    private final String matrix;
+    private final String type;
+    private final String comment;
 
     final private LinkedHashMap<String, String> annotation;
 
+    /**
+     * Annotation constructor.
+     * Makes new LinkedHashMap to store all information.
+     */
     public Annotation(String date, String instrument, String config, String matrix,
                       String type, String comment) {
+
         this.date = date;
         this.instrument = instrument;
         this.config = config;
@@ -34,56 +44,87 @@ public class Annotation {
         annotation.put("Comment", comment);
     }
 
-    public String getDate(){
+    /**
+     * Get annotation date.
+     */
+    public String getDate() {
+
         return  this.date;
     }
 
-    public String getInstrument(){
+    /**
+     * Get annotation instrument.
+     */
+    public String getInstrument() {
+
         return this.instrument;
     }
 
-    public String getConfig(){
+    /**
+     * Get annotation configuration.
+     */
+    public String getConfig() {
+
         return this.config;
     }
 
-    public String getMatrix(){
+    /**
+     * Get annotation matrix.
+     */
+    public String getMatrix() {
+
         return this.matrix;
     }
 
-    public String getType(){
+    /**
+     * Get annotation type.
+     */
+    public String getType() {
+
         return this.type;
     }
 
-    public String getComment(){
+    /**
+     * Get annotation comment.
+     */
+    public String getComment() {
+
         return this.comment;
     }
 
-    public int size(){
+    /**
+     * Get size of annotation hashmap.
+     */
+    public int size() {
+
         return this.annotation.size();
     }
 
+    /**
+     * Get key set of annotation hash map.
+     */
     public Set<String> getKeySet() {
 
         return annotation.keySet();
     }
 
-    public String getValue(String key){
+    /**
+     * Get value of annotation hashmap at key.
+     */
+    public String getValue(String key) {
+
         return annotation.get(key);
     }
 
+    /**
+     * Write annotation to string list.
+     */
     public List<String> writeValues() {
 
         List<String> values = new ArrayList<>();
 
-        Set<String> keys = this.getKeySet();
-
-        for(String key : keys) {
-
-            values.add("\"" + this.getValue(key) + "\"");
-
-        }
+        for(String key : this.getKeySet()) values.add("\"" + this.getValue(key) + "\"");
 
         return(values);
     }
-
 }

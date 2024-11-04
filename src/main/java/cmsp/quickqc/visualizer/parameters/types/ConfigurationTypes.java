@@ -1,5 +1,10 @@
+
 package cmsp.quickqc.visualizer.parameters.types;
 
+/**
+ * Enumeration of QC report context configuration types.
+ * Configuration represents column installation or unique operating conditions, e.g. FAIMS vs Non-FAIMS.
+ */
 public enum ConfigurationTypes {
 
     FUSION(new String[] {"N/A"}),
@@ -12,15 +17,24 @@ public enum ConfigurationTypes {
 
     private final String[] label;
 
+    /**
+     * Constructor for class.
+     */
     ConfigurationTypes(String[] configs) {
+
         this.label = configs;
     }
 
+    /**
+     * Get configurations of input instrument.
+     *
+     * @param instrument Instrument type
+     */
     public static String[] getConfiguration(String instrument) {
-        for(ConfigurationTypes i : values()){
-            if(i.name().equals(instrument)){
-                return i.label;
-            }
+
+        for(ConfigurationTypes i : values()) {
+
+            if(i.name().equals(instrument)) return i.label;
         }
 
         return null;

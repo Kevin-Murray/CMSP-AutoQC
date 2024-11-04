@@ -26,6 +26,7 @@ public class MathUtils {
     }
 
     public static Double calculateAverage(ArrayList<Double> series) {
+
         return series.stream()
                 .mapToDouble(d -> d)
                 .average()

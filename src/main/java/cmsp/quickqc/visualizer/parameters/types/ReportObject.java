@@ -1,18 +1,29 @@
+
 package cmsp.quickqc.visualizer.parameters.types;
 
 import java.util.HashMap;
 
+/**
+ * Report context variables to be monitored in application.
+ * Each matrix type has designated string of variables to monitor.
+ * Class is effectively an inefficient hash map.
+ */
 public class ReportObject {
 
     private final String matrix;
 
     private final static HashMap<String, String[]> reportMap = new HashMap<>();
 
+    // TODO - plan on turing this into a database.
     static {
+
+        // Fusion-Eclipse
         reportMap.put("HeLa Protein Digest",
                 new String[] {"Protein Counts",
                         "Peptide Counts",
                         "PSM Counts"});
+
+        // Fusion-Eclipse
         reportMap.put("iRT Standard Mix",
                 new String[] {"Area - ELGQSGVDTYLQTK",
                         "Area - GILFVGSGVSGGEEGAR",
@@ -34,6 +45,8 @@ public class ReportObject {
                         "RT - HVLTSIGEK",
                         "RT - SSAAPPPPPR",
                         "RT - TASEFDSAIAQDK"});
+
+        // Unused - Formerly Velos
         reportMap.put("BSA Digest - DDA",
                 new String[] {"Area - HADICTLPDTEK",
                         "Area - HLVDEPQNLIK",
@@ -55,6 +68,8 @@ public class ReportObject {
                         "RT - LVNELTEFAK",
                         "RT - TCVADESHAGCEK",
                         "RT - YICDNQDTISSK"});
+
+        // Unused - Sciex 5500, Sciex 6500, Agilent 6495C
         reportMap.put("iRT Mix - MRM",
                 new String[] {"Area - ELGQSGVDTYLQTK",
                         "Area - GISNEGQNASIK",
@@ -79,6 +94,8 @@ public class ReportObject {
                         "Pressure - Max",
                         "Pressure - Min",
                         "Pressure - Avg"});
+
+        // Unused - formerly Agilent 7200
         reportMap.put("Retention Index (n-Alkane)",
                 new String[] {"Area - Decane",
                         "Area - Dodecane",
@@ -106,6 +123,9 @@ public class ReportObject {
                         "Mass Error (PPM) - Nonadecane",
                         "Mass Error (PPM) - Docosane",
                         });
+
+
+        // Unused - formerly Sciex 5500, Sciex 6500
         reportMap.put("BSA Digest - Sciex",
                 new String[] {"Area - HADICTLPDTEK",
                         "Area - HLVDEPQNLIK",
@@ -127,6 +147,8 @@ public class ReportObject {
                         "RT - LVNELTEFAK",
                         "RT - TCVADESHAGCEK",
                         "RT - YICDNQDTISSK"});
+
+        // Agilent 7200
         reportMap.put("SST (SCFA)",
                 new String[] {
                         "Area (Raw) - Acetic Acid",
@@ -163,16 +185,25 @@ public class ReportObject {
                         "Mass Error (PPM) - Propionic Acid",
                         "Mass Error (PPM) - Butyric Acid",
                         "Mass Error (PPM) - Valeric Acid",
-                        "Mass Error (PPM) - 2-Ethylbutyric Acid",
-});
+                        "Mass Error (PPM) - 2-Ethylbutyric Acid"});
     }
 
-    public ReportObject(String matrix){
+    /**
+     * Class constructor.
+     *
+     * @param matrix Input matrix of report context
+     */
+    public ReportObject(String matrix) {
 
         this.matrix = matrix;
     }
 
-    public String[] getReports(){
+    /**
+     * Get report variables of constructed matrix.
+     *
+     * @return array of report variables
+     */
+    public String[] getReports() {
 
         return reportMap.get(matrix);
     }

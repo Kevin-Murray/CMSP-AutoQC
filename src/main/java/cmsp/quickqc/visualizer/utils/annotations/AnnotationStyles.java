@@ -1,6 +1,12 @@
+
 package cmsp.quickqc.visualizer.utils.annotations;
 
+/**
+ * Enumeration of annotation styles for QC plot.
+ */
 public enum AnnotationStyles {
+
+    //TODO - Make into Annotation colors only. Move point style elsewhere.
 
     STANDARD("""
             -fx-background-color: #1B9E77, white;
@@ -35,22 +41,20 @@ public enum AnnotationStyles {
 
     private final String label;
 
-    AnnotationStyles(String s) {
-        this.label = s;
+    /**
+     * Enum constructor
+     */
+    AnnotationStyles(String style) {
+
+        this.label = style;
     }
 
-    public static String getAnnotationName(String type) {
-        for(AnnotationStyles i : values()){
-            if(i.label.equals(type)){
-                return i.name();
-            }
-        }
-
-        return null;
-    }
-
+    /**
+     * Cast label to string.
+     */
     @Override
     public String toString() {
+
         return this.label;
     }
 }

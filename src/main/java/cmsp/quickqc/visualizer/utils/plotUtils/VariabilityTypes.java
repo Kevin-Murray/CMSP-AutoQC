@@ -9,11 +9,13 @@ public enum VariabilityTypes {
     private final String label;
 
     VariabilityTypes(String s) {
+
         this.label = s;
     }
 
     @Override
     public String toString() {
+
         return this.label;
     }
 

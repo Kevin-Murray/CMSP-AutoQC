@@ -1,5 +1,12 @@
+
 package cmsp.quickqc.visualizer.parameters.types;
 
+import java.util.ArrayList;
+
+/**
+ * Enumeration of QC report context date range types.
+ * Date ranges correspond to specific number of day since now.
+ */
 public enum DateRangeType {
 
     ALL("All Dates", 0),
@@ -14,24 +21,47 @@ public enum DateRangeType {
     private final String label;
     private final int range;
 
-    DateRangeType(String s, int n) {
-        this.label = s;
-        this.range = n;
+    /**
+     * Constructor for enum.
+     */
+    DateRangeType(String rangeName, int daysInt) {
+
+        this.label = rangeName;
+        this.range = daysInt;
     }
 
+    /**
+     * Cast label to string.
+     */
     @Override
     public String toString() {
         return this.label;
     }
 
+    /**
+     * Get date range integer for date range.
+     *
+     * @return Number of days integer
+     */
     public static int getDateRange(String dateRange) {
 
-        for(DateRangeType i : values()){
-            if(i.label.equals(dateRange)){
-                return i.range;
-            }
+        for(DateRangeType i : values()) {
+
+            if(i.label.equals(dateRange)) return i.range;
         }
 
         return 0;
+    }
+
+    /**
+     * Get labels of enum class.
+     */
+    public static ArrayList<String> getDateRangeNames() {
+
+        ArrayList<String> values = new ArrayList<>();
+
+        for(DateRangeType i : DateRangeType.values()) values.add(i.label);
+
+        return values;
     }
 }

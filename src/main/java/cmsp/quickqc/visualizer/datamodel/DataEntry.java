@@ -87,22 +87,8 @@ public class DataEntry {
     }
 
     public String getComment() {
+
         return(this.entries.get("Comment").replace("\\n", "\n"));
-    }
-
-    public List<String> getValues() {
-
-        List<String> values = new ArrayList<>();
-
-        Set<String> keys = this.getKeySet();
-
-        for(String key : keys) {
-
-            values.add(this.getValue(key));
-
-        }
-
-        return(values);
     }
 
     public List<String> writeValues() {

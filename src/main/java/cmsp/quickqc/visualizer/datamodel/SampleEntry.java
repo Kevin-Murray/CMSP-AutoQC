@@ -2,8 +2,8 @@ package cmsp.quickqc.visualizer.datamodel;
 
 public class SampleEntry {
 
-    private String field;
-    private String value;
+    private final String field;
+    private final String value;
 
     public SampleEntry(String field, String value){
 

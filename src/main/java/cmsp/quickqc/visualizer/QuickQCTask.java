@@ -2,9 +2,10 @@
 package cmsp.quickqc.visualizer;
 
 import cmsp.quickqc.visualizer.datamodel.DataEntry;
+import cmsp.quickqc.visualizer.datamodel.Parameters;
+import cmsp.quickqc.visualizer.utils.MathUtils;
 import cmsp.quickqc.visualizer.utils.ReportFilteringUtils;
-import cmsp.quickqc.visualizer.utils.annotations.Annotation;
-import cmsp.quickqc.visualizer.parameters.*;
+import cmsp.quickqc.visualizer.datamodel.Annotation;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,13 +17,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import static cmsp.quickqc.visualizer.utils.plotUtils.PlotUtils.getLeveyData;
-import static cmsp.quickqc.visualizer.utils.plotUtils.PlotUtils.getMovingData;
-import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getAnnotationPath;
-import static cmsp.quickqc.visualizer.parameters.types.ReportFiles.getPath;
+import java.util.stream.Collectors;
+
+import static cmsp.quickqc.visualizer.utils.PlotUtils.getLeveyData;
+import static cmsp.quickqc.visualizer.utils.PlotUtils.getMovingData;
 
 /**
  * QuickQC main processing class.
@@ -41,6 +44,7 @@ public class QuickQCTask {
     // Plotting data
     private List<DataEntry> globalEntries;
     private List<DataEntry> workingEntries;
+    private List<DataEntry> mergedEntries;
     private List<Annotation> annotationDatabase;
     private List<Annotation> workingAnnotations;
     private ObservableList<XYChart.Series<String, Number>> chart;
@@ -55,13 +59,13 @@ public class QuickQCTask {
         this.parameters = parameters;
 
         // If parameters valid, assign global variables
-        if(parameters.validSelection()){
-            this.databasePath = getPath(this.parameters);
-            this.annotationPath = getAnnotationPath(this.parameters);
+        if(parameters.validSelection()) {
+
+            this.databasePath = this.parameters.getPath();
+            this.annotationPath = this.parameters.getAnnotationPath();
             this.globalEntries = readReport();
             this.annotationDatabase = readAnnotation();
         }
-
     }
 
     /**
@@ -75,7 +79,7 @@ public class QuickQCTask {
         this.workingAnnotations = getFilteredAnnotation();
 
         // Merge annotations into QC data series.
-        mergePlotData();
+        this.mergedEntries = mergePlotData();
 
         // Format QC data into line chart.
         makePlotData();
@@ -256,8 +260,10 @@ public class QuickQCTask {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDate dateTime = LocalDate.parse(date, formatter);
 
-            if (ReportFilteringUtils.isWithinDateRange(dateTime, parameters.startDate, parameters.endDate) &&
-                    ReportFilteringUtils.isShowable(parameters.showExcluded, entry.excludeData())) {
+            if ((ReportFilteringUtils.isWithinDateRange(dateTime, parameters.startDate, parameters.endDate) &&
+                    ReportFilteringUtils.isShowable(parameters.showExcluded, entry.isExcluded()) &&
+                    ReportFilteringUtils.isMonitoredLogNumber(entry.getLogNumber(), parameters.logNumbers)) ||
+                    ReportFilteringUtils.isGuideSet(parameters.showGuide, entry.isGuide())) {
 
                 newList.add(entry);
             }
@@ -301,12 +307,12 @@ public class QuickQCTask {
         this.chart = FXCollections.observableArrayList();
 
         // Sort entries by date
-        this.workingEntries.sort(Comparator.comparing(DataEntry::getDate));
+        this.mergedEntries.sort(Comparator.comparing(DataEntry::getDate));
 
         // Designate which type of plot to generate.
         switch (parameters.plotType) {
-            case 1 -> this.chart.addAll(getLeveyData(this.workingEntries, parameters.report, parameters.logScale, parameters.varType));
-            case 2 -> this.chart.addAll(getMovingData(this.workingEntries, parameters.report));
+            case 1 -> this.chart.addAll(getLeveyData(this.mergedEntries, parameters.selection, parameters.logScale, parameters.varType, parameters.showGuide));
+            case 2 -> this.chart.addAll(getMovingData(this.mergedEntries, parameters.selection));
         }
     }
 
@@ -314,26 +320,28 @@ public class QuickQCTask {
      * Merge annotation entries into QC data entries.
      * Merged working entries sorted by date.
      */
-    private void mergePlotData() {
+    private List<DataEntry> mergePlotData() {
+
+        List<DataEntry> dataEntries = new ArrayList<>(this.workingEntries);
 
         // Add annotations to entry list, set report value to zero.
         for(Annotation annotation : this.workingAnnotations){
 
-            String[] header = {"Date", parameters.report, "Comment"};
+            String[] header = {"Date", parameters.selection, "Comment"};
             String[] entry = {annotation.getDate(), "0.0", annotation.getComment()};
 
-            this.workingEntries.add(new DataEntry(header, entry, annotation.getType()));
+            dataEntries.add(new DataEntry(header, entry, annotation.getType()));
         }
 
         // Sort entries by date, annotations should appear between sample entries.
-        this.workingEntries.sort(Comparator.comparing(DataEntry::getDate));
+        dataEntries.sort(Comparator.comparing(DataEntry::getDate));
 
         // Loop through working entries, set annotation entries value to be identical to first valid previous data entry.
         // If no valid previous entry exists, replace with first valid older entry.
-        for (int i = 0; i < this.workingEntries.size(); i++){
+        for (int i = 0; i < dataEntries.size(); i++){
 
             // Is annotation.
-            if(this.workingEntries.get(i).getItem(parameters.report) == 0.0){
+            if(dataEntries.get(i).getItem(parameters.selection) == 0.0){
 
                 Double firstValue = 0.0;
                 Double nextValue = 0.0;
@@ -345,8 +353,8 @@ public class QuickQCTask {
                 while(j >= 0){
 
                     // Set value to previous entry.
-                    if(this.workingEntries.get(j).getItem(parameters.report) != 0.0) {
-                        firstValue = this.workingEntries.get(j).getItem(parameters.report);
+                    if(dataEntries.get(j).getItem(parameters.selection) != 0.0) {
+                        firstValue = dataEntries.get(j).getItem(parameters.selection);
                         break;
                     }
 
@@ -354,12 +362,12 @@ public class QuickQCTask {
                 }
 
                 // Find first older non-zero value entry.
-                while(k < this.workingEntries.size()){
+                while(k < dataEntries.size()){
 
                     // Set value to older entry.
-                    if(this.workingEntries.get(k).getItem(parameters.report) != 0.0) {
+                    if(dataEntries.get(k).getItem(parameters.selection) != 0.0) {
 
-                        nextValue = this.workingEntries.get(k).getItem(parameters.report);
+                        nextValue = dataEntries.get(k).getItem(parameters.selection);
                         break;
                     }
 
@@ -368,12 +376,14 @@ public class QuickQCTask {
 
                 // Replace annotation zero value with nearest non-zero value.
                 if(firstValue == 0.0 ){
-                    this.workingEntries.get(i).replaceItem(parameters.report, String.valueOf(nextValue));
+                    dataEntries.get(i).replaceItem(parameters.selection, String.valueOf(nextValue));
                 }  else {
-                    this.workingEntries.get(i).replaceItem(parameters.report, String.valueOf(firstValue));
+                    dataEntries.get(i).replaceItem(parameters.selection, String.valueOf(firstValue));
                 }
             }
         }
+
+        return dataEntries;
     }
 
     /**
@@ -559,7 +569,30 @@ public class QuickQCTask {
 
             if(entry.getDate().equals(date)) {
 
-                entry.setExcluded();
+                entry.changeExclusionStatus();
+            }
+
+        }
+
+        // Update report.
+        writeReport();
+    }
+
+    /**
+     * Update Guide setting of selected data entry.
+     * Update QC report following change.
+     *
+     * @param selectedEntry Selected data entry from line chart.
+     */
+    public void setDataEntryGuide(DataEntry selectedEntry) {
+
+        String date = selectedEntry.getDate();
+
+        for(DataEntry entry : this.globalEntries) {
+
+            if(entry.getDate().equals(date)) {
+
+                entry.changeGuideStatus();
             }
 
         }
@@ -592,6 +625,16 @@ public class QuickQCTask {
         writeReport();
     }
 
+    public String getFirstEntryDate() {
+
+        return this.workingEntries.get(0).getDate();
+    }
+
+    public String getLastEntryDate() {
+
+        return this.workingEntries.get(this.workingEntries.size() - 1).getDate();
+    }
+
     /**
      * Get working data entry list size.
      *
@@ -610,6 +653,85 @@ public class QuickQCTask {
     public int getWorkingAnnotationSize() {
 
         return this.workingAnnotations.size();
+    }
+
+    public String getEntryFrequency() {
+
+        ArrayList<LocalDateTime> dateList = new ArrayList<>();
+
+        for(DataEntry entry : this.workingEntries){
+
+            String date = entry.getDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            dateList.add(LocalDateTime.parse(date, formatter));
+        }
+
+        ArrayList<Double> freq = new ArrayList<>();
+
+        for(int i = 0; i < dateList.size() - 1; i++) {
+
+            freq.add(Duration.between(dateList.get(i), dateList.get(i+1)).toMinutes() / 60.0);
+        }
+
+        return String.format("%,.1f", MathUtils.calculateMedian(freq)) + " hours";
+    }
+
+    private ArrayList<Double> getSeriesValues() {
+
+        ArrayList<Double> valueList = new ArrayList<>();
+
+        for(DataEntry entry : this.workingEntries) {
+
+            valueList.add(entry.getItem(parameters.selection));
+        }
+
+        return valueList;
+    }
+
+    private String formatSummaryValue(double value) {
+
+        String text = Double.toString(value);
+
+        if(text.indexOf('.') > 4) {
+
+            return String.format("%.3E", value);
+        } else {
+
+            return String.format("%,.3f", value);
+        }
+    }
+
+    public String getSeriesMeanString() {
+
+        return formatSummaryValue(MathUtils.calculateAverage(getSeriesValues()));
+    }
+
+    public String getSeriesMin() {
+
+        return formatSummaryValue(Collections.min(getSeriesValues()));
+    }
+
+    public String getSeriesMax() {
+
+        return formatSummaryValue(Collections.max(getSeriesValues()));
+    }
+
+    public String getSeriesSD() {
+
+
+        return formatSummaryValue(MathUtils.calculateStandardDeviation(getSeriesValues()));
+    }
+
+    public String getSeriesRsd() {
+
+        return formatSummaryValue(MathUtils.calculateRelativeStandardDeviation(getSeriesValues()));
+    }
+
+    public List<String> getSeriesLogNumbers() {
+
+        HashSet<String> logNumbers = new HashSet<>(this.workingEntries.stream().map(DataEntry::getLogNumber).collect(Collectors.toList()));
+
+        return logNumbers.stream().sorted().toList();
     }
 
     /**
@@ -677,7 +799,7 @@ public class QuickQCTask {
      */
     public Boolean isAnnotation(int index) {
 
-        return this.workingEntries.get(index).isAnnotation();
+        return this.mergedEntries.get(index).isAnnotation();
     }
 
     /**
@@ -687,7 +809,7 @@ public class QuickQCTask {
      */
     public Boolean isExcluded(int index) {
 
-        return this.workingEntries.get(index).excludeData();
+        return this.mergedEntries.get(index).isExcluded();
     }
 
     /**
@@ -697,7 +819,12 @@ public class QuickQCTask {
      */
     public Boolean hasComment(int index) {
 
-        return !this.workingEntries.get(index).getComment().equals("NA");
+        return !this.mergedEntries.get(index).getComment().equals("NA");
+    }
+
+    public Boolean isGuideSet(int index) {
+
+        return this.mergedEntries.get(index).isGuide();
     }
 
     /**
@@ -708,7 +835,7 @@ public class QuickQCTask {
      */
     public String getAnnotationType(int index) {
 
-        return this.workingEntries.get(index).getType();
+        return this.mergedEntries.get(index).getType();
     }
 
 }

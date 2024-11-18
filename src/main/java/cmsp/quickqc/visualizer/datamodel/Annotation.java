@@ -1,5 +1,7 @@
 
-package cmsp.quickqc.visualizer.utils.annotations;
+package cmsp.quickqc.visualizer.datamodel;
+
+import cmsp.quickqc.visualizer.enums.ReportTypes;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -12,13 +14,6 @@ import java.util.Set;
  */
 public class Annotation {
 
-    private final String date;
-    private final String instrument;
-    private final String config;
-    private final String matrix;
-    private final String type;
-    private final String comment;
-
     final private LinkedHashMap<String, String> annotation;
 
     /**
@@ -28,20 +23,14 @@ public class Annotation {
     public Annotation(String date, String instrument, String config, String matrix,
                       String type, String comment) {
 
-        this.date = date;
-        this.instrument = instrument;
-        this.config = config;
-        this.matrix = matrix;
-        this.type = type;
-        this.comment = comment;
-
         this.annotation = new LinkedHashMap<>();
-        annotation.put("Date", date);
-        annotation.put("Instrument", instrument);
-        annotation.put("Configuration", config);
-        annotation.put("Matrix", matrix);
-        annotation.put("Type", type);
-        annotation.put("Comment", comment);
+
+        annotation.put(ReportTypes.DATE.getLabel(), date);
+        annotation.put(ReportTypes.INSTRUMENT.getLabel(), instrument);
+        annotation.put(ReportTypes.CONFIGURATION.getLabel(), config);
+        annotation.put(ReportTypes.MATRIX.getLabel(), matrix);
+        annotation.put(ReportTypes.ANNOTATION.getLabel(), type);
+        annotation.put(ReportTypes.COMMENT.getLabel(), comment);
     }
 
     /**
@@ -49,7 +38,7 @@ public class Annotation {
      */
     public String getDate() {
 
-        return  this.date;
+        return this.annotation.get(ReportTypes.DATE.getLabel());
     }
 
     /**
@@ -57,7 +46,7 @@ public class Annotation {
      */
     public String getInstrument() {
 
-        return this.instrument;
+        return this.annotation.get(ReportTypes.INSTRUMENT.getLabel());
     }
 
     /**
@@ -65,7 +54,7 @@ public class Annotation {
      */
     public String getConfig() {
 
-        return this.config;
+        return this.annotation.get(ReportTypes.CONFIGURATION.getLabel());
     }
 
     /**
@@ -73,7 +62,7 @@ public class Annotation {
      */
     public String getMatrix() {
 
-        return this.matrix;
+        return this.annotation.get(ReportTypes.MATRIX.getLabel());
     }
 
     /**
@@ -81,7 +70,7 @@ public class Annotation {
      */
     public String getType() {
 
-        return this.type;
+        return this.annotation.get(ReportTypes.ANNOTATION.getLabel());
     }
 
     /**
@@ -89,7 +78,7 @@ public class Annotation {
      */
     public String getComment() {
 
-        return this.comment;
+        return this.annotation.get(ReportTypes.COMMENT.getLabel());
     }
 
     /**
@@ -123,8 +112,8 @@ public class Annotation {
 
         List<String> values = new ArrayList<>();
 
-        for(String key : this.getKeySet()) values.add("\"" + this.getValue(key) + "\"");
+        for (String key : this.getKeySet()) values.add("\"" + this.getValue(key) + "\"");
 
-        return(values);
+        return (values);
     }
 }

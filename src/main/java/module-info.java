@@ -1,4 +1,5 @@
 module cmsp.quickqc.visualizer {
+
     requires javafx.controls;
     requires javafx.fxml;
     requires java.prefs;
@@ -7,7 +8,9 @@ module cmsp.quickqc.visualizer {
     opens cmsp.quickqc.visualizer.datamodel to javafx.fxml;
 
     exports cmsp.quickqc.visualizer;
-    exports cmsp.quickqc.visualizer.parameters;
     exports cmsp.quickqc.visualizer.datamodel;
-    exports cmsp.quickqc.visualizer.utils.plotUtils;
+    exports cmsp.quickqc.visualizer.utils;
+    opens cmsp.quickqc.visualizer.utils to javafx.fxml;
+    exports cmsp.quickqc.visualizer.enums;
+    opens cmsp.quickqc.visualizer.enums to javafx.fxml;
 }

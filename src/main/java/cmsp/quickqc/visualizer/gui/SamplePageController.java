@@ -1,90 +1,162 @@
+
 package cmsp.quickqc.visualizer.gui;
 
 import cmsp.quickqc.visualizer.datamodel.DataEntry;
-import cmsp.quickqc.visualizer.datamodel.SampleEntry;
+import cmsp.quickqc.visualizer.datamodel.PlotEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
+import java.util.List;
 import java.util.Set;
 
+/**
+ * Controller class for sample page.
+ */
 public class SamplePageController {
 
-    @FXML private TextArea commentBox;
-    @FXML private ToggleGroup exclude;
+    @FXML private RadioButton guideExcludeButton;
+    @FXML private RadioButton guideIncludeButton;
     @FXML private RadioButton excludeButton;
     @FXML private RadioButton includeButton;
+    @FXML private TextArea commentBox;
     @FXML private TableView sampleTable;
 
     private DataEntry selectedEntry;
-
     private boolean changedInclusion;
+    private boolean changedGuide;
 
+    /**
+     * Listener method for changes in inclusion-exclusion status of selected data entry point.
+     */
     @FXML
     protected void inclusionGroupListener() {
 
         changedInclusion = true;
     }
 
+    public void guideGroupListener() {
+
+
+        changedGuide = true;
+    }
+
+    /**
+     * Set sample page selection using information from selected data entry point.
+     *
+     * @param selectedEntry
+     */
     public void setDataEntry(DataEntry selectedEntry){
 
         this.selectedEntry = selectedEntry;
 
-        if(selectedEntry.excludeData()){
+        // Is there more elegant way of doing this?
+        if(selectedEntry.isExcluded()) {
+
             excludeButton.setSelected(true);
+
         } else {
+
             includeButton.setSelected(true);
         }
 
+        if(selectedEntry.isGuide()) {
+
+            guideIncludeButton.setSelected(true);
+
+        } else {
+
+            guideExcludeButton.setSelected(true);
+        }
+
+        // Make table with values from selected data entry point.
+        // TODO - raw use of TableView. I don't know how to fix this with current implementation.
         sampleTable.getColumns().clear();
 
-        TableColumn fieldColumn = new TableColumn("Field");
+        TableColumn<List<String>, String> fieldColumn = new TableColumn<>("Field");
         fieldColumn.setCellValueFactory(new PropertyValueFactory<>("field"));
 
-        TableColumn valueColumn = new TableColumn("Value");
+        TableColumn<List<String>, String> valueColumn = new TableColumn<>("Value");
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
 
         sampleTable.getColumns().addAll(fieldColumn, valueColumn);
 
-        ObservableList<SampleEntry> sampleEntries = makeSampleTable(selectedEntry);
+        ObservableList<PlotEntry> sampleEntries = makeSampleTable(selectedEntry);
 
         sampleTable.getItems().addAll(sampleEntries);
 
         this.commentBox.setText(this.selectedEntry.getComment());
     }
 
-    private ObservableList<SampleEntry> makeSampleTable(DataEntry entry){
+    /**
+     * Make TableView compatible entry from selected data entry point.
+     *
+     * @param entry Selected data entry
+     * @return ObservableList of Sample Entries
+     */
+    private ObservableList<PlotEntry> makeSampleTable(DataEntry entry){
 
-        ObservableList<SampleEntry> sampleTableList = FXCollections.observableArrayList();
+        ObservableList<PlotEntry> sampleTableList = FXCollections.observableArrayList();
 
         Set<String> keySet = entry.getKeySet();
 
-        for(String key : keySet){
-            sampleTableList.add(new SampleEntry(key, entry.getValue(key)));
+        // Make new sample entry object for each key:value pair in selected date entry point.
+        for(String key : keySet) {
+
+            sampleTableList.add(new PlotEntry(key, entry.getValue(key)));
         }
 
         return sampleTableList;
     }
 
+    /**
+     * Determine if the inclusion-exclusion status of the selected data entry point has changed.
+     */
     public boolean getChangedInclusion() {
 
-        if(this.changedInclusion){
-            return this.selectedEntry.excludeData() != this.excludeButton.isSelected();
+        // TODO - This logic is confusing. I need to make this more clear to understand.
+        if(this.changedInclusion) {
+
+            return this.selectedEntry.isExcluded() != this.excludeButton.isSelected();
+
         } else {
+
             return false;
         }
     }
 
-    public boolean getChangedComment(){
+    /**
+     * Was guide set inclusion status changed.
+     *
+     * @return true if guide set status changed and guide set marked as showable.
+     */
+    public boolean getChangedGuide() {
+
+        // TODO - This logic is confusing. I need to make this more clear to understand.
+        if(this.changedGuide) {
+
+            return this.selectedEntry.isGuide() != this.guideIncludeButton.isSelected();
+
+        } else {
+
+            return false;
+        }
+    }
+
+    /**
+     * Comment of data entry point has been changed.
+     */
+    public boolean changedComment() {
 
         return !(this.selectedEntry.getValue("Comment").equals(this.commentBox.getText()));
-
     }
 
+    /**
+     * Get comment from comment box.
+     */
     public String getComment() {
+
         return this.commentBox.getText();
     }
-
 }

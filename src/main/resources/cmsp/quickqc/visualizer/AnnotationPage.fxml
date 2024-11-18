@@ -36,7 +36,7 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="annotationConfig" layoutX="150.0" layoutY="120.0" prefHeight="25.0" prefWidth="176.0" />
+      <ChoiceBox fx:id="annotationConfig" layoutX="150.0" layoutY="120.0" prefHeight="25.0" prefWidth="176.0" onAction="#annotationConfigurationListener" />
       <Label layoutX="14.0" layoutY="155.0" text="Matrix:">
          <font>
             <Font size="16.0" />

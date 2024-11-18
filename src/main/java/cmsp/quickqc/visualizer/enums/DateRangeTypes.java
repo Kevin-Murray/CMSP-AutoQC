@@ -1,5 +1,5 @@
 
-package cmsp.quickqc.visualizer.parameters.types;
+package cmsp.quickqc.visualizer.enums;
 
 import java.util.ArrayList;
 
@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Enumeration of QC report context date range types.
  * Date ranges correspond to specific number of day since now.
  */
-public enum DateRangeType {
+public enum DateRangeTypes {
 
     ALL("All Dates", 0),
     LAST7("Last 7 Days", 7),
@@ -24,7 +24,7 @@ public enum DateRangeType {
     /**
      * Constructor for enum.
      */
-    DateRangeType(String rangeName, int daysInt) {
+    DateRangeTypes(String rangeName, int daysInt) {
 
         this.label = rangeName;
         this.range = daysInt;
@@ -45,7 +45,7 @@ public enum DateRangeType {
      */
     public static int getDateRange(String dateRange) {
 
-        for(DateRangeType i : values()) {
+        for(DateRangeTypes i : values()) {
 
             if(i.label.equals(dateRange)) return i.range;
         }
@@ -60,7 +60,7 @@ public enum DateRangeType {
 
         ArrayList<String> values = new ArrayList<>();
 
-        for(DateRangeType i : DateRangeType.values()) values.add(i.label);
+        for(DateRangeTypes i : DateRangeTypes.values()) values.add(i.label);
 
         return values;
     }

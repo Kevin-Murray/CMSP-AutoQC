@@ -1,5 +1,5 @@
 
-package cmsp.quickqc.visualizer.utils.annotations;
+package cmsp.quickqc.visualizer.enums;
 
 import java.util.ArrayList;
 
@@ -11,9 +11,10 @@ public enum AnnotationTypes {
 
     STANDARD("New Stock Solution"),
     COLUMN("Column Change"),
-    MAINTENANCE("Instrument Maintenance"),
     MOBILE("Mobile Phase Change"),
     TUNE("New Tune / Calibration"),
+    PART("New Part / Consumable"),
+    MAINTENANCE("Instrument Maintenance"),
     OTHER("Other");
 
     private final String label;

@@ -1,6 +1,7 @@
 
 package cmsp.quickqc.visualizer.gui;
 
+import cmsp.quickqc.visualizer.enums.ErrorTypes;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -27,11 +28,11 @@ public class ErrorPageController {
     /**
      * Set error message with input message.
      *
-     * @param message String describing error.
+     * @param error Specified error type
      */
     @FXML
-    public void setErrorMessage(String message) {
+    public void setErrorMessage(ErrorTypes error) {
 
-        errorMessageField.setText(message);
+        errorMessageField.setText(error.getErrorMessage());
     }
 }

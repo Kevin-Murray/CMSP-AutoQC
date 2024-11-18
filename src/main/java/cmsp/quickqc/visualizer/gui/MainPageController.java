@@ -125,7 +125,7 @@ public class MainPageController {
         getPreferences();
 
         // Add instrument and date ranges to selections. All other choice boxes are set dynamically.
-        instrumentBox.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(reportContexts));
+        if(reportContexts != null) instrumentBox.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(reportContexts));
         dateRangeBox.getItems().addAll(DateRangeTypes.getDateRangeNames());
 
         // Submit parameters for GUI render
@@ -772,9 +772,11 @@ public class MainPageController {
 
             stage.showAndWait();
 
-            // Update database location.
+            // Update database location and set application defaults.
             this.databasePath = controller.getDatabaseFolder();
-
+            this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());
+            this.reportContexts = readReportConfigs();
+            setApplicationDefaults();
 
         } catch(Exception e) {
 

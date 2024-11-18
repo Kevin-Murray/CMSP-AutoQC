@@ -1,9 +1,10 @@
 
 package cmsp.quickqc.visualizer.utils;
 
-import cmsp.quickqc.visualizer.parameters.*;
-import cmsp.quickqc.visualizer.utils.annotations.Annotation;
+import cmsp.quickqc.visualizer.datamodel.Parameters;
+import cmsp.quickqc.visualizer.datamodel.Annotation;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Utility class for static methods for filtering the mainTask data entry lists.
@@ -36,6 +37,20 @@ public class ReportFilteringUtils {
     public static boolean isShowable(Boolean showExcluded, Boolean exclude) {
 
         return showExcluded || !exclude;
+    }
+
+    /**
+     * Check if DataEntry log number is in user monitored log number list.
+     * If no log numbers monitored, return true.
+     */
+    public static boolean isMonitoredLogNumber(String log, List<String> logNumbers) {
+
+        return logNumbers == null || logNumbers.contains(log);
+    }
+
+    public static boolean isGuideSet(Boolean showGuide, Boolean isGuide) {
+
+        return showGuide && isGuide;
     }
 
     /**

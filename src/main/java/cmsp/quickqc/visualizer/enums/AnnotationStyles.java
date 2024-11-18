@@ -1,5 +1,5 @@
 
-package cmsp.quickqc.visualizer.utils.annotations;
+package cmsp.quickqc.visualizer.enums;
 
 /**
  * Enumeration of annotation styles for QC plot.

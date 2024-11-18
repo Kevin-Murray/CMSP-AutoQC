@@ -1,19 +1,26 @@
 
 package cmsp.quickqc.visualizer.gui;
 
-import cmsp.quickqc.visualizer.parameters.types.ConfigurationTypes;
-import cmsp.quickqc.visualizer.parameters.types.InstrumentTypes;
-import cmsp.quickqc.visualizer.parameters.types.MatrixTypes;
-import cmsp.quickqc.visualizer.utils.annotations.Annotation;
-import cmsp.quickqc.visualizer.utils.annotations.AnnotationTypes;
+import cmsp.quickqc.visualizer.Launcher;
+import cmsp.quickqc.visualizer.datamodel.ReportContext;
+import cmsp.quickqc.visualizer.enums.ErrorTypes;
+import cmsp.quickqc.visualizer.utils.ContextFilteringUtils;
+import cmsp.quickqc.visualizer.datamodel.Annotation;
+import cmsp.quickqc.visualizer.enums.AnnotationTypes;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Controller class for annotation page pop-up window.
@@ -31,30 +38,84 @@ public class AnnotationPageController {
     @FXML private Button annotationSubmit;
     @FXML private Button annotationCancel;
 
+    private ReportContext selectedContext;
+    private List<ReportContext> reportContext;
     private Annotation annotation;
+    private Boolean canceled;
 
     /**
      * Initialize window with default options.
      */
-    public void initialize(){
+    public void initialize() {
+
+        this.canceled = true;
 
         // Instrument types. All other configuration options set dynamically.
         annotationInstrument.getItems().clear();
         annotationInstrument.valueProperty().setValue(null);
-        annotationInstrument.getItems().addAll(InstrumentTypes.getInstrumentNames());
 
         // Annotation types.
         annotationType.getItems().clear();
         annotationType.valueProperty().setValue(null);
         annotationType.getItems().addAll(AnnotationTypes.getAnnotationTypes());
 
-        // Time settings.
-        // TODO - better parameterization of timeChoice? Enum or global parameter?
-        // TODO - initialize annotation page with current time?
+        // Initialize with current date.
+        Date date = new Date();
+        annotationDate.setValue(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        annotationDate.getEditor().setStyle("-fx-alignment: center;");
+
+        // Initialize with current time.
+        SimpleDateFormat formatDate = new SimpleDateFormat("hh:mm");
+        annotationTimeField.setText(formatDate.format(date));
+
+        // Initialize AM-PM setting and current time selection.
         String[] timeChoice = {"AM", "PM"};
         annotationTimePicker.getItems().clear();
         annotationTimePicker.valueProperty().setValue(null);
         annotationTimePicker.getItems().addAll(Arrays.asList(timeChoice));
+        SimpleDateFormat formatAMPM = new SimpleDateFormat("a");
+        annotationTimePicker.valueProperty().setValue(formatAMPM.format(date));
+
+        // Initialize with current selections
+        if(reportContext != null) {
+
+            annotationInstrument.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(reportContext));
+        }
+
+        // Update fields with selected entry
+        if(selectedContext != null) {
+
+            // Set instrument selection
+            annotationInstrument.valueProperty().setValue(selectedContext.instrument());
+
+            // Get and update configuration options.
+            List<String> config = new ArrayList<>();
+            config.add("All");
+            config.addAll(ContextFilteringUtils.getUniqueConfigurations(reportContext, selectedContext.instrument()));
+            annotationConfig.getItems().clear();
+            annotationConfig.getItems().addAll(config);
+            annotationConfig.valueProperty().setValue(selectedContext.config());
+
+            // Get and update matrix options.
+            List<String> matrix = new ArrayList<>();
+            matrix.add("All");
+            matrix.addAll(ContextFilteringUtils.getUniqueMatrices(reportContext, selectedContext.instrument(), selectedContext.config()));
+            annotationMatrix.getItems().clear();
+            annotationMatrix.getItems().addAll(matrix);
+            annotationMatrix.valueProperty().setValue(selectedContext.matrix());
+        }
+    }
+
+    /**
+     * Set application report context and current selected context.
+     * Re-initialize controller to update values.
+     */
+    public void setContext(List<ReportContext> reportContext, ReportContext selectedContext) {
+
+        this.reportContext = reportContext;
+        this.selectedContext = selectedContext;
+
+        initialize();
     }
 
     /**
@@ -62,7 +123,10 @@ public class AnnotationPageController {
      *
      * @param annotation User selected annotation.
      */
-    public void setAnnotation(Annotation annotation) {
+    public void setAnnotation(List<ReportContext> reportContext, Annotation annotation) {
+
+        this.reportContext = reportContext;
+        initialize();
 
         // Time format specifications.
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -85,25 +149,20 @@ public class AnnotationPageController {
         annotationDate.valueProperty().setValue(dateTime.toLocalDate());
 
         // Set instrument selection.
-        String instrument = InstrumentTypes.getInstrument(annotation.getInstrument());
+        String instrument = annotation.getInstrument();
 
         // All non-instrument selections may specify "All" to indicate every context should include this annotation.
         // Get configurations options for selected instrument.
-        // TODO - Configuration specific matrix selections.
-        ArrayList<String> config = new ArrayList<>();
+        List<String> config = new ArrayList<>();
         config.add("All");
-        String[] configurations = ConfigurationTypes.getConfiguration(instrument);
-        if(configurations != null) config.addAll(Arrays.asList(configurations));
-
+        config.addAll(ContextFilteringUtils.getUniqueConfigurations(reportContext, instrument));
         annotationConfig.getItems().clear();
         annotationConfig.getItems().addAll(config);
 
         // Get matrix options for selected instrument.
-        ArrayList<String> matrix = new ArrayList<>();
+        List<String> matrix = new ArrayList<>();
         matrix.add("All");
-        String[] matrices = MatrixTypes.getMatrix(instrument);
-        if(matrices != null) matrix.addAll(Arrays.asList(matrices));
-
+        matrix.addAll(ContextFilteringUtils.getUniqueMatrices(reportContext, instrument, annotation.getConfig()));
         annotationMatrix.getItems().clear();
         annotationMatrix.getItems().addAll(matrix);
 
@@ -117,8 +176,7 @@ public class AnnotationPageController {
 
     /**
      * Annotation instrument choice box listener.
-     * Dynamically updates configuration and matrix choice boxes based on user selection.
-     * TODO - configuration-specific matrix choices.
+     * Dynamically updates configuration choice boxes based on user selection.
      */
     @FXML
     protected void annotationInstrumentListener() {
@@ -127,23 +185,30 @@ public class AnnotationPageController {
 
         String instrument = annotationInstrument.getSelectionModel().getSelectedItem();
 
-        instrument = InstrumentTypes.getInstrument(instrument);
-
         // Get and update configuration options.
-        ArrayList<String> config = new ArrayList<>();
+        List<String> config = new ArrayList<>();
         config.add("All");
-        String[] configurations = ConfigurationTypes.getConfiguration(instrument);
-        if(configurations != null) config.addAll(Arrays.asList(configurations));
-
+        config.addAll(ContextFilteringUtils.getUniqueConfigurations(reportContext, instrument));
         annotationConfig.getItems().clear();
         annotationConfig.getItems().addAll(config);
+    }
+
+    /**
+     * Annotation configuration box listener.
+     * Dynamically updates matrix choice boxed based on user selection.
+     */
+    @FXML
+    protected void annotationConfigurationListener() {
+
+        if(annotationConfig.getSelectionModel().isEmpty()) return;
+
+        String instrument = annotationInstrument.getSelectionModel().getSelectedItem();
+        String config = annotationConfig.getSelectionModel().getSelectedItem();
 
         // Get and update matrix options.
-        ArrayList<String> matrix = new ArrayList<>();
+        List<String> matrix = new ArrayList<>();
         matrix.add("All");
-        String[] matrices = MatrixTypes.getMatrix(instrument);
-        if(matrices != null) matrix.addAll(Arrays.asList(matrices));
-
+        matrix.addAll(ContextFilteringUtils.getUniqueMatrices(reportContext, instrument, config));
         annotationMatrix.getItems().clear();
         annotationMatrix.getItems().addAll(matrix);
     }
@@ -151,43 +216,39 @@ public class AnnotationPageController {
     /**
      * Handles annotation submit button click.
      * If selection valid, make new annotation.
-     * TODO - no error handling currently!!! Whoops... need to get on that ASAP.
      */
     @FXML
     protected void annotationSubmitListener() {
 
-        String errorMessage = "";
-
         // TODO - Is this the best way to handle this?
         if(annotationDate.getValue() == null) {
-            errorMessage = "Date not properly set.";
+            showErrorMessage(ErrorTypes.DATE);
         } else if (annotationTimeField.getText().isEmpty()) {
-            errorMessage = "Time not properly set.";
+           showErrorMessage(ErrorTypes.TIME);
         } else if (annotationTimePicker.getSelectionModel().isEmpty()) {
-            errorMessage = "Time not properly set. Select AM or PM.";
+            showErrorMessage(ErrorTypes.TIMEDAY);
         } else if (annotationInstrument.valueProperty().isNull().getValue()) {
-            errorMessage = "Instrument not properly set.";
+            showErrorMessage(ErrorTypes.INSTRUMENT);
         } else if (annotationConfig.getSelectionModel().isEmpty()) {
-            errorMessage = "Configuration not properly set.";
+            showErrorMessage(ErrorTypes.CONFIGURATION);
         } else if (annotationMatrix.getSelectionModel().isEmpty()) {
-            errorMessage = "Matrix not properly set.";
+            showErrorMessage(ErrorTypes.MATRIX);
         } else if (annotationType.valueProperty().isNull().getValue()) {
-            errorMessage = "Event Type not properly set.";
+            showErrorMessage(ErrorTypes.TYPE);
         } else {
-            this.annotation = makeNewAnnotation();
+            annotation = makeNewAnnotation();
+            canceled = false;
         }
 
-        // TODO - replace with error page call.
-        System.out.println(errorMessage);
-
         // Close window.
-        Stage stage = (Stage) annotationSubmit.getScene().getWindow();
-        stage.close();
+        if(!canceled) {
+            Stage stage = (Stage) annotationSubmit.getScene().getWindow();
+            stage.close();
+        }
     }
 
     /**
      * Handles annotation page cancel button click.
-     * TODO - this doesn't seem to handled correctly. I am seeing big NullPointerException in Runtime window.
      */
     @FXML
     protected void annotationCancelListener() {
@@ -232,5 +293,47 @@ public class AnnotationPageController {
     public Annotation getAnnotation() {
 
         return this.annotation;
+    }
+
+    /**
+     * Determine if window was closed through submit button
+     *
+     * @return true if cancel or close window selected
+     */
+    public Boolean wasCanceled() {
+
+        return this.canceled;
+    }
+
+    /**
+     * Launches error window with input error message.
+     */
+    @FXML
+    protected  void showErrorMessage(ErrorTypes error) {
+
+        try {
+
+            // Get error page window design.
+            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("ErrorPage.fxml"));
+            Parent root = fxmlLoader.load();
+
+            // Initialize error window with message.
+            ErrorPageController controller = fxmlLoader.getController();
+            controller.setErrorMessage(error);
+
+            // Launch pop-up window.
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setResizable(false);
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.showAndWait();
+
+        } catch(Exception e) {
+
+            // TODO - better error handling.
+            e.printStackTrace();
+        }
     }
 }

@@ -3,12 +3,15 @@ package cmsp.quickqc.visualizer.gui;
 
 import cmsp.quickqc.visualizer.*;
 import cmsp.quickqc.visualizer.datamodel.DataEntry;
-import cmsp.quickqc.visualizer.parameters.*;
-import cmsp.quickqc.visualizer.parameters.types.*;
-import cmsp.quickqc.visualizer.utils.annotations.Annotation;
-import cmsp.quickqc.visualizer.utils.annotations.AnnotationStyles;
-import cmsp.quickqc.visualizer.utils.annotations.AnnotationTypes;
-import cmsp.quickqc.visualizer.utils.plotUtils.*;
+import cmsp.quickqc.visualizer.datamodel.Parameters;
+import cmsp.quickqc.visualizer.datamodel.ReportContext;
+import cmsp.quickqc.visualizer.enums.*;
+import cmsp.quickqc.visualizer.utils.ContextFilteringUtils;
+import cmsp.quickqc.visualizer.utils.PlotUtils;
+import cmsp.quickqc.visualizer.datamodel.Annotation;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -23,6 +26,8 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -32,6 +37,10 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -46,11 +55,9 @@ public class MainPageController {
     @FXML public ChoiceBox<String> instrumentBox;
     @FXML public ChoiceBox<String> configurationBox;
     @FXML public ChoiceBox<String> matrixBox;
+    @FXML public ChoiceBox<String> standardBox;
     @FXML public ChoiceBox<String> reportBox;
     @FXML public ChoiceBox<String> dateRangeBox;
-
-    @FXML public Button submitButton;
-    @FXML public Button resetButton;
 
     @FXML public RadioButton leveyJenningsButton;
     @FXML public RadioButton movingRangeButton;
@@ -60,27 +67,47 @@ public class MainPageController {
     @FXML public DatePicker startDatePicker;
     @FXML public DatePicker endDatePicker;
 
+    @FXML public ComboBox<String> logNumberBox;
+
     @FXML public LineChart<String, Number> lineChart;
     @FXML public CategoryAxis xAxis;
     @FXML public NumberAxis yAxis;
 
     @FXML public TableView<Map<Integer, String>> valueTable;
     @FXML public TableView<Map<Integer, String>>  annotationTable;
+    @FXML public Label nEntriesLabel;
+    @FXML public Label firstEntryLabel;
+    @FXML public Label seriesMeanLabel;
+    @FXML public Label nAnnotLabel;
+    @FXML public Label lastEntryLabel;
+    @FXML public Label avgFreqLabel;
+    @FXML public Label seriesMinLabel;
+    @FXML public Label seriesMaxLabel;
+    @FXML public Label seriesSDLabel;
+    @FXML public Label seriesRsdLabel;
+    @FXML public Label lastRefreshLabel;
 
     private Parameters mainParameters;
     private QuickQCTask mainTask;
-    private Path databasePath;
 
+    private Path databasePath;
+    private Path reportConfigPath;
+
+    private List<ReportContext> reportContexts;
+    private ReportContext selectedContext;
     private Map<String, Boolean> annotationMap;
+
     private Boolean logScale;
     private Boolean showExcluded;
     private Boolean showLegend;
-    public Boolean showGuideSet;
+    private Boolean showGuideSet;
+    private Boolean refresh = false;
+
     private String varType;
+    private List<String> logNumbers;
 
     private Preferences prefs;
 
-    private Boolean reset = false;
 
     /**
      * Initialize controller class to default values.
@@ -91,47 +118,99 @@ public class MainPageController {
         mainParameters = new Parameters();
         mainTask = new QuickQCTask(mainParameters);
 
+        // Set all gui options to default
+        setApplicationDefaults();
+
+        // If user has used application previously, get last used configuration.
+        getPreferences();
+
+        // Add instrument and date ranges to selections. All other choice boxes are set dynamically.
+        instrumentBox.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(reportContexts));
+        dateRangeBox.getItems().addAll(DateRangeTypes.getDateRangeNames());
+
+        // Submit parameters for GUI render
+        if(validReportSelection()) submitButtonClick();
+
+        // Refresh application every ten minutes
+        Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(600), event -> {
+
+            this.refresh = true;
+            if(validReportSelection()) submitButtonClick();
+
+            // Force garbage collection to minimize memory usage.
+            System.gc();
+        }));
+
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+    /**
+     * Default values for all GUI selection boxes
+     */
+    public void setApplicationDefaults() {
+
         // Line chart starts empty.
         lineChart.getData().clear();
         lineChart.setLegendVisible(true);
-        yAxis.setLabel("Value"); // TODO - Report context specific yAxis label
+        yAxis.setLabel("Value");
 
         // All ChoiceBox and DatePicker objects cleared or set to null.
         instrumentBox.getItems().clear();
         instrumentBox.valueProperty().setValue(null);
         configurationBox.getItems().clear();
+        configurationBox.valueProperty().setValue(null);
         matrixBox.getItems().clear();
+        matrixBox.valueProperty().setValue(null);
+        standardBox.getItems().clear();
+        standardBox.valueProperty().setValue(null);
         reportBox.getItems().clear();
+        reportBox.valueProperty().setValue(null);
         dateRangeBox.getItems().clear();
         dateRangeBox.valueProperty().setValue(null);
         startDatePicker.setValue(null);
         endDatePicker.setValue(null);
         startDatePicker.setDisable(true);
         endDatePicker.setDisable(true);
+        logNumberBox.getItems().clear();
+
+        // All QC summary labels set to null
+        nEntriesLabel.textProperty().setValue(null);
+        nAnnotLabel.textProperty().setValue(null);
+        firstEntryLabel.textProperty().setValue(null);
+        lastEntryLabel.textProperty().setValue(null);
+        avgFreqLabel.textProperty().setValue(null);
+        seriesMeanLabel.textProperty().setValue(null);
+        seriesMinLabel.textProperty().setValue(null);
+        seriesMaxLabel.textProperty().setValue(null);
+        seriesSDLabel.textProperty().setValue(null);
+        seriesRsdLabel.textProperty().setValue(null);
+
+        // Last database refresh
+        lastRefreshLabel.textProperty().setValue("Last Refresh:");
 
         // By default, show legend, remove excluded points, and plot in linear scale with RSD variability guides.
         showLegend = true;
         showExcluded = false;
+        showGuideSet = false;
         logScale = false;
-        varType = VariabilityTypes.RSD.toString();
+        varType = VariabilityTypes.RSD.getLabel();
+
+        // No log numbers monitored.
+        logNumbers = null;
 
         // All annotation types are visible.
         annotationMap = new HashMap<>();
-        for(AnnotationTypes type : AnnotationTypes.values()){
-            annotationMap.put(type.toString(), true);
+        for(AnnotationTypes type : AnnotationTypes.values()) annotationMap.put(type.toString(), true);
+
+        // On reset, re-initialize values available to user.
+        if(reportContexts != null) {
+
+            instrumentBox.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(reportContexts));
+            dateRangeBox.getItems().addAll(DateRangeTypes.getDateRangeNames());
+            dateRangeBox.valueProperty().setValue(DateRangeTypes.ALL.toString());
         }
 
-        // If user has used application previously, get last used configuration. Otherwise, set to defaults.
-        if(!reset){
-            getPreferences();
-        } else {
-            dateRangeBox.setValue("All Dates");
-            reset = false;
-        }
-
-        // Add instrument and date ranges to selections. All other choice boxes are set dynamically.
-        instrumentBox.getItems().addAll(InstrumentTypes.getInstrumentNames());
-        dateRangeBox.getItems().addAll(DateRangeType.getDateRangeNames());
     }
 
     /**
@@ -141,9 +220,9 @@ public class MainPageController {
     protected void submitButtonClick() {
 
         // If database not specified, show error message.
-        // TODO - Needs better error handling
-        if(databasePath == null){
-            showMissingDatabaseDialog();
+        if(databasePath == null) {
+
+            showErrorMessage(ErrorTypes.DATABASE);
             return;
         }
 
@@ -152,11 +231,10 @@ public class MainPageController {
 
         // Current user selected parameters.
         Parameters selectParams = new Parameters(
-                instrumentBox,
-                configurationBox,
-                matrixBox,
+                selectedContext,
                 reportBox,
                 dateRangeBox,
+                logNumbers,
                 leveyJenningsButton,
                 movingRangeButton,
                 cusummButton,
@@ -171,10 +249,12 @@ public class MainPageController {
                 databasePath);
 
         // If user selected to visualize a new report, reprocess task. Else, update parameters in existing task.
-        if(mainParameters.diffReportSelection(selectParams)) {
+        if(mainParameters.diffReportSelection(selectParams) || refresh) {
 
             mainParameters = selectParams;
             mainTask = new QuickQCTask(mainParameters);
+            updateLastRefresh();
+            refresh = false;
 
         } else {
 
@@ -186,10 +266,9 @@ public class MainPageController {
         mainTask.run();
 
         // Check if main task working entries list is empty.
-        // TODO - better error handling.
         if(mainTask.getWorkingEntrySize() == 0) {
 
-            showNoDataInRangeDialog();
+            showErrorMessage(ErrorTypes.RANGE);
             return;
         }
 
@@ -207,10 +286,7 @@ public class MainPageController {
             XYChart.Series<String, Number> series = plotData.get(i);
             ObservableList<XYChart.Data<String, Number>> seriesData = series.getData();
 
-            for(XYChart.Data<String, Number> data : seriesData) {
-
-                data.getNode().setVisible(false);
-            }
+            for(XYChart.Data<String, Number> data : seriesData) data.getNode().setVisible(false);
         }
 
         // Show or hide legend.
@@ -219,11 +295,7 @@ public class MainPageController {
         // Handle if data entry from series is clicked on the plot. Only for main series.
         XYChart.Series<String, Number> mainSeries = plotData.get(0);
         ObservableList<XYChart.Data<String, Number>> seriesData = mainSeries.getData();
-
-        for(XYChart.Data<String, Number> data : seriesData) {
-
-            data.getNode().setOnMouseClicked(e -> showSampleInfo(data));
-        }
+        for(XYChart.Data<String, Number> data : seriesData) data.getNode().setOnMouseClicked(e -> showSampleInfo(data));
 
         // Get node of main series.
         // TODO - Pull by main series name?
@@ -289,6 +361,15 @@ public class MainPageController {
                                     -fx-padding: 5px;""");
                     }
                 }
+
+                if(mainTask.isGuideSet(i) && showGuideSet) {
+
+                    nodes.get(i).setStyle("""
+                                -fx-background-color: blue, blue;
+                                    -fx-background-insets: 0, 2;
+                                    -fx-background-radius: 8px;
+                                    -fx-padding: 8px;""");
+                }
             }
         }
 
@@ -308,23 +389,31 @@ public class MainPageController {
         annotationTable.getColumns().addAll(mainTask.makeAnnotationTable());
         if(mainTask.getWorkingAnnotationSize() != 0) annotationTable.getItems().addAll(mainTask.getAnnotationData());
 
+        // Update QC Summary Area
+        nEntriesLabel.textProperty().setValue(String.valueOf(mainTask.getWorkingEntrySize()));
+        nAnnotLabel.textProperty().setValue(String.valueOf(mainTask.getWorkingAnnotationSize()));
+        firstEntryLabel.textProperty().setValue(mainTask.getFirstEntryDate());
+        lastEntryLabel.textProperty().setValue(mainTask.getLastEntryDate());
+        avgFreqLabel.textProperty().setValue(mainTask.getEntryFrequency());
+        seriesMeanLabel.textProperty().setValue(mainTask.getSeriesMeanString());
+        seriesMinLabel.textProperty().setValue(mainTask.getSeriesMin());
+        seriesMaxLabel.textProperty().setValue(mainTask.getSeriesMax());
+        seriesSDLabel.textProperty().setValue(mainTask.getSeriesSD());
+        seriesRsdLabel.textProperty().setValue(mainTask.getSeriesRsd());
+
+        // Update log number options
+        String entry = logNumberBox.getEditor().getText();
+        logNumberBox.getItems().clear();
+        logNumberBox.getItems().addAll(mainTask.getSeriesLogNumbers());
+        logNumberBox.setValue(entry);
+
         // Take all current context selections and add to user preferences.
         setPreferences();
     }
 
     /**
-     * Reset all user selections to default.
-     */
-    @FXML
-    protected void setResetButton(){
-        this.reset = true;
-        initialize();
-    }
-
-    /**
      * Listener method for changes in instrument box selection.
-     * Dynamically updates configuration and matrix choice boxes based on selection.
-     * TODO - remove matrix component, make new configuration-specific handling.
+     * Dynamically updates configuration selections based on instrument selection.
      */
     @FXML
     protected void instrumentBoxListener() {
@@ -332,27 +421,51 @@ public class MainPageController {
         // Nothing set, ignore.
         if(instrumentBox.getSelectionModel().isEmpty()) return;
 
+        // Get selected item
         String instrument = instrumentBox.getSelectionModel().getSelectedItem();
 
-        // Update configuration and matrix selections based on instrument selection.
-        instrument = InstrumentTypes.getInstrument(instrument);
-        String[] configuration = ConfigurationTypes.getConfiguration(instrument);
-        String[] matrix = MatrixTypes.getMatrix(instrument);
-
-        // Clear existing selections and set items.
+        // Clear existing selections
         configurationBox.getItems().clear();
+        configurationBox.valueProperty().setValue(null);
         matrixBox.getItems().clear();
+        matrixBox.valueProperty().setValue(null);
+        standardBox.getItems().clear();
+        standardBox.valueProperty().setValue(null);
         reportBox.getItems().clear();
+        reportBox.valueProperty().setValue(null);
 
-        // Add new options
-        // TODO - Error handling if they are null? I don't know how they could be.
-        if(configuration != null) configurationBox.getItems().addAll(Arrays.asList(configuration));
-        if(matrix != null) matrixBox.getItems().addAll(Arrays.asList(matrix));
+        // Set new selections
+        if(reportContexts != null) configurationBox.getItems().addAll(ContextFilteringUtils.getUniqueConfigurations(reportContexts, instrument));
     }
 
     /**
+     * Listener method for changes in the configuration choice box.
+     * Dynamically updates matrix selections based on configuration selection.
+     */
+    @FXML
+    protected void configBoxListener() {
+
+        // Nothing set, ignore.
+        if(configurationBox.getSelectionModel().isEmpty()) return;
+
+        // Get selected item
+        String instrument = instrumentBox.getSelectionModel().getSelectedItem();
+        String config = configurationBox.getSelectionModel().getSelectedItem();
+
+        // Clear existing selections
+        matrixBox.getItems().clear();
+        matrixBox.valueProperty().setValue(null);
+        reportBox.getItems().clear();
+        reportBox.valueProperty().setValue(null);
+
+        // Set new selections
+        if(reportContexts != null) matrixBox.getItems().addAll(ContextFilteringUtils.getUniqueMatrices(reportContexts, instrument, config));
+    }
+
+
+    /**
      * Listener method for changes in the matrix choice box.
-     * Dynamically updates report selections based on matrix selection.
+     * Dynamically updates standard selections based on matrix selection.
      */
     @FXML
     protected void matrixBoxListener() {
@@ -360,23 +473,65 @@ public class MainPageController {
         // Nothing set, ignore.
         if(matrixBox.getSelectionModel().isEmpty()) return;
 
-        // Create ReportObject based on matrix selection.
-        // ReportObject is HashMap with report context selections.
+        // Get Selected item
+        String instrument = instrumentBox.getSelectionModel().getSelectedItem();
+        String config = configurationBox.getSelectionModel().getSelectedItem();
         String matrix = matrixBox.getSelectionModel().getSelectedItem();
-        ReportObject reports = new ReportObject(matrix);
 
-        // Clear existing selections and set items.
+        // Clear existing selections
+        standardBox.getItems().clear();
+        standardBox.valueProperty().setValue(null);
         reportBox.getItems().clear();
-        reportBox.getItems().addAll(Arrays.asList(reports.getReports()));
+        reportBox.valueProperty().setValue(null);
+
+        // Set new selections
+        if(reportContexts != null) {
+            standardBox.getItems().addAll(ContextFilteringUtils.getUniqueStandards(reportContexts, instrument, config, matrix));
+        }
     }
 
     /**
-     * Disable submit button if report context not specified.
+     * Listener method for changes in the standard choice box.
+     * Dynamically updates report selections based on matrix selection.
+     */
+    @FXML
+    protected void standardBoxListener() {
+
+        // Nothing set, ignore.
+        if(standardBox.getSelectionModel().isEmpty()) return;
+
+        // Get Selected item
+        String instrument = instrumentBox.getSelectionModel().getSelectedItem();
+        String config = configurationBox.getSelectionModel().getSelectedItem();
+        String matrix = matrixBox.getSelectionModel().getSelectedItem();
+        String standard = standardBox.getSelectionModel().getSelectedItem();
+
+        // Clear existing selections, but don't set to null for easy switching of standard-report
+        if(reportContexts != null) {
+
+            selectedContext = ContextFilteringUtils.getSelectedReportContext(reportContexts, instrument, config, matrix, standard);
+            List<String> items = selectedContext.variables();
+            List<String> setItems = reportBox.getItems();
+
+            if(!setItems.equals(items)) {
+
+                reportBox.getItems().clear();
+                reportBox.valueProperty().setValue(null);
+
+                reportBox.getItems().addAll(items);
+            }
+
+            if(validReportSelection()) submitButtonClick();
+        }
+    }
+
+    /**
+     * Submit user selections if date range, standard, and report properly set.
      */
     @FXML
     protected void reportBoxListener() {
 
-        submitButton.setDisable(reportBox.getSelectionModel().isEmpty());
+        if(validReportSelection()) submitButtonClick();
     }
 
     /**
@@ -394,10 +549,6 @@ public class MainPageController {
 
         if(dateRange.equals("All Dates")) {
 
-            if(!reportBox.getSelectionModel().isEmpty()){
-                submitButton.setDisable(false);
-            }
-
             // Remove all dates in DatePickers and disable them.
             startDatePicker.setValue(null);
             endDatePicker.setValue(null);
@@ -406,9 +557,6 @@ public class MainPageController {
             endDatePicker.setDisable(true);
 
         } else if (dateRange.equals("Custom Date Range")) {
-
-            // Disable submit button until date range specified.
-            submitButton.setDisable(true);
 
             // Reset Date Pickers and enable them.
             startDatePicker.setValue(null);
@@ -419,13 +567,9 @@ public class MainPageController {
 
         } else {
 
-            if(!reportBox.getSelectionModel().isEmpty()){
-                submitButton.setDisable(false);
-            }
-
             // Replace Date Picker values with appropriate start and end dates, then enable them.
             LocalDate endDate = LocalDate.now();
-            LocalDate startDate = endDate.minusDays(DateRangeType.getDateRange(dateRange));
+            LocalDate startDate = endDate.minusDays(DateRangeTypes.getDateRange(dateRange));
 
             startDatePicker.setValue(startDate);
             endDatePicker.setValue(endDate);
@@ -433,11 +577,12 @@ public class MainPageController {
             startDatePicker.setDisable(true);
             endDatePicker.setDisable(true);
         }
+
+        if(validReportSelection()) submitButtonClick();
     }
 
     /**
      * Listener method for changes in date picker boxes.
-     * TODO - need to handle custom date range interaction with default parameters.
      */
     @FXML
     protected void datePickerListener(){
@@ -460,21 +605,82 @@ public class MainPageController {
 
                 // Highlight DatePicker in red and disable submit button.
                 startDatePicker.setBackground(new Background(new BackgroundFill(Color.RED, new CornerRadii(0), Insets.EMPTY)));
-                submitButton.setDisable(true);
 
             } else {
 
                 startDatePicker.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(0), Insets.EMPTY)));
+            }
+        }
 
-                if(!reportBox.getSelectionModel().isEmpty()){
-                    submitButton.setDisable(false);
+        if(validReportSelection()) submitButtonClick();
+    }
+
+    /**
+     * Listener method for changes in the plot type radio buttons.
+     */
+    @FXML
+    protected void plotTypeListener() {
+
+        if(validReportSelection()) submitButtonClick();
+    }
+
+    /**
+     * Listener method for key entries in log number combo box.
+     *
+     * @param keyEvent If enter key pressed, handle input.
+     */
+    @FXML
+    protected void logNumberBoxKeyListener(KeyEvent keyEvent) {
+
+        // User input enter key
+        if(keyEvent.getCode().equals(KeyCode.ENTER)) {
+
+            String input = logNumberBox.getEditor().getText().trim();
+
+            if(input.isEmpty()) {
+
+                this.logNumbers = null;
+                submitButtonClick();
+
+            } else {
+
+                logNumberBox.setValue(input);
+                logNumberBox.getEditor().setText(input);
+
+                // Split input string and trim whitespace.
+                String[] logNumbers = input.split(",");
+                Arrays.stream(logNumbers).map(String::trim).toArray(unused -> logNumbers);
+
+                // Check if each log number is 5-digit number
+                for(String log : logNumbers) {
+
+                    if(!log.matches("\\d{5}")) {
+
+                        showErrorMessage(ErrorTypes.LOG);
+                        return;
+                    }
                 }
+
+                this.logNumbers = Arrays.asList(logNumbers);
+
+                if(validReportSelection()) submitButtonClick();
             }
         }
     }
 
     /**
-     * Handle primary mouse click on main series data point on line chart.
+     * Update the last refresh label to show current time.
+     */
+    @FXML
+    protected void updateLastRefresh() {
+
+        Date now = new Date();
+        String label = "Last Refresh: " + now;
+        this.lastRefreshLabel.textProperty().setValue(label);
+    }
+
+    /**
+     * Handle primary mouse click on main series data point on the line chart.
      * Launch pop-up window with sample information for selected entry.
      *
      * @param data User selected data entry
@@ -515,6 +721,15 @@ public class MainPageController {
                 submitButtonClick();
             }
 
+            // Primary user change - point marked from inclusion/exclusion from the series.
+            if(controller.getChangedGuide()) {
+
+                // Update entry in main task series. Update change in master database. Update the plot.
+                this.mainTask.setDataEntryGuide(selectedEntry);
+                this.mainTask.writeReport();
+                submitButtonClick();
+            }
+
             // Secondary user change - user comment on QC point
             if(controller.changedComment()) {
 
@@ -523,8 +738,6 @@ public class MainPageController {
                 this.mainTask.writeReport();
                 submitButtonClick();
             }
-
-            // TODO - Guide set designation handling.
 
         } catch(Exception e) {
 
@@ -538,7 +751,7 @@ public class MainPageController {
      * Currently only used to designate directory of QC databases.
      */
     @FXML
-    protected void menuSetUpListener(){
+    protected void menuSetUpListener() {
 
         try {
 
@@ -562,6 +775,7 @@ public class MainPageController {
             // Update database location.
             this.databasePath = controller.getDatabaseFolder();
 
+
         } catch(Exception e) {
 
             // TODO - better error handling.
@@ -570,14 +784,29 @@ public class MainPageController {
     }
 
     /**
-     * Handle empty database path.
-     * User must specify database in set-up window.
-     * TODO - only handles missing location. Needs to handle wrong location.
-     *
-     * @see #menuSetUpListener()
+     * Reset all user selections to default.
      */
     @FXML
-    protected void showMissingDatabaseDialog() {
+    protected void menuEditDefaultListener() {
+
+        setApplicationDefaults();
+    }
+
+    /**
+     * Refresh application to update QC database
+     */
+    @FXML
+    protected void menuEditRefreshListener() {
+
+        this.refresh = true;
+        submitButtonClick();
+    }
+
+    /**
+     * Launches error window with input error message.
+     */
+    @FXML
+    protected  void showErrorMessage(ErrorTypes error) {
 
         try {
 
@@ -586,44 +815,8 @@ public class MainPageController {
             Parent root = fxmlLoader.load();
 
             // Initialize error window with message.
-            ErrorPageController controller = fxmlLoader.<ErrorPageController>getController();
-            controller.setErrorMessage("Database path not set properly.\nPlease set in - Files > Set Up...");
-
-            // Launch pop-up window.
-            Stage stage = new Stage();
-            stage.initStyle(StageStyle.UNDECORATED);
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-
-            stage.showAndWait();
-
-        } catch(Exception e) {
-
-            // TODO - better error handling.
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * Handle empty series in user specified data range.
-     * TODO - merge all error page handling into single method?
-     *
-     * @see #submitButtonClick()
-     */
-    @FXML
-    protected void showNoDataInRangeDialog() {
-
-        try {
-
-            // Get error page design.
-            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("ErrorPage.fxml"));
-            Parent root = fxmlLoader.load();
-
-            // Initialize error page with message.
-            ErrorPageController controller = fxmlLoader.<ErrorPageController>getController();
-            controller.setErrorMessage("No QC entries in date range.\nPlease adjust the range and try again.");
+            ErrorPageController controller = fxmlLoader.getController();
+            controller.setErrorMessage(error);
 
             // Launch pop-up window.
             Stage stage = new Stage();
@@ -643,7 +836,6 @@ public class MainPageController {
 
     /**
      * Set application preference setting with current user selections.
-     * TODO - expand preferences stored - date picker, annotation map, variability guides...
      *
      * @see #submitButtonClick()
      */
@@ -652,27 +844,24 @@ public class MainPageController {
         // This will define a node in which the preferences can be stored.
         prefs = Preferences.userRoot().node(this.getClass().getName());
 
-        // TODO - specify preference IDs using Enum?
-        String ID1 = "Database Path";
-        String ID2 = "Instrument";
-        String ID3 = "Configuration";
-        String ID4 = "Matrix";
-        String ID5 = "Report";
-        String ID6 = "Date Range";
-        String ID7 = "Show Excluded";
+        // To simply preferences, don't allow Custom date range to be a preference.
+        String date = (this.mainParameters.dateRange.equals(DateRangeTypes.CUSTOM.toString())) ?
+                DateRangeTypes.ALL.toString() : this.mainParameters.dateRange;
 
-        prefs.put(ID1, this.mainParameters.databasePath.toString());
-        prefs.put(ID2, this.mainParameters.instrument);
-        prefs.put(ID3, this.mainParameters.configuration);
-        prefs.put(ID4, this.mainParameters.matrix);
-        prefs.put(ID5, this.mainParameters.report);
-        prefs.put(ID6, this.mainParameters.dateRange);
-        prefs.putBoolean(ID7, this.mainParameters.showExcluded);
+        // Assign preferences.
+        prefs.put(ReportTypes.DATABASE.name(), this.mainParameters.databasePath.toString());
+        prefs.put(ReportTypes.INSTRUMENT.name(), this.mainParameters.instrument);
+        prefs.put(ReportTypes.CONFIGURATION.name(), this.mainParameters.configuration);
+        prefs.put(ReportTypes.MATRIX.name(), this.mainParameters.matrix);
+        prefs.put(ReportTypes.STANDARD.name(), this.mainParameters.standard);
+        prefs.put(ReportTypes.REPORT.name(), this.mainParameters.report);
+        prefs.put(ReportTypes.RANGE.name(), date);
+        prefs.put(ReportTypes.GUIDE.name(), this.mainParameters.showGuide.toString());
+        prefs.putBoolean(ReportTypes.EXCLUDED.name(), this.mainParameters.showExcluded);
     }
 
     /**
      * Retrieve user application preferences.
-     * TODO - expand preferences stored - date picker, annotation map, variability guides...
      *
      * @see #setPreferences()
      * @see #submitButtonClick()
@@ -683,67 +872,43 @@ public class MainPageController {
         // This will retrieve the node where the user preferences are stored.
         prefs = Preferences.userRoot().node(this.getClass().getName());
 
-        // TODO - specify preference IDs using Enum?
-        String ID1 = "Database Path";
-        String ID2 = "Instrument";
-        String ID3 = "Configuration";
-        String ID4 = "Matrix";
-        String ID5 = "Report";
-        String ID6 = "Date Range";
-        String ID7 = "Show Excluded";
-
         // Get preference, return default value if none found.
-        String databasePath = prefs.get(ID1, null);
-        String instrument = prefs.get(ID2, null);
-        String config = prefs.get(ID3, null);
-        String matrix = prefs.get(ID4, null);
-        String report = prefs.get(ID5, null);
-        String dateRange = prefs.get(ID6, null);
-        showExcluded = prefs.getBoolean(ID7, true);
+        String databasePath = prefs.get(ReportTypes.DATABASE.name(), null);
+        String instrument = prefs.get(ReportTypes.INSTRUMENT.name(), null);
+        String config = prefs.get(ReportTypes.CONFIGURATION.name(), null);
+        String matrix = prefs.get(ReportTypes.MATRIX.name(), null);
+        String standard = prefs.get(ReportTypes.STANDARD.name(), null);
+        String report = prefs.get(ReportTypes.REPORT.name(), null);
+        String dateRange = prefs.get(ReportTypes.RANGE.name(), null);
+        showExcluded = prefs.getBoolean(ReportTypes.EXCLUDED.name(), true);
+        showGuideSet = prefs.getBoolean(ReportTypes.GUIDE.name(), false);
 
         // Update database path.
         if(databasePath != null) {
 
             this.databasePath = Paths.get(databasePath);
+
+            // Format report configs database
+            this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());
+            this.reportContexts = readReportConfigs();
         }
 
         // Handle choice box options based on instrument setting.
-        // TODO - can I just call #instrumentBoxListener()?
-        if(instrument != null) {
+        if(instrument != null && config != null && matrix != null && standard != null && report != null && reportContexts != null) {
 
-            instrumentBox.setValue(instrument);
-
-            instrument = InstrumentTypes.getInstrument(instrument);
-
-            String[] configurationOptions = ConfigurationTypes.getConfiguration(instrument);
-            String[] matrixOptions = MatrixTypes.getMatrix(instrument);
-
-            // Add new options
-            // TODO - Error handling if they are null?
-            if(configurationOptions != null) configurationBox.getItems().addAll(Arrays.asList(configurationOptions));
-            if(matrixOptions != null) matrixBox.getItems().addAll(Arrays.asList(matrixOptions));
-        }
-
-        // Set user configuration selection.
-        // TODO - configuration-specific matrix selections update planned.
-        if(config != null) {
-
-            configurationBox.setValue(config);
-        }
-
-        // Set matrix choice. Update options in matrix choice box.
-        if(matrix != null) {
-
-            matrixBox.setValue(matrix);
-            matrixBoxListener();
-        }
-
-        // Set report choice. Update listener.
-        // TODO - what does #reportBoxListener() method call do here? Redundant?
-        if(report != null) {
-
-            reportBox.setValue(report);
-            reportBoxListener();
+            instrumentBox.valueProperty().setValue(instrument);
+            configurationBox.getItems().clear();
+            configurationBox.getItems().addAll(ContextFilteringUtils.getUniqueConfigurations(reportContexts, instrument));
+            configurationBox.valueProperty().setValue(config);
+            matrixBox.getItems().clear();
+            matrixBox.getItems().addAll(ContextFilteringUtils.getUniqueMatrices(reportContexts, instrument, config));
+            matrixBox.valueProperty().setValue(matrix);
+            standardBox.getItems().clear();
+            standardBox.getItems().addAll(ContextFilteringUtils.getUniqueStandards(reportContexts, instrument, config, matrix));
+            standardBox.valueProperty().setValue(standard);
+            reportBox.getItems().clear();
+            reportBox.getItems().addAll(ContextFilteringUtils.getSelectedReportContext(reportContexts, instrument, config, matrix, standard).variables());
+            reportBox.valueProperty().setValue(report);
         }
 
         // Set date range.
@@ -752,15 +917,15 @@ public class MainPageController {
 
             dateRangeBox.setValue(dateRange);
 
-            if(dateRange.equals("All Dates")) {
-
-                startDatePicker.setDisable(true);
-                endDatePicker.setDisable(true);
+            if(dateRange.equals(DateRangeTypes.ALL.toString())) {
 
                 startDatePicker.setValue(null);
                 endDatePicker.setValue(null);
 
-            } else if (dateRange.equals("Custom Date Range")) {
+                startDatePicker.setDisable(true);
+                endDatePicker.setDisable(true);
+
+            } else if (dateRange.equals(DateRangeTypes.CUSTOM.toString())) {
 
                 startDatePicker.setValue(null);
                 endDatePicker.setValue(null);
@@ -771,13 +936,10 @@ public class MainPageController {
             } else {
 
                 LocalDate endDate = LocalDate.now();
-                LocalDate startDate = endDate.minusDays(DateRangeType.getDateRange(dateRange));
+                LocalDate startDate = endDate.minusDays(DateRangeTypes.getDateRange(dateRange));
 
                 startDatePicker.setDisable(true);
                 endDatePicker.setDisable(true);
-
-                startDatePicker.setValue(null);
-                endDatePicker.setValue(null);
 
                 startDatePicker.setValue(startDate);
                 endDatePicker.setValue(endDate);
@@ -873,46 +1035,52 @@ public class MainPageController {
         CustomMenuItem ann4 = new CustomMenuItem(am4);
         ann4.setHideOnClick(false);
 
-        CheckBox am5 = new CheckBox("Instrument Maintenance");
+        CheckBox am5 = new CheckBox("New Part / Consumable");
         am5.setSelected(annotationMap.get(am5.getText()));
         am5.setOnAction((ActionEvent e) -> {annotationMap.put(am5.getText(), am5.isSelected()); submitButtonClick();});
-        am5.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #C8A2C8");
+        am5.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #97EB75");
         CustomMenuItem ann5 = new CustomMenuItem(am5);
         ann5.setHideOnClick(false);
 
-        CheckBox am6 = new CheckBox("Other");
+        CheckBox am6 = new CheckBox("Instrument Maintenance");
         am6.setSelected(annotationMap.get(am6.getText()));
         am6.setOnAction((ActionEvent e) -> {annotationMap.put(am6.getText(), am6.isSelected()); submitButtonClick();});
-        am6.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #E6AB02");
+        am6.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #C8A2C8");
         CustomMenuItem ann6 = new CustomMenuItem(am6);
         ann6.setHideOnClick(false);
 
+        CheckBox am7 = new CheckBox("Other");
+        am7.setSelected(annotationMap.get(am6.getText()));
+        am7.setOnAction((ActionEvent e) -> {annotationMap.put(am7.getText(), am7.isSelected()); submitButtonClick();});
+        am7.setStyle("-fx-text-fill: -fx-text-base-color; selected-box-color: #E6AB02");
+        CustomMenuItem ann7 = new CustomMenuItem(am7);
+        ann7.setHideOnClick(false);
+
         Menu annotMenu = new Menu("Show Annotations");
-        annotMenu.getItems().addAll(ann1, ann2, ann3, ann4, ann5, ann6);
+        annotMenu.getItems().addAll(ann1, ann2, ann3, ann4, ann5, ann6, ann7);
 
         // Other check box items.
         // TODO - convert all context menu strings into Enum?
         CheckBox lg2 = new CheckBox("Log2 Values");
-        lg2.setSelected(false);
+        lg2.setSelected(logScale);
         lg2.setOnAction((ActionEvent e) -> {logScale = lg2.isSelected(); submitButtonClick();});
         lg2.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem logMenu = new CustomMenuItem(lg2);
         logMenu.setHideOnClick(false);
 
         CheckBox slg = new CheckBox("Show Legend");
-        slg.setSelected(true);
+        slg.setSelected(showLegend);
         slg.setOnAction((ActionEvent e) -> {showLegend = slg.isSelected(); submitButtonClick();});
         slg.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem legendMenu = new CustomMenuItem(slg);
         legendMenu.setHideOnClick(false);
 
         CheckBox sgd = new CheckBox("Show Guide");
-        sgd.setSelected(false);
-        sgd.setDisable(true);
+        sgd.setSelected(showGuideSet);
+        sgd.setOnAction((ActionEvent e) -> {showGuideSet = sgd.isSelected(); submitButtonClick();});
         sgd.setStyle("-fx-text-fill: -fx-text-base-color");
         CustomMenuItem guideMenu = new CustomMenuItem(sgd);
         guideMenu.setHideOnClick(false);
-        guideMenu.setDisable(true);
 
         CheckBox sxp = new CheckBox("Show Excluded Points");
         sxp.setSelected(showExcluded);
@@ -942,7 +1110,7 @@ public class MainPageController {
                             contextMenu.show(lineChart, mouseEvent.getScreenX(), mouseEvent.getScreenY());
 
                         }
-                        if (mouseEvent.getButton() == MouseButton.PRIMARY & mouseEvent.getClickCount() >= 2) {
+                        if (mouseEvent.getButton() == MouseButton.PRIMARY & mouseEvent.getClickCount() >= 1) {
                             contextMenu.hide();
                         }
 
@@ -1015,6 +1183,7 @@ public class MainPageController {
             FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("AnnotationPage.fxml"));
             Parent root = fxmlLoader.load();
             AnnotationPageController controller = fxmlLoader.getController();
+            controller.setContext(reportContexts, selectedContext);
 
             // Launch pop-up window.
             Stage stage = new Stage();
@@ -1023,13 +1192,17 @@ public class MainPageController {
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
-            // Handle user input.
-            mainTask.addAnnotation(controller.getAnnotation());
-            mainTask.sortAnnotations();
-            mainTask.writeAnnotationReport();
+            // If page wasn't canceled, handle new annotation.
+            if(!controller.wasCanceled()) {
 
-            // Update application.
-            submitButtonClick();
+                // Handle user input.
+                mainTask.addAnnotation(controller.getAnnotation());
+                mainTask.sortAnnotations();
+                mainTask.writeAnnotationReport();
+
+                // Update application.
+                submitButtonClick();
+            }
 
         } catch(Exception e) {
 
@@ -1055,7 +1228,7 @@ public class MainPageController {
 
             // Initialize page with selected annotation.
             AnnotationPageController controller = fxmlLoader.getController();
-            controller.setAnnotation(annotation);
+            controller.setAnnotation(reportContexts, annotation);
 
             // Launch pop-up window.
             Stage stage = new Stage();
@@ -1064,13 +1237,16 @@ public class MainPageController {
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
-            // Update annotation entry with new input and update master annotation database.
-            mainTask.editAnnotation(annotation, controller.getAnnotation());
-            mainTask.sortAnnotations();
-            mainTask.writeAnnotationReport();
+            if(!controller.wasCanceled()) {
 
-            // Refresh application.
-            submitButtonClick();
+                // Update annotation entry with new input and update master annotation database.
+                mainTask.editAnnotation(annotation, controller.getAnnotation());
+                mainTask.sortAnnotations();
+                mainTask.writeAnnotationReport();
+
+                // Refresh application.
+                submitButtonClick();
+            }
 
         } catch(Exception e) {
 
@@ -1094,5 +1270,68 @@ public class MainPageController {
 
         // Refresh application.
         submitButtonClick();
+    }
+
+    /**
+     *
+     */
+    private List<ReportContext> readReportConfigs() {
+
+        List<ReportContext> contextList = new ArrayList<>();
+
+        // Create an instance of BufferedReader
+        try (BufferedReader br = Files.newBufferedReader(this.reportConfigPath, StandardCharsets.US_ASCII)) {
+
+            String line = br.readLine();
+            line = line.replace("\"", "");
+            String[] header = line.split(",");
+
+            line = br.readLine();
+
+            // Loop through database line by line.
+            while (line != null) {
+
+                // TODO - evaluate a more efficient way to handle commas in comment field.
+                // Parse strings.
+                String[] attributes = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                for(int i = 0; i < attributes.length; i++) {
+
+                    attributes[i] = attributes[i].replace("\"", "");
+                }
+
+                // Handle variable string in fifth column. Entries separated by semicolon.
+                String[] variables = attributes[4].split(";");
+                Arrays.stream(variables).map(String::trim).toArray(unused -> variables);
+                List<String> varArray = Arrays.asList(variables);
+
+                Path reportPath = this.databasePath.resolve(attributes[5]);
+
+                // Make ReportContext Object
+                contextList.add(new ReportContext(attributes[0], attributes[1], attributes[2], attributes[3], reportPath, varArray));
+
+                line = br.readLine();
+            }
+
+        } catch (IOException ioe) {
+
+            // TODO - Error handling
+            ioe.printStackTrace();
+        }
+
+        return contextList;
+    }
+
+    /**
+     * Check if all report context are properly set by user.
+     *
+     * @return true if all context set
+     */
+    private Boolean validReportSelection() {
+
+        return (!reportBox.getSelectionModel().isEmpty() &&
+                !standardBox.getSelectionModel().isEmpty() &&
+                (!dateRangeBox.getSelectionModel().isEmpty() && !dateRangeBox.getSelectionModel().getSelectedItem().equals("Custom Date Range") ||
+                        (startDatePicker.getValue() != null && endDatePicker.getValue() != null)));
+
     }
 }

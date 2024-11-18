@@ -17,7 +17,6 @@ public class QuickQCMain extends Application {
 
     /**
      * Starts QC application.
-     *
      */
     @Override
     public void start(Stage stage) throws IOException {
@@ -34,7 +33,7 @@ public class QuickQCMain extends Application {
         main.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styleGuide.css")).toString());
 
         // Set application icon.
-        Image image = new Image("cmsp/quickqc/visualizer/quickQA-icon.png");
+        Image image = new Image("cmsp/quickqc/visualizer/quickQC-icon.png");
         stage.getIcons().add(image);
 
         // Open gui.
@@ -45,12 +44,10 @@ public class QuickQCMain extends Application {
 
     /**
      *  Main method.
-     *
      */
     public static void main(String[] args) {
 
         // Uses Launcher class as true main method class. Not really sure why it's designed like this...
         launch();
     }
-
 }

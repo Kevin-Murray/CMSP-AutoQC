@@ -774,10 +774,17 @@ public class MainPageController {
 
             // Update database location and set application defaults.
             this.databasePath = controller.getDatabaseFolder();
-            this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());
-            this.reportContexts = readReportConfigs();
-            setApplicationDefaults();
 
+            if(!Files.exists(this.databasePath)) {
+
+                showErrorMessage(ErrorTypes.DATABASE);
+
+            } else {
+
+                this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());
+                this.reportContexts = readReportConfigs();
+                setApplicationDefaults();
+            }
         } catch(Exception e) {
 
             // TODO - better error handling.
@@ -889,6 +896,13 @@ public class MainPageController {
         if(databasePath != null) {
 
             this.databasePath = Paths.get(databasePath);
+
+            // Preference database location no longer exists.
+            if(!Files.exists(this.databasePath)) {
+
+                showErrorMessage(ErrorTypes.DATABASE);
+                return;
+            }
 
             // Format report configs database
             this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());

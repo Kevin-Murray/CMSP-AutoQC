@@ -1,8 +1,8 @@
 
-package cmsp.quickqc.visualizer.utils.plotUtils;
+package cmsp.quickqc.visualizer.utils;
 
 import cmsp.quickqc.visualizer.datamodel.DataEntry;
-import cmsp.quickqc.visualizer.utils.MathUtils;
+import cmsp.quickqc.visualizer.enums.VariabilityTypes;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.SnapshotParameters;
@@ -31,12 +31,13 @@ public class PlotUtils {
      * @param varType Type of variability guides
      * @return List of chart series data
      */
-    public static ObservableList<XYChart.Series<String, Number>> getLeveyData(List<DataEntry> reportItems, String reportType, Boolean logScale, String varType){
+    public static ObservableList<XYChart.Series<String, Number>> getLeveyData(List<DataEntry> reportItems, String reportType, Boolean logScale, String varType, Boolean showGuideSet){
 
         ObservableList<XYChart.Series<String, Number>> plotData = FXCollections.observableArrayList();
 
         ArrayList<String> dateList = new ArrayList<>();
         ArrayList<Double> itemList = new ArrayList<>();
+        ArrayList<Double> guideList = new ArrayList<>();
 
         // Main series contains all date strings and values of report context to be plotted.
         XYChart.Series<String, Number> mainSeries = new XYChart.Series<>();
@@ -51,13 +52,17 @@ public class PlotUtils {
 
                 dateList.add(entry.getDate());
                 itemList.add(entry.getItem(reportType, logScale));
+
+                if(showGuideSet && entry.isGuide()) guideList.add(entry.getItem(reportType, logScale));
             }
 
             mainSeries.getData().add(new XYChart.Data<>(entry.getDate(), entry.getItem(reportType, logScale)));
         }
 
         // Calculate series mean
-        double mean = MathUtils.calculateAverage(itemList);
+        double mean = (showGuideSet && guideList.size() >= 3) ?
+                MathUtils.calculateAverage(guideList) :
+                MathUtils.calculateAverage(itemList);
 
         // Create series for mean and variability guides.
         XYChart.Series<String, Number> meanSeries = new XYChart.Series<>();
@@ -75,9 +80,12 @@ public class PlotUtils {
 
         // Use series standard deviations as guides.
         // Levels set as 1, 2, 3 standard deviations from mean.
-        if(varType.equals(VariabilityTypes.STD.toString())) {
+        if(varType.equals(VariabilityTypes.STD.getLabel())) {
 
-            double sd = MathUtils.calculateStandardDeviation(itemList);
+            double sd = (showGuideSet && guideList.size() >= 3) ?
+                    MathUtils.calculateStandardDeviation(guideList) :
+                    MathUtils.calculateStandardDeviation(itemList);
+
             var1 = 1 * sd;
             var2 = 2 * sd;
             var3 = 3 * sd;
@@ -88,7 +96,7 @@ public class PlotUtils {
 
         // Use relative standard deviation of mean as guides.
         // Levels set as standard deviation equivalent to 5%, 10%, and 20% RSD.
-        if(varType.equals(VariabilityTypes.RSD.toString())) {
+        if(varType.equals(VariabilityTypes.RSD.getLabel())) {
 
             var1 = 0.05 * mean;
             var2 = 0.10 * mean;

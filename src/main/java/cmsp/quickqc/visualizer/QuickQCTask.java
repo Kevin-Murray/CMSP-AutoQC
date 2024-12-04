@@ -541,15 +541,34 @@ public class QuickQCTask {
 
         String date = data.getXValue();
 
-        // Get DataEntry by selected data point data
-        // Assumption that it is impossible for to entries to have the same date.
-        // TODO - validate assumption.
-        for(DataEntry entry : this.workingEntries) {
+        // Get Annotation by selected data point data
+        // Assumption that it is impossible for to entries to have the same date
+        // TODO - give entries unique identifiers.
+        for(DataEntry entry : this.mergedEntries) {
 
-            if(entry.getDate().equals(date)) {
+            if(entry.getDate().equals(date)) return entry;
+        }
 
-                return entry;
-            }
+        return null;
+    }
+
+    /**
+     * Get Annotation from DataEntry-Annotation entry.
+     *
+     * @param entry User selected entry from line chart.
+     * @return Annotation object of selection.
+     */
+    public Annotation getDataEntryAnnotation(DataEntry entry) {
+
+        String date = entry.getDate();
+        String type = entry.getType();
+
+        // Get Annotation by selected data point data and type
+        // Assumption that it is impossible for to annotations to have the same date and type (not true)
+        // TODO - give annotations unique identifiers.
+        for(Annotation annotation : this.workingAnnotations) {
+
+            if(annotation.getDate().equals(date) && annotation.getType().equals(type)) return annotation;
         }
 
         return null;
@@ -567,11 +586,7 @@ public class QuickQCTask {
 
         for(DataEntry entry : this.globalEntries) {
 
-            if(entry.getDate().equals(date)) {
-
-                entry.changeExclusionStatus();
-            }
-
+            if(entry.getDate().equals(date)) entry.changeExclusionStatus();
         }
 
         // Update report.
@@ -590,11 +605,7 @@ public class QuickQCTask {
 
         for(DataEntry entry : this.globalEntries) {
 
-            if(entry.getDate().equals(date)) {
-
-                entry.changeGuideStatus();
-            }
-
+            if(entry.getDate().equals(date)) entry.changeGuideStatus();
         }
 
         // Update report.
@@ -614,11 +625,7 @@ public class QuickQCTask {
 
         for(DataEntry entry : this.globalEntries) {
 
-            if(entry.getDate().equals(date)) {
-
-                entry.setComment(comment);
-            }
-
+            if(entry.getDate().equals(date)) entry.setComment(comment);
         }
 
         // Update report.

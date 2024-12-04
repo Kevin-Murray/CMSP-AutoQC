@@ -22,7 +22,7 @@ public class QuickQCMain extends Application {
     public void start(Stage stage) throws IOException {
 
         // Set application title.
-        stage.setTitle("CMSP - QuickQC Visualizer (v. 1.3.0)");
+        stage.setTitle("CMSP - QuickQC Visualizer (v. 1.3.1)");
 
         // Load main page design.
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainPageGui.fxml"));

@@ -28,6 +28,11 @@ public enum AnnotationStyles {
              -fx-background-insets: 0, 4;
              -fx-background-radius: 10px;
              -fx-padding: 10px;"""),
+    PART("""
+            -fx-background-color: #97EB75, white;
+             -fx-background-insets: 0, 4;
+             -fx-background-radius: 10px;
+             -fx-padding: 10px;"""),
     TUNE("""
             -fx-background-color: #E7298A, white;
              -fx-background-insets: 0, 4;

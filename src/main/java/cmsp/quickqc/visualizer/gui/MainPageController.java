@@ -685,64 +685,72 @@ public class MainPageController {
      *
      * @param data User selected data entry
      */
-    protected void showSampleInfo(XYChart.Data<String, Number> data){
+    protected void showSampleInfo(XYChart.Data<String, Number> data) {
 
         DataEntry selectedEntry = this.mainTask.getDataEntry(data);
 
         if(selectedEntry == null) return;
 
-        // Open pop-up window with data entry point information.
-        try {
+        if(selectedEntry.isAnnotation()) {
 
-            // Get the window design for pop-up.
-            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("SamplePage.fxml"));
-            Parent root = fxmlLoader.load();
+            // Bring up edit annotation page for selected annotation.
+            editAnnotation(this.mainTask.getDataEntryAnnotation(selectedEntry));
 
-            // Set sample page controller class.
-            SamplePageController controller = fxmlLoader.<SamplePageController>getController();
-            controller.setDataEntry(selectedEntry);
+        } else {
 
-            // Launch pop-up window.
-            Stage stage = new Stage();
-            stage.setTitle("QC Information");
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
+            // Open pop-up window with data entry point information.
+            try {
 
-            // Handle all user designated changes after the window is closed.
-            stage.showAndWait();
+                // Get the window design for pop-up.
+                FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("SamplePage.fxml"));
+                Parent root = fxmlLoader.load();
 
-            // Primary user change - point marked from inclusion/exclusion from the series.
-            if(controller.getChangedInclusion()) {
+                // Set sample page controller class.
+                SamplePageController controller = fxmlLoader.<SamplePageController>getController();
+                controller.setDataEntry(selectedEntry);
 
-                // Update entry in main task series. Update change in master database. Update the plot.
-                this.mainTask.setDataEntryInclusion(selectedEntry);
-                this.mainTask.writeReport();
-                submitButtonClick();
+                // Launch pop-up window.
+                Stage stage = new Stage();
+                stage.setTitle("QC Information");
+                stage.setResizable(false);
+                stage.setScene(new Scene(root));
+                stage.initModality(Modality.APPLICATION_MODAL);
+
+                // Handle all user designated changes after the window is closed.
+                stage.showAndWait();
+
+                // Primary user change - point marked from inclusion/exclusion from the series.
+                if (controller.getChangedInclusion()) {
+
+                    // Update entry in main task series. Update change in master database. Update the plot.
+                    this.mainTask.setDataEntryInclusion(selectedEntry);
+                    this.mainTask.writeReport();
+                    submitButtonClick();
+                }
+
+                // Primary user change - point marked from inclusion/exclusion from the series.
+                if (controller.getChangedGuide()) {
+
+                    // Update entry in main task series. Update change in master database. Update the plot.
+                    this.mainTask.setDataEntryGuide(selectedEntry);
+                    this.mainTask.writeReport();
+                    submitButtonClick();
+                }
+
+                // Secondary user change - user comment on QC point
+                if (controller.changedComment()) {
+
+                    // Update comment in main task series. Update master database. Update the plot.
+                    this.mainTask.setDataEntryComment(selectedEntry, controller.getComment());
+                    this.mainTask.writeReport();
+                    submitButtonClick();
+                }
+
+            } catch (Exception e) {
+
+                // TODO - better error handling.
+                e.printStackTrace();
             }
-
-            // Primary user change - point marked from inclusion/exclusion from the series.
-            if(controller.getChangedGuide()) {
-
-                // Update entry in main task series. Update change in master database. Update the plot.
-                this.mainTask.setDataEntryGuide(selectedEntry);
-                this.mainTask.writeReport();
-                submitButtonClick();
-            }
-
-            // Secondary user change - user comment on QC point
-            if(controller.changedComment()) {
-
-                // Update comment in main task series. Update master database. Update the plot.
-                this.mainTask.setDataEntryComment(selectedEntry, controller.getComment());
-                this.mainTask.writeReport();
-                submitButtonClick();
-            }
-
-        } catch(Exception e) {
-
-            // TODO - better error handling.
-            e.printStackTrace();
         }
     }
 
@@ -774,10 +782,17 @@ public class MainPageController {
 
             // Update database location and set application defaults.
             this.databasePath = controller.getDatabaseFolder();
-            this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());
-            this.reportContexts = readReportConfigs();
-            setApplicationDefaults();
 
+            if(!Files.exists(this.databasePath)) {
+
+                showErrorMessage(ErrorTypes.DATABASE);
+
+            } else {
+
+                this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());
+                this.reportContexts = readReportConfigs();
+                setApplicationDefaults();
+            }
         } catch(Exception e) {
 
             // TODO - better error handling.
@@ -889,6 +904,13 @@ public class MainPageController {
         if(databasePath != null) {
 
             this.databasePath = Paths.get(databasePath);
+
+            // Preference database location no longer exists.
+            if(!Files.exists(this.databasePath)) {
+
+                showErrorMessage(ErrorTypes.DATABASE);
+                return;
+            }
 
             // Format report configs database
             this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());

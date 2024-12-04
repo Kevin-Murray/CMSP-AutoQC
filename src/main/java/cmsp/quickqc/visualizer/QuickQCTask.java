@@ -541,15 +541,34 @@ public class QuickQCTask {
 
         String date = data.getXValue();
 
-        // Get DataEntry by selected data point data
-        // Assumption that it is impossible for to entries to have the same date.
-        // TODO - validate assumption.
-        for(DataEntry entry : this.workingEntries) {
+        // Get Annotation by selected data point data
+        // Assumption that it is impossible for to entries to have the same date
+        // TODO - give entries unique identifiers.
+        for(DataEntry entry : this.mergedEntries) {
 
-            if(entry.getDate().equals(date)) {
+            if(entry.getDate().equals(date)) return entry;
+        }
 
-                return entry;
-            }
+        return null;
+    }
+
+    /**
+     * Get Annotation from DataEntry-Annotation entry.
+     *
+     * @param entry User selected entry from line chart.
+     * @return Annotation object of selection.
+     */
+    public Annotation getDataEntryAnnotation(DataEntry entry) {
+
+        String date = entry.getDate();
+        String type = entry.getType();
+
+        // Get Annotation by selected data point data and type
+        // Assumption that it is impossible for to annotations to have the same date and type (not true)
+        // TODO - give annotations unique identifiers.
+        for(Annotation annotation : this.workingAnnotations) {
+
+            if(annotation.getDate().equals(date) && annotation.getType().equals(type)) return annotation;
         }
 
         return null;
@@ -567,11 +586,7 @@ public class QuickQCTask {
 
         for(DataEntry entry : this.globalEntries) {
 
-            if(entry.getDate().equals(date)) {
-
-                entry.changeExclusionStatus();
-            }
-
+            if(entry.getDate().equals(date)) entry.changeExclusionStatus();
         }
 
         // Update report.
@@ -590,11 +605,7 @@ public class QuickQCTask {
 
         for(DataEntry entry : this.globalEntries) {
 
-            if(entry.getDate().equals(date)) {
-
-                entry.changeGuideStatus();
-            }
-
+            if(entry.getDate().equals(date)) entry.changeGuideStatus();
         }
 
         // Update report.
@@ -614,22 +625,28 @@ public class QuickQCTask {
 
         for(DataEntry entry : this.globalEntries) {
 
-            if(entry.getDate().equals(date)) {
-
-                entry.setComment(comment);
-            }
-
+            if(entry.getDate().equals(date)) entry.setComment(comment);
         }
 
         // Update report.
         writeReport();
     }
 
+    /**
+     * Get date of first QC entry in selected series.
+     *
+     * @return String of date
+     */
     public String getFirstEntryDate() {
 
         return this.workingEntries.get(0).getDate();
     }
 
+    /**
+     * Get date of last QC entry in selected series.
+     *
+     * @return String of date
+     */
     public String getLastEntryDate() {
 
         return this.workingEntries.get(this.workingEntries.size() - 1).getDate();
@@ -655,10 +672,17 @@ public class QuickQCTask {
         return this.workingAnnotations.size();
     }
 
+    /**
+     * Compute frequency of QC acquisition in selected series. Average frequency calculated as median time difference
+     * between filtered QC entries.
+     *
+     * @return String of acquisition frequency
+     */
     public String getEntryFrequency() {
 
         ArrayList<LocalDateTime> dateList = new ArrayList<>();
 
+        // Get dates.
         for(DataEntry entry : this.workingEntries){
 
             String date = entry.getDate();
@@ -668,6 +692,7 @@ public class QuickQCTask {
 
         ArrayList<Double> freq = new ArrayList<>();
 
+        // Compute duration between entries.
         for(int i = 0; i < dateList.size() - 1; i++) {
 
             freq.add(Duration.between(dateList.get(i), dateList.get(i+1)).toMinutes() / 60.0);
@@ -676,6 +701,11 @@ public class QuickQCTask {
         return String.format("%,.1f", MathUtils.calculateMedian(freq)) + " hours";
     }
 
+    /**
+     * Get selected QC value from user input.
+     *
+     * @return Double ArrayList of values.
+     */
     private ArrayList<Double> getSeriesValues() {
 
         ArrayList<Double> valueList = new ArrayList<>();
@@ -688,10 +718,18 @@ public class QuickQCTask {
         return valueList;
     }
 
+    /**
+     * Format input string to desired format.
+     * TODO - not working with some entries, e.g. Peptide areas.
+     *
+     * @param value double value to format.
+     * @return String of formatted value
+     */
     private String formatSummaryValue(double value) {
 
         String text = Double.toString(value);
 
+        // If more than 4 digits, format as scientific.
         if(text.indexOf('.') > 4) {
 
             return String.format("%.3E", value);
@@ -701,32 +739,51 @@ public class QuickQCTask {
         }
     }
 
+    /**
+     * Get series mean as string.
+     */
     public String getSeriesMeanString() {
 
         return formatSummaryValue(MathUtils.calculateAverage(getSeriesValues()));
     }
 
+    /**
+     * Get series minimum as string.
+     */
     public String getSeriesMin() {
 
         return formatSummaryValue(Collections.min(getSeriesValues()));
     }
 
+    /**
+     * Get series max as string.
+     */
     public String getSeriesMax() {
 
         return formatSummaryValue(Collections.max(getSeriesValues()));
     }
 
+    /**
+     * Get series standard deviation as string.
+     */
     public String getSeriesSD() {
-
 
         return formatSummaryValue(MathUtils.calculateStandardDeviation(getSeriesValues()));
     }
 
+    /**
+     * Get series relative deviation as string.
+     */
     public String getSeriesRsd() {
 
         return formatSummaryValue(MathUtils.calculateRelativeStandardDeviation(getSeriesValues()));
     }
 
+    /**
+     * Get unique log numbers of selected QC entries.
+     *
+     * @return List of sorted unique log number strings.
+     */
     public List<String> getSeriesLogNumbers() {
 
         HashSet<String> logNumbers = new HashSet<>(this.workingEntries.stream().map(DataEntry::getLogNumber).collect(Collectors.toList()));
@@ -822,6 +879,12 @@ public class QuickQCTask {
         return !this.mergedEntries.get(index).getComment().equals("NA");
     }
 
+    /**
+     * Check if entry at index is part of the guide set.
+     *
+     * @param index index in merged QC-annotation series
+     * @return boolean true if part of guide set
+     */
     public Boolean isGuideSet(int index) {
 
         return this.mergedEntries.get(index).isGuide();
@@ -837,5 +900,4 @@ public class QuickQCTask {
 
         return this.mergedEntries.get(index).getType();
     }
-
 }

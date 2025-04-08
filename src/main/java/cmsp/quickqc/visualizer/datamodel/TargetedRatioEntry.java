@@ -1,5 +1,9 @@
 package cmsp.quickqc.visualizer.datamodel;
 
+import cmsp.quickqc.visualizer.enums.TargetedRatioTypes;
+
+import java.util.Objects;
+
 /**
  * Information Class to store output of Skyline Ratio Results export.
  */
@@ -29,37 +33,37 @@ public class TargetedRatioEntry {
         // Compute context specific variables as needed.
         for (int i = 0; i < header.length; i++) {
 
-            switch (header[i]) {
+            switch (Objects.requireNonNull(TargetedRatioTypes.fromImportName(header[i]))) {
 
-                case ("Molecule"):
+                case MOLECULE:
                     name = entry[i];
                     break;
-                case ("Molecule List"):
+                case LIST:
                     list = entry[i];
                     internalStandard = entry[i].toLowerCase().matches("internal standard|internal standards|istd|istds|standard|standards");
                     break;
-                case ("Replicate"):
+                case SAMPLE:
                     sampleName = entry[i];
                     break;
-                case ("Sample Type"):
+                case TYPE:
                     sampleType = entry[i];
                     break;
-                case ("Sample Dilution Factor"):
+                case DILF:
                     dilutionFactor = Double.parseDouble(entry[i]);
                     break;
-                case ("Analyte Concentration"):
+                case CONC:
                     expectedConcentration = (entry[i].isEmpty()) ? null : Double.parseDouble(entry[i]);
                     break;
-                case ("Quantification"):
+                case QUANT:
                     // Quantification value is stored as "Value <Space> Unit". Parse by space and store value and units.
                     measuredConcentration = (entry[i].equals("#N/A")) ? null : Double.parseDouble(entry[i].split(" ")[0]);
                     unit = (measuredConcentration == null) ? null : entry[i].split(" ", 2)[1];
                     break;
-                case ("Accuracy"):
+                case ACCURACY:
                     // Remove percent sign, replace NA entries with null
                     accuracy = (entry[i].equals("#N/A")) ? null : Double.parseDouble(entry[i].split("%")[0]);
                     break;
-                case ("Exclude From Calibration"):
+                case EXCLUDE:
                     excludedFromCalibration = Boolean.parseBoolean(entry[i]);
                     break;
             }

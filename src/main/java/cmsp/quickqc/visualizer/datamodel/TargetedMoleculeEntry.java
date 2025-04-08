@@ -1,5 +1,9 @@
 package cmsp.quickqc.visualizer.datamodel;
 
+import cmsp.quickqc.visualizer.enums.TargetedMoleculeTypes;
+
+import java.util.Objects;
+
 /**
  * Information Class to store output of Skyline Molecule Quantification export.
  */
@@ -35,45 +39,45 @@ public class TargetedMoleculeEntry {
     public TargetedMoleculeEntry(String[] header, String[] entry) {
 
         // Loop through array and match each result with corresponding variable.
-        for(int i = 0; i < header.length; i++) {
+        for (int i = 0; i < header.length; i++) {
 
-            switch (header[i]) {
-                case "Molecule List":
+            switch (Objects.requireNonNull(TargetedMoleculeTypes.fromImportName(header[i]))) {
+                case LIST:
                     list = entry[i];
                     internalStandard = entry[i].toLowerCase().matches("internal standard|internal standards|istd|istds|standard|standards");
                     break;
-                case "Molecule":
+                case NAME:
                     name = entry[i];
                     break;
-                case "Molecule Formula":
+                case FORMULA:
                     formula = entry[i];
                     break;
-                case "CAS":
+                case CAS:
                     cas = entry[i];
                     break;
-                case "Average Measured Retention Time":
+                case RT:
                     retentionTime = Double.parseDouble(entry[i]);
                     break;
-                case "Standard Type":
+                case TYPE:
                     standardType = entry[i];
                     break;
-                case "Normalization Method":
+                case NORM:
                     normalizationMethod = entry[i];
                     break;
-                case "Internal Standard Concentration":
+                case STDCONC:
                     standardConcentration = (entry[i].isEmpty()) ? null : Double.parseDouble(entry[i]);
                     break;
-                case "Concentration Multiplier":
+                case MULT:
                     // If user did not specify concentration multiplier in Skyline, software default is 1.0x
                     concentrationMultiplier = (entry[i].isEmpty()) ? 1.0 : Double.parseDouble(entry[i]);
                     break;
-                case "Molecule Note":
+                case NOTE:
                     note = entry[i];
                     break;
-                case "Calibration Curve":
+                case CURVE:
                     calibrationCurve = entry[i];
                     break;
-                case "R Squared":
+                case R2:
                     calibrationFit = (entry[i].equals("#N/A")) ? null : Double.parseDouble(String.format("%.3f", Double.parseDouble(entry[i])));
             }
         }

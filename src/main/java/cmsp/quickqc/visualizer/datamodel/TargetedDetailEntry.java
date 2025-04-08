@@ -23,6 +23,7 @@ public class TargetedDetailEntry {
      */
     public TargetedDetailEntry(String[] header, String[] entry) {
 
+        // Loop through array and match each result with corresponding variable.
         for (int i = 0; i < header.length; i++) {
 
             switch (Objects.requireNonNull(TargetedDetailsTypes.fromImportName(header[i]))) {

@@ -1,13 +1,13 @@
 package cmsp.quickqc.visualizer.datamodel;
 
-import cmsp.quickqc.visualizer.enums.ReplicateDetailsTableTypes;
+import cmsp.quickqc.visualizer.enums.TargetedDetailsTypes;
 
 import java.util.Objects;
 
 /**
  * Information Class to store output of Skyline Sample Details export.
  */
-public class ReplicateDetailEntry {
+public class TargetedDetailEntry {
 
     private String name;
     private String type;
@@ -21,11 +21,11 @@ public class ReplicateDetailEntry {
      * @param header Array of header strings from external export
      * @param entry  Array of values strings from external export
      */
-    public ReplicateDetailEntry(String[] header, String[] entry) {
+    public TargetedDetailEntry(String[] header, String[] entry) {
 
         for (int i = 0; i < header.length; i++) {
 
-            switch (Objects.requireNonNull(ReplicateDetailsTableTypes.fromImportName(header[i]))) {
+            switch (Objects.requireNonNull(TargetedDetailsTypes.fromImportName(header[i]))) {
                 case NAME:
                     name = entry[i];
                     break;

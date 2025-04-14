@@ -6,6 +6,7 @@ import cmsp.quickqc.visualizer.datamodel.DataEntry;
 import cmsp.quickqc.visualizer.datamodel.Parameters;
 import cmsp.quickqc.visualizer.datamodel.ReportContext;
 import cmsp.quickqc.visualizer.enums.*;
+import cmsp.quickqc.visualizer.tasks.QuickQCTask;
 import cmsp.quickqc.visualizer.utils.ContextFilteringUtils;
 import cmsp.quickqc.visualizer.utils.PlotUtils;
 import cmsp.quickqc.visualizer.datamodel.Annotation;

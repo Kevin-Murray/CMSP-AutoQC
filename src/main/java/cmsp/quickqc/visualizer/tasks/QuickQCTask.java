@@ -1,5 +1,5 @@
 
-package cmsp.quickqc.visualizer;
+package cmsp.quickqc.visualizer.tasks;
 
 import cmsp.quickqc.visualizer.datamodel.DataEntry;
 import cmsp.quickqc.visualizer.datamodel.Parameters;

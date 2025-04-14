@@ -6,6 +6,7 @@ import cmsp.quickqc.visualizer.datamodel.DataEntry;
 import cmsp.quickqc.visualizer.datamodel.Parameters;
 import cmsp.quickqc.visualizer.datamodel.ReportContext;
 import cmsp.quickqc.visualizer.enums.*;
+import cmsp.quickqc.visualizer.tasks.QuickQCTask;
 import cmsp.quickqc.visualizer.utils.ContextFilteringUtils;
 import cmsp.quickqc.visualizer.utils.PlotUtils;
 import cmsp.quickqc.visualizer.datamodel.Annotation;
@@ -1357,5 +1358,25 @@ public class MainPageController {
                 (!dateRangeBox.getSelectionModel().isEmpty() && !dateRangeBox.getSelectionModel().getSelectedItem().equals("Custom Date Range") ||
                         (startDatePicker.getValue() != null && endDatePicker.getValue() != null)));
 
+    }
+
+    /**
+     * Return stage to home page.
+     *
+     * @param event MouseEvent user clicked button
+     * @throws IOException
+     */
+    public void homeButtonClick(ActionEvent event) throws IOException {
+
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/cmsp/quickqc/visualizer/HomePage.fxml"));
+        Parent root = fxmlLoader.load();
+
+        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root);
+
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/cmsp/quickqc/visualizer/styleGuide.css")).toString());
+
+        stage.setScene(scene);
+        stage.show();
     }
 }

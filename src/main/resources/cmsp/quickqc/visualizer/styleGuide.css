@@ -27,7 +27,27 @@ TODO - Figure out a better way to handle this
 
 #annotationTable .table-column {
   -fx-alignment: CENTER;
+
 }
+
+#accuracyTable .table-column {
+  -fx-alignment: CENTER;
+}
+
+#precisionTable .table-column {
+  -fx-alignment: CENTER;}
+
+#sampleTable .table-column {
+  -fx-alignment: CENTER;
+}
+
+#fileDetailsTable .table-column {
+  -fx-alignment: CENTER;
+}
+
+#moleculeTable .table-column {
+  -fx-alignment: CENTER;
+  }
 
 .context-menu {-fx-effect: null;}
 
@@ -55,4 +75,8 @@ Check Box Styling
 .check-box:indeterminate  > .box > .mark {
     /* modify mark color */
     -fx-background-color: mark-color;
+}
+
+.homeBackground {
+    -fx-background-image: url("homePage-background.png");
 }

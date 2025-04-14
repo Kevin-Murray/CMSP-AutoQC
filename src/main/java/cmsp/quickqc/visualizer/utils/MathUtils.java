@@ -58,7 +58,11 @@ public class MathUtils {
         int middle = array.size() / 2;
         middle = middle > 0 && middle % 2 == 0 ? middle - 1 : middle;
 
-        return array.get(middle);
+        if(middle != 0){
+            return array.get(middle);
+        } else {
+            return 0.0;
+        }
     }
 
     /**

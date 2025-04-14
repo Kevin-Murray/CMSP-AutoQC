@@ -6,7 +6,7 @@ package cmsp.quickqc.visualizer.enums;
  */
 public enum ErrorTypes {
 
-    DATABASE("\"Database path not set properly.\\nPlease set in - Files > Set Up...\""),
+    DATABASE("Database path not set properly.\nPlease set in - Files > Set Up...\n\nSelect `QuickQC` folder in CBS_cmsp_results_2024 back-up drive."),
     RANGE("No QC entries in date range.\nPlease adjust the range and try again."),
     LOG("Log Number does not match expected format '00000'"),
     DATE( "Date not properly set."),
@@ -15,7 +15,9 @@ public enum ErrorTypes {
     INSTRUMENT("Instrument not properly set."),
     CONFIGURATION("Configuration not properly set."),
     MATRIX("Matrix not properly set."),
-    TYPE("Event Type not properly set.");
+    TYPE("Event Type not properly set."),
+
+    TARGETBLANK("No replicates with `Blank` sample type detected in Skyline document. Please revise and resubmit.");
 
     private final String errorMessage;
 

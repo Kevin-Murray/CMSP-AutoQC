@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.tool.box.gui.TargetedReportsController">
+    <children>
+        <MenuBar>
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem fx:id="menuSetUp" onAction="#menuSetUpListener" mnemonicParsing="false" text="Set Up..." />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Quit" />
+                    </items>
+                </Menu>
+            <Menu mnemonicParsing="false" text="Edit">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Default" />
+                  <MenuItem mnemonicParsing="false" text="Refresh" />
+              </items>
+            </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About AutoQC" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <SplitPane dividerPositions="0.5" focusTraversable="false">
+         <items>
+            <AnchorPane prefHeight="144.0" prefWidth="558.0">
+               <children>
+                  <Label layoutX="14.0" layoutY="32.0" text="Skyline Document:">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="skylineDocumentFile" layoutX="136.0" layoutY="29.0" prefHeight="25.0" prefWidth="412.0" />
+                  <Button alignment="CENTER" contentDisplay="CENTER" layoutX="552.0" layoutY="29.0" mnemonicParsing="false" onAction="#openDocumentClick" prefHeight="25.0" prefWidth="32.0" text="..." textAlignment="CENTER" />
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="144.0" prefWidth="652.0">
+               <children>
+                  <Rectangle arcHeight="20.0" arcWidth="20.0" fill="#ffe1c4" height="59.0" layoutX="19.0" layoutY="12.0" stroke="BLACK" strokeLineCap="BUTT" strokeMiterLimit="50.0" strokeType="INSIDE" width="393.0" />
+                  <Spinner fx:id="blankThresholdSpinner" layoutX="34.0" layoutY="38.0" prefHeight="25.0" prefWidth="103.0" />
+                  <Spinner fx:id="accuracyThresholdSpinner" layoutX="290.0" layoutY="38.0" prefHeight="25.0" prefWidth="103.0" />
+                  <Label layoutX="34.0" layoutY="20.0" prefHeight="17.0" prefWidth="103.0" text="LOD S/N Threshold" />
+                  <Label alignment="CENTER" layoutX="290.0" layoutY="20.0" prefHeight="17.0" prefWidth="103.0" text="LOQ Min Accuracy" />
+                  <Button layoutX="452.0" layoutY="7.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="130.0" text="Catalogue Results">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="exportButton" onAction="#exportButtonClick" layoutX="452.0" layoutY="42.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="130.0" text="Export Results">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Button>
+                  <Label layoutX="164.0" layoutY="21.0" prefHeight="17.0" prefWidth="103.0" text="LOQ S/N Threshold" />
+                  <Spinner fx:id="loqThresholdSpinner" layoutX="164.0" layoutY="38.0" prefHeight="25.0" prefWidth="103.0" />
+               </children></AnchorPane>
+         </items>
+        </SplitPane>
+      <AnchorPane>
+         <children>
+                <TabPane prefHeight="672.0" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                        <Tab text="Sample Results">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0">
+                                    <children>
+                                        <TableView fx:id="sampleTable" layoutX="374.0" layoutY="143.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"> </TableView>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                        <Tab text="Calibration Fit">
+                            <content>
+                                <AnchorPane>
+                                    <children>
+                                        <TableView fx:id="moleculeTable" disable="false" editable="true" prefHeight="643.0" prefWidth="1200.0">
+                                                    </TableView>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                  <Tab text="Experimental Accuracy">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0">
+                           <children>
+                              <TableView fx:id="accuracyTable" layoutX="374.0" layoutY="143.0" prefHeight="643.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"> </TableView>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                  <Tab text="Experimental Precision">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0">
+                           <children>
+                              <TableView fx:id="precisionTable" layoutX="374.0" layoutY="143.0" prefHeight="643.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"> </TableView>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                  <Tab text="File Details">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0">
+                           <children>
+                              <TableView fx:id="fileDetailsTable" layoutX="374.0" layoutY="143.0" prefHeight="643.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"> </TableView>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                    </tabs>
+                </TabPane>
+         </children>
+      </AnchorPane>
+      <HBox prefHeight="50.0" prefWidth="1200.0" style="-fx-border-color: #5F5F5F; -fx-background-color: #DDDDDD;">
+         <children>
+            <Button fx:id="homeButton" alignment="CENTER" mnemonicParsing="false" onAction="#homeButtonClick" prefHeight="37.0" prefWidth="40">
+                <graphic>
+                    <ImageView fitHeight="25" fitWidth="25" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@icons/home-icon.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Pane prefHeight="39.0" prefWidth="918.0" />
+            <Label fx:id="lastRefreshLabel" prefHeight="39.0" prefWidth="240.0" text="Label">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+    </children>
+</VBox>

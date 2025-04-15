@@ -7,7 +7,7 @@ plugins {
     id 'org.gradlex.extra-java-module-info' version '1.0'
 }
 
-group 'cmsp.quickqc'
+group 'cmsp.tool'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -26,8 +26,8 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-    mainModule = 'cmsp.quickqc.visualizer'
-    mainClass = 'cmsp.quickqc.visualizer.Launcher'
+    mainModule = 'cmsp.tool.box'
+    mainClass = 'cmsp.tool.box.Launcher'
     applicationName = "CMSP Tool Box"
 }
 
@@ -63,7 +63,7 @@ jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'cmsp.quickqc.visualizer'
+        name = 'cmsp.tool.box'
     }
 }
 

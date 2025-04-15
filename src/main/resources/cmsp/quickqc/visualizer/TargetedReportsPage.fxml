@@ -171,7 +171,7 @@
             <Button fx:id="homeButton" alignment="CENTER" mnemonicParsing="false" onAction="#homeButtonClick" prefHeight="37.0" prefWidth="40">
                 <graphic>
                     <ImageView fitHeight="25" fitWidth="25" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@home-icon.png" />
+                        <Image url="@icons/home-icon.png" />
                     </ImageView>
                 </graphic>
             </Button>

@@ -3,23 +3,24 @@ package cmsp.quickqc.visualizer.utils;
 
 import java.util.HashSet;
 import java.util.List;
-import cmsp.quickqc.visualizer.datamodel.ReportContext;
+
+import cmsp.quickqc.visualizer.datamodel.QcReportContext;
 
 /**
- * Utility class for filtering Lists of ReportContext.
+ * Utility class for filtering Lists of QcReportContext.
  * TODO - this is all very messy. Can this be implemented better?
  */
 public class ContextFilteringUtils {
 
     /**
-     * Get unique instruments from List of ReportContext
+     * Get unique instruments from List of QcReportContext
      *
      * @param contextList Application contexts to from database
      * @return String List of unique instruments
      */
-    public static List<String> getUniqueInstruments(List<ReportContext> contextList) {
+    public static List<String> getUniqueInstruments(List<QcReportContext> contextList) {
 
-        HashSet<String> context = new HashSet<>(contextList.stream().map(ReportContext::instrument).toList());
+        HashSet<String> context = new HashSet<>(contextList.stream().map(QcReportContext::instrument).toList());
 
         return context.stream().sorted().toList();
     }
@@ -31,7 +32,7 @@ public class ContextFilteringUtils {
      * @param instrument String of specified instrument
      * @return List of Report Context that only include the specified instrument
      */
-    private static List<ReportContext> filterInstrumentContext(List<ReportContext> contextList, String instrument) {
+    private static List<QcReportContext> filterInstrumentContext(List<QcReportContext> contextList, String instrument) {
 
         return contextList.stream().filter(context -> context.instrument().equals(instrument)).toList();
     }
@@ -43,11 +44,11 @@ public class ContextFilteringUtils {
      * @param instrument String of specified instrument
      * @return List of unique configuration strings
      */
-    public static List<String> getUniqueConfigurations(List<ReportContext> contextList, String instrument) {
+    public static List<String> getUniqueConfigurations(List<QcReportContext> contextList, String instrument) {
 
-        List<ReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
+        List<QcReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
 
-        HashSet<String> context = new HashSet<>(instrumentContext.stream().map(ReportContext::config).toList());
+        HashSet<String> context = new HashSet<>(instrumentContext.stream().map(QcReportContext::config).toList());
 
         return context.stream().sorted().toList();
     }
@@ -60,9 +61,9 @@ public class ContextFilteringUtils {
      * @param config String of specified configuration
      * @return List of Report Contexts of specified instrument and configuration
      */
-    private static List<ReportContext> filterConfigContext(List<ReportContext> contextList, String instrument, String config) {
+    private static List<QcReportContext> filterConfigContext(List<QcReportContext> contextList, String instrument, String config) {
 
-        List<ReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
+        List<QcReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
 
         return instrumentContext.stream().filter(context -> context.config().equals(config)).toList();
     }
@@ -75,12 +76,12 @@ public class ContextFilteringUtils {
      * @param config String of specified configuration
      * @return List of unique matrix strings
      */
-    public static List<String> getUniqueMatrices(List<ReportContext> contextList, String instrument, String config) {
+    public static List<String> getUniqueMatrices(List<QcReportContext> contextList, String instrument, String config) {
 
-        List<ReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
-        List<ReportContext> configContext = filterConfigContext(instrumentContext, instrument, config);
+        List<QcReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
+        List<QcReportContext> configContext = filterConfigContext(instrumentContext, instrument, config);
 
-        HashSet<String> context = new HashSet<>(configContext.stream().map(ReportContext::matrix).toList());
+        HashSet<String> context = new HashSet<>(configContext.stream().map(QcReportContext::matrix).toList());
 
         return context.stream().sorted().toList();
     }
@@ -94,10 +95,10 @@ public class ContextFilteringUtils {
      * @param matrix String of specified matrix
      * @return List of filtered Report Contexts
      */
-    private static List<ReportContext> filterMatrixContext(List<ReportContext> contextList, String instrument, String config, String matrix) {
+    private static List<QcReportContext> filterMatrixContext(List<QcReportContext> contextList, String instrument, String config, String matrix) {
 
-        List<ReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
-        List<ReportContext> configContext = filterConfigContext(instrumentContext, instrument, config);
+        List<QcReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
+        List<QcReportContext> configContext = filterConfigContext(instrumentContext, instrument, config);
 
         return configContext.stream().filter(context -> context.matrix().equals(matrix)).toList();
     }
@@ -111,13 +112,13 @@ public class ContextFilteringUtils {
      * @param matrix String of specified matrix
      * @return List of unique standard strings
      */
-    public static List<String> getUniqueStandards(List<ReportContext> contextList, String instrument, String config, String matrix) {
+    public static List<String> getUniqueStandards(List<QcReportContext> contextList, String instrument, String config, String matrix) {
 
-        List<ReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
-        List<ReportContext> configContext = filterConfigContext(instrumentContext, instrument, config);
-        List<ReportContext> matrixContext = filterMatrixContext(configContext, instrument, config, matrix);
+        List<QcReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
+        List<QcReportContext> configContext = filterConfigContext(instrumentContext, instrument, config);
+        List<QcReportContext> matrixContext = filterMatrixContext(configContext, instrument, config, matrix);
 
-        HashSet<String> context = new HashSet<>(matrixContext.stream().map(ReportContext::standard).toList());
+        HashSet<String> context = new HashSet<>(matrixContext.stream().map(QcReportContext::standard).toList());
 
         return context.stream().sorted().toList();
     }
@@ -132,11 +133,11 @@ public class ContextFilteringUtils {
      * @param standard String of specified standard
      * @return Unique Report Context object.
      */
-    public static ReportContext getSelectedReportContext(List<ReportContext> contextList, String instrument, String config, String matrix, String standard) {
+    public static QcReportContext getSelectedReportContext(List<QcReportContext> contextList, String instrument, String config, String matrix, String standard) {
 
-        List<ReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
-        List<ReportContext> configContext = filterConfigContext(instrumentContext, instrument, config);
-        List<ReportContext> matrixContext = filterMatrixContext(configContext, instrument, config, matrix);
+        List<QcReportContext> instrumentContext = filterInstrumentContext(contextList, instrument);
+        List<QcReportContext> configContext = filterConfigContext(instrumentContext, instrument, config);
+        List<QcReportContext> matrixContext = filterMatrixContext(configContext, instrument, config, matrix);
         return matrixContext.stream().filter(context -> context.standard().equals(standard)).toList().get(0);
     }
 }

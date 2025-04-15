@@ -2,17 +2,13 @@
 package cmsp.quickqc.visualizer;
 
 /**
- *  Launch QuickQC application.
+ *  Launch CMSP Tool Box application.
  */
 public class Launcher {
 
-    /**
-     * Main method.
-     *
-     */
     public static void main(String[] args) {
 
-        QuickQCMain.main(args);
+        CmspToolBoxMain.main(args);
     }
 
 }

@@ -62,7 +62,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.quickqc.visualizer.gui.MainPageController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.quickqc.visualizer.gui.QuickQCController">
     <children>
         <MenuBar prefHeight="32.0" prefWidth="1148.0">
             <menus>
@@ -304,7 +304,7 @@
             <Button fx:id="homeButton" alignment="CENTER" mnemonicParsing="false" prefHeight="37.0" prefWidth="40" onAction="#homeButtonClick">
                 <graphic>
                     <ImageView fitHeight="25" fitWidth="25" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@home-icon.png" />
+                        <Image url="@icons/home-icon.png" />
                     </ImageView>
                 </graphic>
             </Button>

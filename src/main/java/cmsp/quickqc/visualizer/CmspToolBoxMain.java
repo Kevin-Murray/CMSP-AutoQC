@@ -11,18 +11,15 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * QuickQC main class.
+ * CMSP Tool Box main class.
  */
-public class QuickQCMain extends Application {
+public class CmspToolBoxMain extends Application {
 
-    /**
-     * Starts QC application.
-     */
     @Override
     public void start(Stage stage) throws IOException {
 
         // Set application title.
-        stage.setTitle("CMSP Tool Box (v. 1.4.0)");
+        stage.setTitle("CMSP Tool Box (v. 1.4.1)");
 
         // Load main page design.
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
@@ -33,7 +30,7 @@ public class QuickQCMain extends Application {
         main.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styleGuide.css")).toString());
 
         // Set application icon.
-        Image image = new Image("cmsp/quickqc/visualizer/quickQC-icon.png");
+        Image image = new Image("cmsp/quickqc/visualizer/icons/quickQC-icon.png");
         stage.getIcons().add(image);
 
         // Open gui.
@@ -42,9 +39,6 @@ public class QuickQCMain extends Application {
         stage.show();
     }
 
-    /**
-     *  Main method.
-     */
     public static void main(String[] args) {
 
         // Uses Launcher class as true main method class. Not really sure why it's designed like this...

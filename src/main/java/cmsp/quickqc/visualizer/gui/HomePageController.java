@@ -28,7 +28,7 @@ public class HomePageController {
      */
     public void launchModule_QQC(MouseEvent event) throws IOException {
         
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/cmsp/quickqc/visualizer/MainPageGui.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/cmsp/quickqc/visualizer/QuickQCPageGui.fxml"));
 
         root = fxmlLoader.load();
 

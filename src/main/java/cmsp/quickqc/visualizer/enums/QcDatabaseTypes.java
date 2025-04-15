@@ -4,7 +4,7 @@ package cmsp.quickqc.visualizer.enums;
 /**
  * Database type file names.
  */
-public enum DatabaseTypes {
+public enum QcDatabaseTypes {
 
     REPORT("CMSP_QC_ReportContexts.csv"),
     ANNOTATION("CMSP_QC_Annotations.csv");
@@ -16,7 +16,7 @@ public enum DatabaseTypes {
      *
      * @param fileName Filename as string
      */
-    DatabaseTypes (String fileName) {
+    QcDatabaseTypes(String fileName) {
 
         this.fileName = fileName;
     }

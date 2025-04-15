@@ -1,7 +1,7 @@
 
 package cmsp.quickqc.visualizer.datamodel;
 
-import cmsp.quickqc.visualizer.enums.ReportTypes;
+import cmsp.quickqc.visualizer.enums.QcReportTypes;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -9,28 +9,28 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Annotation class. Stores instrument event information to be displayed along QC data.
+ * QcAnnotation class. Stores instrument event information to be displayed along QC data.
  * Annotations include events such as column changes, instrument maintenance, or other potentially impactful events.
  */
-public class Annotation {
+public class QcAnnotation {
 
     final private LinkedHashMap<String, String> annotation;
 
     /**
-     * Annotation constructor.
+     * QcAnnotation constructor.
      * Makes new LinkedHashMap to store all information.
      */
-    public Annotation(String date, String instrument, String config, String matrix,
-                      String type, String comment) {
+    public QcAnnotation(String date, String instrument, String config, String matrix,
+                        String type, String comment) {
 
         this.annotation = new LinkedHashMap<>();
 
-        annotation.put(ReportTypes.DATE.getLabel(), date);
-        annotation.put(ReportTypes.INSTRUMENT.getLabel(), instrument);
-        annotation.put(ReportTypes.CONFIGURATION.getLabel(), config);
-        annotation.put(ReportTypes.MATRIX.getLabel(), matrix);
-        annotation.put(ReportTypes.ANNOTATION.getLabel(), type);
-        annotation.put(ReportTypes.COMMENT.getLabel(), comment);
+        annotation.put(QcReportTypes.DATE.getLabel(), date);
+        annotation.put(QcReportTypes.INSTRUMENT.getLabel(), instrument);
+        annotation.put(QcReportTypes.CONFIGURATION.getLabel(), config);
+        annotation.put(QcReportTypes.MATRIX.getLabel(), matrix);
+        annotation.put(QcReportTypes.ANNOTATION.getLabel(), type);
+        annotation.put(QcReportTypes.COMMENT.getLabel(), comment);
     }
 
     /**
@@ -38,7 +38,7 @@ public class Annotation {
      */
     public String getDate() {
 
-        return this.annotation.get(ReportTypes.DATE.getLabel());
+        return this.annotation.get(QcReportTypes.DATE.getLabel());
     }
 
     /**
@@ -46,7 +46,7 @@ public class Annotation {
      */
     public String getInstrument() {
 
-        return this.annotation.get(ReportTypes.INSTRUMENT.getLabel());
+        return this.annotation.get(QcReportTypes.INSTRUMENT.getLabel());
     }
 
     /**
@@ -54,7 +54,7 @@ public class Annotation {
      */
     public String getConfig() {
 
-        return this.annotation.get(ReportTypes.CONFIGURATION.getLabel());
+        return this.annotation.get(QcReportTypes.CONFIGURATION.getLabel());
     }
 
     /**
@@ -62,7 +62,7 @@ public class Annotation {
      */
     public String getMatrix() {
 
-        return this.annotation.get(ReportTypes.MATRIX.getLabel());
+        return this.annotation.get(QcReportTypes.MATRIX.getLabel());
     }
 
     /**
@@ -70,7 +70,7 @@ public class Annotation {
      */
     public String getType() {
 
-        return this.annotation.get(ReportTypes.ANNOTATION.getLabel());
+        return this.annotation.get(QcReportTypes.ANNOTATION.getLabel());
     }
 
     /**
@@ -78,7 +78,7 @@ public class Annotation {
      */
     public String getComment() {
 
-        return this.annotation.get(ReportTypes.COMMENT.getLabel());
+        return this.annotation.get(QcReportTypes.COMMENT.getLabel());
     }
 
     /**

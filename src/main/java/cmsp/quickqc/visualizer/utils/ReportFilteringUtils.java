@@ -1,8 +1,9 @@
 
 package cmsp.quickqc.visualizer.utils;
 
-import cmsp.quickqc.visualizer.datamodel.Parameters;
-import cmsp.quickqc.visualizer.datamodel.Annotation;
+import cmsp.quickqc.visualizer.datamodel.QcAnnotation;
+import cmsp.quickqc.visualizer.datamodel.QcParameters;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class ReportFilteringUtils {
     }
 
     /**
-     * Check if DataEntry log number is in user monitored log number list.
+     * Check if QcDataEntry log number is in user monitored log number list.
      * If no log numbers monitored, return true.
      */
     public static boolean isMonitoredLogNumber(String log, List<String> logNumbers) {
@@ -56,15 +57,15 @@ public class ReportFilteringUtils {
     /**
      * Filter annotations by current report context and line chart context menu settings.
      *
-     * @param parameters Main page parameters
-     * @param annotation Input annotation object
-     * @return true if annotation matches current context
+     * @param qcParameters Main page qcParameters
+     * @param qcAnnotation Input qcAnnotation object
+     * @return true if qcAnnotation matches current context
      */
-    public static boolean filteredAnnotation(Parameters parameters, Annotation annotation){
+    public static boolean filteredAnnotation(QcParameters qcParameters, QcAnnotation qcAnnotation){
 
-        return (parameters.instrument.equals(annotation.getInstrument()) &&
-                (parameters.configuration.equals(annotation.getConfig()) || annotation.getConfig().equals("All")) &&
-                (parameters.matrix.equals(annotation.getMatrix()) || annotation.getMatrix().equals("All")) &&
-                (parameters.annotationMap.get(annotation.getType())));
+        return (qcParameters.instrument.equals(qcAnnotation.getInstrument()) &&
+                (qcParameters.configuration.equals(qcAnnotation.getConfig()) || qcAnnotation.getConfig().equals("All")) &&
+                (qcParameters.matrix.equals(qcAnnotation.getMatrix()) || qcAnnotation.getMatrix().equals("All")) &&
+                (qcParameters.annotationMap.get(qcAnnotation.getType())));
     }
 }

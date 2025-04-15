@@ -4,7 +4,7 @@ package cmsp.quickqc.visualizer.enums;
 /**
  * Enum of various report context global values.
  */
-public enum ReportTypes {
+public enum QcReportTypes {
 
     DATABASE("Database"),
     INSTRUMENT("Instrument"),
@@ -26,7 +26,7 @@ public enum ReportTypes {
      *
      * @param label Global label string
      */
-    ReportTypes(String label) {
+    QcReportTypes(String label) {
 
         this.label = label;
     }

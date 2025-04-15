@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Enumeration of annotation types.
  * Annotations types are descriptors of instrument events, such as replacing a column.
  */
-public enum AnnotationTypes {
+public enum QcAnnotationTypes {
 
     STANDARD("New Stock Solution"),
     COLUMN("Column Change"),
@@ -22,7 +22,7 @@ public enum AnnotationTypes {
     /**
      * Enum constructor.
      */
-    AnnotationTypes(String type) {
+    QcAnnotationTypes(String type) {
 
         this.label = type;
     }
@@ -32,7 +32,7 @@ public enum AnnotationTypes {
      */
     public static String getAnnotationType(String type) {
 
-        for(AnnotationTypes i : values()) {
+        for(QcAnnotationTypes i : values()) {
 
             if(i.label.equals(type)) return i.name();
         }
@@ -56,7 +56,7 @@ public enum AnnotationTypes {
 
         ArrayList<String> values = new ArrayList<>();
 
-        for(AnnotationTypes i : AnnotationTypes.values()) values.add(i.label);
+        for(QcAnnotationTypes i : QcAnnotationTypes.values()) values.add(i.label);
 
         return values;
     }

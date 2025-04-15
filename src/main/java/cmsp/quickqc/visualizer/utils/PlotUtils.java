@@ -1,8 +1,8 @@
 
 package cmsp.quickqc.visualizer.utils;
 
-import cmsp.quickqc.visualizer.datamodel.DataEntry;
-import cmsp.quickqc.visualizer.enums.VariabilityTypes;
+import cmsp.quickqc.visualizer.datamodel.QcDataEntry;
+import cmsp.quickqc.visualizer.enums.QcVariabilityTypes;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.SnapshotParameters;
@@ -31,7 +31,7 @@ public class PlotUtils {
      * @param varType Type of variability guides
      * @return List of chart series data
      */
-    public static ObservableList<XYChart.Series<String, Number>> getLeveyData(List<DataEntry> reportItems, String reportType, Boolean logScale, String varType, Boolean showGuideSet){
+    public static ObservableList<XYChart.Series<String, Number>> getLeveyData(List<QcDataEntry> reportItems, String reportType, Boolean logScale, String varType, Boolean showGuideSet){
 
         ObservableList<XYChart.Series<String, Number>> plotData = FXCollections.observableArrayList();
 
@@ -44,7 +44,7 @@ public class PlotUtils {
         mainSeries.setName("Main Series");
 
         // Loop through data entries and add them to main series.
-        for(DataEntry entry : reportItems) {
+        for(QcDataEntry entry : reportItems) {
 
             // Get data values for descriptive statistic calculation and dates for variability guides.
             // Exclude annotations.
@@ -80,7 +80,7 @@ public class PlotUtils {
 
         // Use series standard deviations as guides.
         // Levels set as 1, 2, 3 standard deviations from mean.
-        if(varType.equals(VariabilityTypes.STD.getLabel())) {
+        if(varType.equals(QcVariabilityTypes.STD.getLabel())) {
 
             double sd = (showGuideSet && guideList.size() >= 3) ?
                     MathUtils.calculateStandardDeviation(guideList) :
@@ -96,7 +96,7 @@ public class PlotUtils {
 
         // Use relative standard deviation of mean as guides.
         // Levels set as standard deviation equivalent to 5%, 10%, and 20% RSD.
-        if(varType.equals(VariabilityTypes.RSD.getLabel())) {
+        if(varType.equals(QcVariabilityTypes.RSD.getLabel())) {
 
             var1 = 0.05 * mean;
             var2 = 0.10 * mean;
@@ -143,7 +143,7 @@ public class PlotUtils {
      * @param reportType Report variable to plot
      * @return List of series to be plotted on main page line chart
      */
-    public static ObservableList<XYChart.Series<String, Number>> getMovingData(List<DataEntry> reportItems, String reportType){
+    public static ObservableList<XYChart.Series<String, Number>> getMovingData(List<QcDataEntry> reportItems, String reportType){
 
         ObservableList<XYChart.Series<String, Number>> plotData = FXCollections.observableArrayList();
 
@@ -159,7 +159,7 @@ public class PlotUtils {
         Double previousItem = reportItems.get(0).getItem(reportType);
 
         // Loop through data entries and subtract value of current entry with previous entry.
-        for(DataEntry entry : reportItems) {
+        for(QcDataEntry entry : reportItems) {
 
             dateList.add(entry.getDate());
 

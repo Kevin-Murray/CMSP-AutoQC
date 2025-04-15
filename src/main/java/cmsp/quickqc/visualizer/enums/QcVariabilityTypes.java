@@ -4,7 +4,7 @@ package cmsp.quickqc.visualizer.enums;
 /**
  * Variability guides enum. Types of variability measures that may be used to assess process control.
  */
-public enum VariabilityTypes {
+public enum QcVariabilityTypes {
 
     STD("Standard Deviations"),
     RSD("Relative Std. Dev. (RSD)"),
@@ -17,7 +17,7 @@ public enum VariabilityTypes {
      *
      * @param label String label
      */
-    VariabilityTypes(String label) {
+    QcVariabilityTypes(String label) {
 
         this.label = label;
     }

@@ -1,7 +1,7 @@
 
 package cmsp.quickqc.visualizer.datamodel;
 
-import cmsp.quickqc.visualizer.enums.DatabaseTypes;
+import cmsp.quickqc.visualizer.enums.QcDatabaseTypes;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Parameter class that stores all user input selections to control the QC report context.
  */
-public class Parameters {
+public class QcParameters {
 
     public String instrument;
     public String configuration;
@@ -38,35 +38,35 @@ public class Parameters {
     /**
      * Null-constructor for parameters class.
      */
-    public Parameters() {
+    public QcParameters() {
 
     }
 
     /**
      * Constructor for parameters class. Formats user input selections or preferences.
      */
-    public Parameters(ReportContext reportContext,
-                      ChoiceBox<String> reportBox,
-                      ChoiceBox<String> dateRangeBox,
-                      List<String> logNumbers,
-                      RadioButton leveyJenningsButton,
-                      RadioButton movingRangeButton,
-                      RadioButton cusummButton,
-                      RadioButton cusumvButton,
-                      DatePicker startDatePicker,
-                      DatePicker endDatePicker,
-                      String varType,
-                      Map<String, Boolean> annotationMap,
-                      Boolean logScale,
-                      Boolean showExcluded,
-                      Boolean showGuideSet,
-                      Path databasePath) {
+    public QcParameters(QcReportContext qcReportContext,
+                        ChoiceBox<String> reportBox,
+                        ChoiceBox<String> dateRangeBox,
+                        List<String> logNumbers,
+                        RadioButton leveyJenningsButton,
+                        RadioButton movingRangeButton,
+                        RadioButton cusummButton,
+                        RadioButton cusumvButton,
+                        DatePicker startDatePicker,
+                        DatePicker endDatePicker,
+                        String varType,
+                        Map<String, Boolean> annotationMap,
+                        Boolean logScale,
+                        Boolean showExcluded,
+                        Boolean showGuideSet,
+                        Path databasePath) {
 
         // Set user input parameters.
-        this.instrument = reportContext.instrument();
-        this.configuration = reportContext.config();
-        this.matrix = reportContext.matrix();
-        this.standard = reportContext.standard();
+        this.instrument = qcReportContext.instrument();
+        this.configuration = qcReportContext.config();
+        this.matrix = qcReportContext.matrix();
+        this.standard = qcReportContext.standard();
         this.report = reportBox.getSelectionModel().getSelectedItem();
         this.dateRange = dateRangeBox.getSelectionModel().getSelectedItem();
         this.logNumbers = logNumbers;
@@ -101,7 +101,7 @@ public class Parameters {
         this.showExcluded = showExcluded;
         this.showGuide = showGuideSet;
         this.databasePath = databasePath;
-        this.reportPath = reportContext.database();
+        this.reportPath = qcReportContext.database();
     }
 
     /**
@@ -125,7 +125,7 @@ public class Parameters {
      * @param newParam Changed user selections
      * @return true if either instrument, configuration, or matrix is different
      */
-    public boolean diffReportSelection(Parameters newParam) {
+    public boolean diffReportSelection(QcParameters newParam) {
 
         if(this.validSelection()) {
 
@@ -153,11 +153,11 @@ public class Parameters {
     /**
      * Get path of annotation database CSV
      *
-     * @return Annotation database CSV path
+     * @return QcAnnotation database CSV path
      */
     public Path getAnnotationPath() {
 
         // TODO - annotation database path should be handled by enum
-        return this.databasePath.resolve(Paths.get(DatabaseTypes.ANNOTATION.getFileName()));
+        return this.databasePath.resolve(Paths.get(QcDatabaseTypes.ANNOTATION.getFileName()));
     }
 }

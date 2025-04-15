@@ -4,7 +4,7 @@ package cmsp.quickqc.visualizer.datamodel;
  * Line Chart data point class.
  * Stores X-value (String date) and Y-Value (String to be cast to Double)
  */
-public class PlotEntry{
+public class QcPlotEntry {
 
     private final String field;
     private final String value;
@@ -14,7 +14,7 @@ public class PlotEntry{
      * @param field Date string
      * @param value Value string that is a numerical value
      */
-    public PlotEntry(String field, String value){
+    public QcPlotEntry(String field, String value){
 
         this.field = field;
         this.value = value;

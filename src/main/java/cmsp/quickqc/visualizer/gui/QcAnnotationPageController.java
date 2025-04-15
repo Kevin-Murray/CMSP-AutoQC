@@ -2,11 +2,11 @@
 package cmsp.quickqc.visualizer.gui;
 
 import cmsp.quickqc.visualizer.Launcher;
-import cmsp.quickqc.visualizer.datamodel.ReportContext;
+import cmsp.quickqc.visualizer.datamodel.QcReportContext;
 import cmsp.quickqc.visualizer.enums.ErrorTypes;
 import cmsp.quickqc.visualizer.utils.ContextFilteringUtils;
-import cmsp.quickqc.visualizer.datamodel.Annotation;
-import cmsp.quickqc.visualizer.enums.AnnotationTypes;
+import cmsp.quickqc.visualizer.datamodel.QcAnnotation;
+import cmsp.quickqc.visualizer.enums.QcAnnotationTypes;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,9 +23,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * Controller class for annotation page pop-up window.
+ * Controller class for qcAnnotation page pop-up window.
  */
-public class AnnotationPageController {
+public class QcAnnotationPageController {
 
     @FXML private DatePicker annotationDate;
     @FXML private TextField annotationTimeField;
@@ -38,9 +38,9 @@ public class AnnotationPageController {
     @FXML private Button annotationSubmit;
     @FXML private Button annotationCancel;
 
-    private ReportContext selectedContext;
-    private List<ReportContext> reportContext;
-    private Annotation annotation;
+    private QcReportContext selectedContext;
+    private List<QcReportContext> qcReportContext;
+    private QcAnnotation qcAnnotation;
     private Boolean canceled;
 
     /**
@@ -54,10 +54,10 @@ public class AnnotationPageController {
         annotationInstrument.getItems().clear();
         annotationInstrument.valueProperty().setValue(null);
 
-        // Annotation types.
+        // QcAnnotation types.
         annotationType.getItems().clear();
         annotationType.valueProperty().setValue(null);
-        annotationType.getItems().addAll(AnnotationTypes.getAnnotationTypes());
+        annotationType.getItems().addAll(QcAnnotationTypes.getAnnotationTypes());
 
         // Initialize with current date.
         Date date = new Date();
@@ -77,9 +77,9 @@ public class AnnotationPageController {
         annotationTimePicker.valueProperty().setValue(formatAMPM.format(date));
 
         // Initialize with current selections
-        if(reportContext != null) {
+        if(qcReportContext != null) {
 
-            annotationInstrument.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(reportContext));
+            annotationInstrument.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(qcReportContext));
         }
 
         // Update fields with selected entry
@@ -91,7 +91,7 @@ public class AnnotationPageController {
             // Get and update configuration options.
             List<String> config = new ArrayList<>();
             config.add("All");
-            config.addAll(ContextFilteringUtils.getUniqueConfigurations(reportContext, selectedContext.instrument()));
+            config.addAll(ContextFilteringUtils.getUniqueConfigurations(qcReportContext, selectedContext.instrument()));
             annotationConfig.getItems().clear();
             annotationConfig.getItems().addAll(config);
             annotationConfig.valueProperty().setValue(selectedContext.config());
@@ -99,7 +99,7 @@ public class AnnotationPageController {
             // Get and update matrix options.
             List<String> matrix = new ArrayList<>();
             matrix.add("All");
-            matrix.addAll(ContextFilteringUtils.getUniqueMatrices(reportContext, selectedContext.instrument(), selectedContext.config()));
+            matrix.addAll(ContextFilteringUtils.getUniqueMatrices(qcReportContext, selectedContext.instrument(), selectedContext.config()));
             annotationMatrix.getItems().clear();
             annotationMatrix.getItems().addAll(matrix);
             annotationMatrix.valueProperty().setValue(selectedContext.matrix());
@@ -110,27 +110,27 @@ public class AnnotationPageController {
      * Set application report context and current selected context.
      * Re-initialize controller to update values.
      */
-    public void setContext(List<ReportContext> reportContext, ReportContext selectedContext) {
+    public void setContext(List<QcReportContext> qcReportContext, QcReportContext selectedContext) {
 
-        this.reportContext = reportContext;
+        this.qcReportContext = qcReportContext;
         this.selectedContext = selectedContext;
 
         initialize();
     }
 
     /**
-     * Fill window with selected annotation information.
+     * Fill window with selected qcAnnotation information.
      *
-     * @param annotation User selected annotation.
+     * @param qcAnnotation User selected qcAnnotation.
      */
-    public void setAnnotation(List<ReportContext> reportContext, Annotation annotation) {
+    public void setAnnotation(List<QcReportContext> qcReportContext, QcAnnotation qcAnnotation) {
 
-        this.reportContext = reportContext;
+        this.qcReportContext = qcReportContext;
         initialize();
 
         // Time format specifications.
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime dateTime = LocalDateTime.parse(annotation.getDate(), formatter);
+        LocalDateTime dateTime = LocalDateTime.parse(qcAnnotation.getDate(), formatter);
 
         int hour = dateTime.getHour();
         int min = dateTime.getMinute();
@@ -149,33 +149,33 @@ public class AnnotationPageController {
         annotationDate.valueProperty().setValue(dateTime.toLocalDate());
 
         // Set instrument selection.
-        String instrument = annotation.getInstrument();
+        String instrument = qcAnnotation.getInstrument();
 
-        // All non-instrument selections may specify "All" to indicate every context should include this annotation.
+        // All non-instrument selections may specify "All" to indicate every context should include this qcAnnotation.
         // Get configurations options for selected instrument.
         List<String> config = new ArrayList<>();
         config.add("All");
-        config.addAll(ContextFilteringUtils.getUniqueConfigurations(reportContext, instrument));
+        config.addAll(ContextFilteringUtils.getUniqueConfigurations(qcReportContext, instrument));
         annotationConfig.getItems().clear();
         annotationConfig.getItems().addAll(config);
 
         // Get matrix options for selected instrument.
         List<String> matrix = new ArrayList<>();
         matrix.add("All");
-        matrix.addAll(ContextFilteringUtils.getUniqueMatrices(reportContext, instrument, annotation.getConfig()));
+        matrix.addAll(ContextFilteringUtils.getUniqueMatrices(qcReportContext, instrument, qcAnnotation.getConfig()));
         annotationMatrix.getItems().clear();
         annotationMatrix.getItems().addAll(matrix);
 
         // Set all fields with annotations values.
-        annotationInstrument.valueProperty().setValue(annotation.getInstrument());
-        annotationConfig.valueProperty().setValue(annotation.getConfig());
-        annotationMatrix.valueProperty().setValue(annotation.getMatrix());
-        annotationType.valueProperty().setValue(annotation.getType());
-        annotationComment.setText(annotation.getComment());
+        annotationInstrument.valueProperty().setValue(qcAnnotation.getInstrument());
+        annotationConfig.valueProperty().setValue(qcAnnotation.getConfig());
+        annotationMatrix.valueProperty().setValue(qcAnnotation.getMatrix());
+        annotationType.valueProperty().setValue(qcAnnotation.getType());
+        annotationComment.setText(qcAnnotation.getComment());
     }
 
     /**
-     * Annotation instrument choice box listener.
+     * QcAnnotation instrument choice box listener.
      * Dynamically updates configuration choice boxes based on user selection.
      */
     @FXML
@@ -188,13 +188,13 @@ public class AnnotationPageController {
         // Get and update configuration options.
         List<String> config = new ArrayList<>();
         config.add("All");
-        config.addAll(ContextFilteringUtils.getUniqueConfigurations(reportContext, instrument));
+        config.addAll(ContextFilteringUtils.getUniqueConfigurations(qcReportContext, instrument));
         annotationConfig.getItems().clear();
         annotationConfig.getItems().addAll(config);
     }
 
     /**
-     * Annotation configuration box listener.
+     * QcAnnotation configuration box listener.
      * Dynamically updates matrix choice boxed based on user selection.
      */
     @FXML
@@ -208,14 +208,14 @@ public class AnnotationPageController {
         // Get and update matrix options.
         List<String> matrix = new ArrayList<>();
         matrix.add("All");
-        matrix.addAll(ContextFilteringUtils.getUniqueMatrices(reportContext, instrument, config));
+        matrix.addAll(ContextFilteringUtils.getUniqueMatrices(qcReportContext, instrument, config));
         annotationMatrix.getItems().clear();
         annotationMatrix.getItems().addAll(matrix);
     }
 
     /**
-     * Handles annotation submit button click.
-     * If selection valid, make new annotation.
+     * Handles qcAnnotation submit button click.
+     * If selection valid, make new qcAnnotation.
      */
     @FXML
     protected void annotationSubmitListener() {
@@ -236,7 +236,7 @@ public class AnnotationPageController {
         } else if (annotationType.valueProperty().isNull().getValue()) {
             showErrorMessage(ErrorTypes.TYPE);
         } else {
-            annotation = makeNewAnnotation();
+            qcAnnotation = makeNewAnnotation();
             canceled = false;
         }
 
@@ -248,7 +248,7 @@ public class AnnotationPageController {
     }
 
     /**
-     * Handles annotation page cancel button click.
+     * Handles qcAnnotation page cancel button click.
      */
     @FXML
     protected void annotationCancelListener() {
@@ -258,11 +258,11 @@ public class AnnotationPageController {
     }
 
     /**
-     * Make new annotation object with user selected context options.
+     * Make new qcAnnotation object with user selected context options.
      *
-     * @return Annotation object.
+     * @return QcAnnotation object.
      */
-    private Annotation makeNewAnnotation() {
+    private QcAnnotation makeNewAnnotation() {
 
         // Format date and time selection.
         // I hate date-time handling...
@@ -278,8 +278,8 @@ public class AnnotationPageController {
         String comment = annotationComment.getText();
         if(comment.isEmpty()) comment = "NA";
 
-        // Return new annotation object.
-        return new Annotation(dateTime.format(outFormat),
+        // Return new qcAnnotation object.
+        return new QcAnnotation(dateTime.format(outFormat),
                 annotationInstrument.getSelectionModel().getSelectedItem(),
                 annotationConfig.getSelectionModel().getSelectedItem(),
                 annotationMatrix.getSelectionModel().getSelectedItem(),
@@ -288,11 +288,11 @@ public class AnnotationPageController {
     }
 
     /**
-     * Get selected annotation object.
+     * Get selected qcAnnotation object.
      */
-    public Annotation getAnnotation() {
+    public QcAnnotation getAnnotation() {
 
-        return this.annotation;
+        return this.qcAnnotation;
     }
 
     /**

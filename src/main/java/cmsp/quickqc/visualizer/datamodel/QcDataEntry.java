@@ -7,9 +7,9 @@ import static cmsp.quickqc.visualizer.utils.MathUtils.log2;
 
 /**
  * QC data class. Stores all tabular entries as a LinkedHashMap.
- * For plotting purposes, Annotations may be stored as DataEntry
+ * For plotting purposes, Annotations may be stored as QcDataEntry
  */
-public class DataEntry {
+public class QcDataEntry {
 
     final private LinkedHashMap<String, String> entries;
     final private String type;
@@ -21,7 +21,7 @@ public class DataEntry {
      * @param entry Variable values that user intends to monitor
      * @param type Indicator whether entry is faux-annotation entry
      */
-    public DataEntry(String[] header, String[] entry, String type) {
+    public QcDataEntry(String[] header, String[] entry, String type) {
 
         this.entries = new LinkedHashMap<>();
         addItems(header, entry);
@@ -65,7 +65,7 @@ public class DataEntry {
     }
 
     /**
-     * Is DataEntry marked as excluded from the QC line chart.
+     * Is QcDataEntry marked as excluded from the QC line chart.
      *
      * @return Boolean exclusion status
      */
@@ -119,7 +119,7 @@ public class DataEntry {
     }
 
     /**
-     * Size of this DataEntry LinkedHashSet variable
+     * Size of this QcDataEntry LinkedHashSet variable
      *
      * @return int this LinkedHashSet size
      */
@@ -128,7 +128,7 @@ public class DataEntry {
     }
 
     /**
-     *  Change DataEntry exclusion status to opposite status
+     *  Change QcDataEntry exclusion status to opposite status
      */
     public void changeExclusionStatus() {
 
@@ -145,7 +145,7 @@ public class DataEntry {
     }
 
     /**
-     * Change DataEntry guide set status to opposite status
+     * Change QcDataEntry guide set status to opposite status
      */
     public void changeGuideStatus() {
 
@@ -163,7 +163,7 @@ public class DataEntry {
     }
 
     /**
-     * Set DataEntry comment
+     * Set QcDataEntry comment
      *
      * @param comment User input comment
      */
@@ -173,7 +173,7 @@ public class DataEntry {
     }
 
     /**
-     * Get DataEntry comment
+     * Get QcDataEntry comment
      *
      * @return Comment string
      */
@@ -183,7 +183,7 @@ public class DataEntry {
     }
 
     /**
-     * Get DataEntry experimental log number
+     * Get QcDataEntry experimental log number
      *
      * @return Log number string
      */
@@ -193,7 +193,7 @@ public class DataEntry {
     }
 
     /**
-     * Write as DataEntry values as string wrapped with quotation marks for database writing.
+     * Write as QcDataEntry values as string wrapped with quotation marks for database writing.
      *
      * @return List of strings of each value in quotation marks
      */
@@ -211,7 +211,7 @@ public class DataEntry {
     }
 
     /**
-     * Get type of DataEntry - QC report value or annotation type.
+     * Get type of QcDataEntry - QC report value or annotation type.
      *
      * @return String of entry type
      */
@@ -221,7 +221,7 @@ public class DataEntry {
     }
 
     /**
-     * Is DataEntry an annotation or QC report value.
+     * Is QcDataEntry an annotation or QC report value.
      *
      * @return Boolean true if annotation
      */
@@ -231,7 +231,7 @@ public class DataEntry {
     }
 
     /**
-     * Is DataEntry part of report guide set.
+     * Is QcDataEntry part of report guide set.
      *
      * @return Boolean true if part of guide set
      */

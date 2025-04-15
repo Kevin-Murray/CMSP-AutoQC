@@ -4,9 +4,9 @@ package cmsp.quickqc.visualizer.enums;
 /**
  * Enumeration of annotation styles for QC plot.
  */
-public enum AnnotationStyles {
+public enum QcAnnotationStyles {
 
-    //TODO - Make into Annotation colors only. Move point style elsewhere.
+    //TODO - Make into QcAnnotation colors only. Move point style elsewhere.
 
     STANDARD("""
             -fx-background-color: #1B9E77, white;
@@ -49,7 +49,7 @@ public enum AnnotationStyles {
     /**
      * Enum constructor
      */
-    AnnotationStyles(String style) {
+    QcAnnotationStyles(String style) {
 
         this.label = style;
     }

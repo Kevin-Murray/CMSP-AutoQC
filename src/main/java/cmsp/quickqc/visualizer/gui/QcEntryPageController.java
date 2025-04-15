@@ -1,8 +1,8 @@
 
 package cmsp.quickqc.visualizer.gui;
 
-import cmsp.quickqc.visualizer.datamodel.DataEntry;
-import cmsp.quickqc.visualizer.datamodel.PlotEntry;
+import cmsp.quickqc.visualizer.datamodel.QcDataEntry;
+import cmsp.quickqc.visualizer.datamodel.QcPlotEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Controller class for sample page.
  */
-public class SamplePageController {
+public class QcEntryPageController {
 
     @FXML private RadioButton guideExcludeButton;
     @FXML private RadioButton guideIncludeButton;
@@ -23,7 +23,7 @@ public class SamplePageController {
     @FXML private TextArea commentBox;
     @FXML private TableView sampleTable;
 
-    private DataEntry selectedEntry;
+    private QcDataEntry selectedEntry;
     private boolean changedInclusion;
     private boolean changedGuide;
 
@@ -47,7 +47,7 @@ public class SamplePageController {
      *
      * @param selectedEntry
      */
-    public void setDataEntry(DataEntry selectedEntry){
+    public void setDataEntry(QcDataEntry selectedEntry){
 
         this.selectedEntry = selectedEntry;
 
@@ -82,7 +82,7 @@ public class SamplePageController {
 
         sampleTable.getColumns().addAll(fieldColumn, valueColumn);
 
-        ObservableList<PlotEntry> sampleEntries = makeSampleTable(selectedEntry);
+        ObservableList<QcPlotEntry> sampleEntries = makeSampleTable(selectedEntry);
 
         sampleTable.getItems().addAll(sampleEntries);
 
@@ -95,16 +95,16 @@ public class SamplePageController {
      * @param entry Selected data entry
      * @return ObservableList of Sample Entries
      */
-    private ObservableList<PlotEntry> makeSampleTable(DataEntry entry){
+    private ObservableList<QcPlotEntry> makeSampleTable(QcDataEntry entry){
 
-        ObservableList<PlotEntry> sampleTableList = FXCollections.observableArrayList();
+        ObservableList<QcPlotEntry> sampleTableList = FXCollections.observableArrayList();
 
         Set<String> keySet = entry.getKeySet();
 
         // Make new sample entry object for each key:value pair in selected date entry point.
         for(String key : keySet) {
 
-            sampleTableList.add(new PlotEntry(key, entry.getValue(key)));
+            sampleTableList.add(new QcPlotEntry(key, entry.getValue(key)));
         }
 
         return sampleTableList;

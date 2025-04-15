@@ -28,7 +28,7 @@ tasks.withType(JavaCompile) {
 application {
     mainModule = 'cmsp.quickqc.visualizer'
     mainClass = 'cmsp.quickqc.visualizer.Launcher'
-    applicationName = "QuickQC"
+    applicationName = "CMSP Tool Box"
 }
 
 javafx {

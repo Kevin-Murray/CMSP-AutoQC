@@ -1,11 +1,11 @@
 
 package cmsp.quickqc.visualizer.tasks;
 
-import cmsp.quickqc.visualizer.datamodel.DataEntry;
-import cmsp.quickqc.visualizer.datamodel.Parameters;
+import cmsp.quickqc.visualizer.datamodel.QcAnnotation;
+import cmsp.quickqc.visualizer.datamodel.QcDataEntry;
+import cmsp.quickqc.visualizer.datamodel.QcParameters;
 import cmsp.quickqc.visualizer.utils.MathUtils;
 import cmsp.quickqc.visualizer.utils.ReportFilteringUtils;
-import cmsp.quickqc.visualizer.datamodel.Annotation;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,32 +39,32 @@ public class QuickQCTask {
     private Path annotationPath;
 
     // User specified selections
-    private Parameters parameters;
+    private QcParameters qcParameters;
 
     // Plotting data
-    private List<DataEntry> globalEntries;
-    private List<DataEntry> workingEntries;
-    private List<DataEntry> mergedEntries;
-    private List<Annotation> annotationDatabase;
-    private List<Annotation> workingAnnotations;
+    private List<QcDataEntry> globalEntries;
+    private List<QcDataEntry> workingEntries;
+    private List<QcDataEntry> mergedEntries;
+    private List<QcAnnotation> qcAnnotationDatabase;
+    private List<QcAnnotation> workingQcAnnotations;
     private ObservableList<XYChart.Series<String, Number>> chart;
 
     /**
      * QuickQC main processing method.
      *
-     * @param parameters User input parameters class
+     * @param qcParameters User input qcParameters class
      */
-    public QuickQCTask(Parameters parameters) {
+    public QuickQCTask(QcParameters qcParameters) {
 
-        this.parameters = parameters;
+        this.qcParameters = qcParameters;
 
-        // If parameters valid, assign global variables
-        if(parameters.validSelection()) {
+        // If qcParameters valid, assign global variables
+        if(qcParameters.validSelection()) {
 
-            this.databasePath = this.parameters.getPath();
-            this.annotationPath = this.parameters.getAnnotationPath();
+            this.databasePath = this.qcParameters.getPath();
+            this.annotationPath = this.qcParameters.getAnnotationPath();
             this.globalEntries = readReport();
-            this.annotationDatabase = readAnnotation();
+            this.qcAnnotationDatabase = readAnnotation();
         }
     }
 
@@ -76,7 +76,7 @@ public class QuickQCTask {
 
         // Get appropriate QC data and filter based on user selections.
         this.workingEntries = getFilteredData();
-        this.workingAnnotations = getFilteredAnnotation();
+        this.workingQcAnnotations = getFilteredAnnotation();
 
         // Merge annotations into QC data series.
         this.mergedEntries = mergePlotData();
@@ -90,9 +90,9 @@ public class QuickQCTask {
      *
      * @return List of data entries.
      */
-    private List<DataEntry> readReport() {
+    private List<QcDataEntry> readReport() {
 
-        List<DataEntry> dataEntries = new ArrayList<>();
+        List<QcDataEntry> dataEntries = new ArrayList<>();
 
         // Create an instance of BufferedReader
         try (BufferedReader br = Files.newBufferedReader(this.databasePath, StandardCharsets.US_ASCII)) {
@@ -114,7 +114,7 @@ public class QuickQCTask {
                 }
 
                 // Make data entry object and add to list.
-                DataEntry entry = new DataEntry(header, attributes, "Sample");
+                QcDataEntry entry = new QcDataEntry(header, attributes, "Sample");
                 dataEntries.add(entry);
 
                 line = br.readLine();
@@ -132,11 +132,11 @@ public class QuickQCTask {
     /**
      * Read annotation database entries into list.
      *
-     * @return List of Annotation objects.
+     * @return List of QcAnnotation objects.
      */
-    private ObservableList<Annotation> readAnnotation() {
+    private ObservableList<QcAnnotation> readAnnotation() {
 
-        ObservableList<Annotation> annotationList = FXCollections.observableArrayList();
+        ObservableList<QcAnnotation> qcAnnotationList = FXCollections.observableArrayList();
 
         // Create an instance of BufferedReader.
         try (BufferedReader br = Files.newBufferedReader(this.annotationPath, StandardCharsets.US_ASCII)) {
@@ -156,14 +156,14 @@ public class QuickQCTask {
                     attributes[i] = attributes[i].replace("\"", "");
                 }
 
-                // Create new annotation object and add to list.
-                Annotation annotation = new Annotation(attributes[0], // Date string
+                // Create new qcAnnotation object and add to list.
+                QcAnnotation qcAnnotation = new QcAnnotation(attributes[0], // Date string
                         attributes[1], // Instrument string
                         attributes[2], // Configuration string
                         attributes[3], // Matrix string
                         attributes[4], // Type string
                         attributes[5]); // Comment string
-                annotationList.add(annotation);
+                qcAnnotationList.add(qcAnnotation);
 
                 line = br.readLine();
             }
@@ -174,7 +174,7 @@ public class QuickQCTask {
             ioe.printStackTrace();
         }
 
-        return annotationList;
+        return qcAnnotationList;
     }
 
     /**
@@ -194,7 +194,7 @@ public class QuickQCTask {
             writer.newLine();
 
             // Write all remaining entries.
-            for (DataEntry entry: this.globalEntries) {
+            for (QcDataEntry entry: this.globalEntries) {
 
                 writer.write(String.join(",", entry.writeValues()));
                 writer.newLine();
@@ -222,14 +222,14 @@ public class QuickQCTask {
             BufferedWriter writer = Files.newBufferedWriter(this.annotationPath);
 
             // Write header row from database keys.
-            List<String> header = new ArrayList<>(this.annotationDatabase.get(0).getKeySet());
+            List<String> header = new ArrayList<>(this.qcAnnotationDatabase.get(0).getKeySet());
             writer.write(String.join(",", header));
             writer.newLine();
 
             // Write all remaining records.
-            for (Annotation annotation: this.annotationDatabase) {
+            for (QcAnnotation qcAnnotation : this.qcAnnotationDatabase) {
 
-                writer.write(String.join(",", annotation.writeValues()));
+                writer.write(String.join(",", qcAnnotation.writeValues()));
                 writer.newLine();
             }
 
@@ -249,21 +249,21 @@ public class QuickQCTask {
      *
      * @return List of filtered data entries.
      */
-    private List<DataEntry> getFilteredData() {
+    private List<QcDataEntry> getFilteredData() {
 
-        List<DataEntry> newList = new ArrayList<>();
+        List<QcDataEntry> newList = new ArrayList<>();
 
         // Loop through list, checking if each entry within specified date range and showable.
-        for (DataEntry entry : this.globalEntries) {
+        for (QcDataEntry entry : this.globalEntries) {
 
             String date = entry.getDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDate dateTime = LocalDate.parse(date, formatter);
 
-            if ((ReportFilteringUtils.isWithinDateRange(dateTime, parameters.startDate, parameters.endDate) &&
-                    ReportFilteringUtils.isShowable(parameters.showExcluded, entry.isExcluded()) &&
-                    ReportFilteringUtils.isMonitoredLogNumber(entry.getLogNumber(), parameters.logNumbers)) ||
-                    ReportFilteringUtils.isGuideSet(parameters.showGuide, entry.isGuide())) {
+            if ((ReportFilteringUtils.isWithinDateRange(dateTime, qcParameters.startDate, qcParameters.endDate) &&
+                    ReportFilteringUtils.isShowable(qcParameters.showExcluded, entry.isExcluded()) &&
+                    ReportFilteringUtils.isMonitoredLogNumber(entry.getLogNumber(), qcParameters.logNumbers)) ||
+                    ReportFilteringUtils.isGuideSet(qcParameters.showGuide, entry.isGuide())) {
 
                 newList.add(entry);
             }
@@ -277,21 +277,21 @@ public class QuickQCTask {
      *
      * @return List of filtered annotations.
      */
-    private List<Annotation> getFilteredAnnotation() {
+    private List<QcAnnotation> getFilteredAnnotation() {
 
-        List<Annotation> newList = new ArrayList<>();
+        List<QcAnnotation> newList = new ArrayList<>();
 
         // Loop through annotation database, check if annotation in date range.
-        for (Annotation annotation : this.annotationDatabase) {
+        for (QcAnnotation qcAnnotation : this.qcAnnotationDatabase) {
 
-            String date = annotation.getDate();
+            String date = qcAnnotation.getDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDate dateTime = LocalDate.parse(date, formatter);
 
-            if (ReportFilteringUtils.isWithinDateRange(dateTime, parameters.startDate, parameters.endDate) &&
-                    ReportFilteringUtils.filteredAnnotation(parameters, annotation)) {
+            if (ReportFilteringUtils.isWithinDateRange(dateTime, qcParameters.startDate, qcParameters.endDate) &&
+                    ReportFilteringUtils.filteredAnnotation(qcParameters, qcAnnotation)) {
 
-                newList.add(annotation);
+                newList.add(qcAnnotation);
             }
         }
 
@@ -307,12 +307,12 @@ public class QuickQCTask {
         this.chart = FXCollections.observableArrayList();
 
         // Sort entries by date
-        this.mergedEntries.sort(Comparator.comparing(DataEntry::getDate));
+        this.mergedEntries.sort(Comparator.comparing(QcDataEntry::getDate));
 
         // Designate which type of plot to generate.
-        switch (parameters.plotType) {
-            case 1 -> this.chart.addAll(getLeveyData(this.mergedEntries, parameters.selection, parameters.logScale, parameters.varType, parameters.showGuide));
-            case 2 -> this.chart.addAll(getMovingData(this.mergedEntries, parameters.selection));
+        switch (qcParameters.plotType) {
+            case 1 -> this.chart.addAll(getLeveyData(this.mergedEntries, qcParameters.selection, qcParameters.logScale, qcParameters.varType, qcParameters.showGuide));
+            case 2 -> this.chart.addAll(getMovingData(this.mergedEntries, qcParameters.selection));
         }
     }
 
@@ -320,28 +320,28 @@ public class QuickQCTask {
      * Merge annotation entries into QC data entries.
      * Merged working entries sorted by date.
      */
-    private List<DataEntry> mergePlotData() {
+    private List<QcDataEntry> mergePlotData() {
 
-        List<DataEntry> dataEntries = new ArrayList<>(this.workingEntries);
+        List<QcDataEntry> dataEntries = new ArrayList<>(this.workingEntries);
 
         // Add annotations to entry list, set report value to zero.
-        for(Annotation annotation : this.workingAnnotations){
+        for(QcAnnotation qcAnnotation : this.workingQcAnnotations){
 
-            String[] header = {"Date", parameters.selection, "Comment"};
-            String[] entry = {annotation.getDate(), "0.0", annotation.getComment()};
+            String[] header = {"Date", qcParameters.selection, "Comment"};
+            String[] entry = {qcAnnotation.getDate(), "0.0", qcAnnotation.getComment()};
 
-            dataEntries.add(new DataEntry(header, entry, annotation.getType()));
+            dataEntries.add(new QcDataEntry(header, entry, qcAnnotation.getType()));
         }
 
         // Sort entries by date, annotations should appear between sample entries.
-        dataEntries.sort(Comparator.comparing(DataEntry::getDate));
+        dataEntries.sort(Comparator.comparing(QcDataEntry::getDate));
 
         // Loop through working entries, set annotation entries value to be identical to first valid previous data entry.
         // If no valid previous entry exists, replace with first valid older entry.
         for (int i = 0; i < dataEntries.size(); i++){
 
             // Is annotation.
-            if(dataEntries.get(i).getItem(parameters.selection) == 0.0){
+            if(dataEntries.get(i).getItem(qcParameters.selection) == 0.0){
 
                 Double firstValue = 0.0;
                 Double nextValue = 0.0;
@@ -353,8 +353,8 @@ public class QuickQCTask {
                 while(j >= 0){
 
                     // Set value to previous entry.
-                    if(dataEntries.get(j).getItem(parameters.selection) != 0.0) {
-                        firstValue = dataEntries.get(j).getItem(parameters.selection);
+                    if(dataEntries.get(j).getItem(qcParameters.selection) != 0.0) {
+                        firstValue = dataEntries.get(j).getItem(qcParameters.selection);
                         break;
                     }
 
@@ -365,9 +365,9 @@ public class QuickQCTask {
                 while(k < dataEntries.size()){
 
                     // Set value to older entry.
-                    if(dataEntries.get(k).getItem(parameters.selection) != 0.0) {
+                    if(dataEntries.get(k).getItem(qcParameters.selection) != 0.0) {
 
-                        nextValue = dataEntries.get(k).getItem(parameters.selection);
+                        nextValue = dataEntries.get(k).getItem(qcParameters.selection);
                         break;
                     }
 
@@ -376,9 +376,9 @@ public class QuickQCTask {
 
                 // Replace annotation zero value with nearest non-zero value.
                 if(firstValue == 0.0 ){
-                    dataEntries.get(i).replaceItem(parameters.selection, String.valueOf(nextValue));
+                    dataEntries.get(i).replaceItem(qcParameters.selection, String.valueOf(nextValue));
                 }  else {
-                    dataEntries.get(i).replaceItem(parameters.selection, String.valueOf(firstValue));
+                    dataEntries.get(i).replaceItem(qcParameters.selection, String.valueOf(firstValue));
                 }
             }
         }
@@ -396,7 +396,7 @@ public class QuickQCTask {
         ArrayList<TableColumn<Map<Integer, String>, String>> columns = new ArrayList<>();
 
         // Get key set from the data entry list.
-        DataEntry entry = this.workingEntries.get(0);
+        QcDataEntry entry = this.workingEntries.get(0);
         int col = entry.size();
         String[] keys = entry.getKeySet().toArray(new String[0]);
 
@@ -435,12 +435,12 @@ public class QuickQCTask {
         ObservableList<Map<Integer, String>> allData = FXCollections.observableArrayList();
 
         // Get number of columns and key set.
-        DataEntry entry = this.workingEntries.get(0);
+        QcDataEntry entry = this.workingEntries.get(0);
         int col = entry.size();
         String[] keys = entry.getKeySet().toArray(new String[0]);
 
         // Add each data entry into mapped table row object.
-        for (DataEntry data : this.workingEntries) {
+        for (QcDataEntry data : this.workingEntries) {
 
             // Table rows are hash maps.
             Map<Integer, String> dataRow = new HashMap<>();
@@ -465,9 +465,9 @@ public class QuickQCTask {
         ArrayList<TableColumn<Map<Integer, String>, String>> columns = new ArrayList<>();
 
         // Get number of columns and key set.
-        Annotation annotation = this.annotationDatabase.get(0);
-        int col = annotation.size();
-        String[] keys = annotation.getKeySet().toArray(new String[0]);
+        QcAnnotation qcAnnotation = this.qcAnnotationDatabase.get(0);
+        int col = qcAnnotation.size();
+        String[] keys = qcAnnotation.getKeySet().toArray(new String[0]);
 
         // Make table column for each key in set.
         for (int i = 0; i < col; i++) {
@@ -479,7 +479,7 @@ public class QuickQCTask {
             tableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(index)));
             //tableColumn.setCellValueFactory(new MapValueFactory(i)); // This was working but didn't like raw use.
 
-            // Bigger column width for annotation comments.
+            // Bigger column width for qcAnnotation comments.
             if(name.equals("Comment")) {
 
                 tableColumn.setMinWidth(400);
@@ -501,12 +501,12 @@ public class QuickQCTask {
         ObservableList<Map<Integer, String>> allData = FXCollections.observableArrayList();
 
         // Get column number and key set.
-        Annotation annotation = this.workingAnnotations.get(0);
-        int col = annotation.size();
-        String[] keys = annotation.getKeySet().toArray(new String[0]);
+        QcAnnotation qcAnnotation = this.workingQcAnnotations.get(0);
+        int col = qcAnnotation.size();
+        String[] keys = qcAnnotation.getKeySet().toArray(new String[0]);
 
-        // Add each annotation entry as a mapped table row.
-        for (Annotation entry : this.workingAnnotations) {
+        // Add each qcAnnotation entry as a mapped table row.
+        for (QcAnnotation entry : this.workingQcAnnotations) {
 
             // Table rows are hash maps.
             Map<Integer, String> dataRow = new HashMap<>();
@@ -522,29 +522,29 @@ public class QuickQCTask {
     }
 
     /**
-     * Replace existing Parameters with new Parameters.
+     * Replace existing QcParameters with new QcParameters.
      *
-     * @param newParams New user Parameters.
+     * @param newParams New user QcParameters.
      */
-    public void updateParams(Parameters newParams) {
+    public void updateParams(QcParameters newParams) {
 
-        this.parameters = newParams;
+        this.qcParameters = newParams;
     }
 
     /**
-     * Get DataEntry from current chart data point.
+     * Get QcDataEntry from current chart data point.
      *
      * @param data Selected chart data.
-     * @return Selected DataEntry or null if not found.
+     * @return Selected QcDataEntry or null if not found.
      */
-    public DataEntry getDataEntry(XYChart.Data<String, Number> data) {
+    public QcDataEntry getDataEntry(XYChart.Data<String, Number> data) {
 
         String date = data.getXValue();
 
-        // Get Annotation by selected data point data
+        // Get QcAnnotation by selected data point data
         // Assumption that it is impossible for to entries to have the same date
         // TODO - give entries unique identifiers.
-        for(DataEntry entry : this.mergedEntries) {
+        for(QcDataEntry entry : this.mergedEntries) {
 
             if(entry.getDate().equals(date)) return entry;
         }
@@ -553,22 +553,22 @@ public class QuickQCTask {
     }
 
     /**
-     * Get Annotation from DataEntry-Annotation entry.
+     * Get QcAnnotation from QcDataEntry-QcAnnotation entry.
      *
      * @param entry User selected entry from line chart.
-     * @return Annotation object of selection.
+     * @return QcAnnotation object of selection.
      */
-    public Annotation getDataEntryAnnotation(DataEntry entry) {
+    public QcAnnotation getDataEntryAnnotation(QcDataEntry entry) {
 
         String date = entry.getDate();
         String type = entry.getType();
 
-        // Get Annotation by selected data point data and type
+        // Get QcAnnotation by selected data point data and type
         // Assumption that it is impossible for to annotations to have the same date and type (not true)
         // TODO - give annotations unique identifiers.
-        for(Annotation annotation : this.workingAnnotations) {
+        for(QcAnnotation qcAnnotation : this.workingQcAnnotations) {
 
-            if(annotation.getDate().equals(date) && annotation.getType().equals(type)) return annotation;
+            if(qcAnnotation.getDate().equals(date) && qcAnnotation.getType().equals(type)) return qcAnnotation;
         }
 
         return null;
@@ -580,11 +580,11 @@ public class QuickQCTask {
      *
      * @param selectedEntry Selected data entry from line chart.
      */
-    public void setDataEntryInclusion(DataEntry selectedEntry) {
+    public void setDataEntryInclusion(QcDataEntry selectedEntry) {
 
         String date = selectedEntry.getDate();
 
-        for(DataEntry entry : this.globalEntries) {
+        for(QcDataEntry entry : this.globalEntries) {
 
             if(entry.getDate().equals(date)) entry.changeExclusionStatus();
         }
@@ -599,11 +599,11 @@ public class QuickQCTask {
      *
      * @param selectedEntry Selected data entry from line chart.
      */
-    public void setDataEntryGuide(DataEntry selectedEntry) {
+    public void setDataEntryGuide(QcDataEntry selectedEntry) {
 
         String date = selectedEntry.getDate();
 
-        for(DataEntry entry : this.globalEntries) {
+        for(QcDataEntry entry : this.globalEntries) {
 
             if(entry.getDate().equals(date)) entry.changeGuideStatus();
         }
@@ -619,11 +619,11 @@ public class QuickQCTask {
      * @param selectedEntry Selected data entry from line chart.
      * @param comment New user comment.
      */
-    public void setDataEntryComment(DataEntry selectedEntry, String comment) {
+    public void setDataEntryComment(QcDataEntry selectedEntry, String comment) {
 
         String date = selectedEntry.getDate();
 
-        for(DataEntry entry : this.globalEntries) {
+        for(QcDataEntry entry : this.globalEntries) {
 
             if(entry.getDate().equals(date)) entry.setComment(comment);
         }
@@ -669,7 +669,7 @@ public class QuickQCTask {
      */
     public int getWorkingAnnotationSize() {
 
-        return this.workingAnnotations.size();
+        return this.workingQcAnnotations.size();
     }
 
     /**
@@ -683,7 +683,7 @@ public class QuickQCTask {
         ArrayList<LocalDateTime> dateList = new ArrayList<>();
 
         // Get dates.
-        for(DataEntry entry : this.workingEntries){
+        for(QcDataEntry entry : this.workingEntries){
 
             String date = entry.getDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -710,9 +710,9 @@ public class QuickQCTask {
 
         ArrayList<Double> valueList = new ArrayList<>();
 
-        for(DataEntry entry : this.workingEntries) {
+        for(QcDataEntry entry : this.workingEntries) {
 
-            valueList.add(entry.getItem(parameters.selection));
+            valueList.add(entry.getItem(qcParameters.selection));
         }
 
         return valueList;
@@ -786,19 +786,19 @@ public class QuickQCTask {
      */
     public List<String> getSeriesLogNumbers() {
 
-        HashSet<String> logNumbers = new HashSet<>(this.workingEntries.stream().map(DataEntry::getLogNumber).collect(Collectors.toList()));
+        HashSet<String> logNumbers = new HashSet<>(this.workingEntries.stream().map(QcDataEntry::getLogNumber).collect(Collectors.toList()));
 
         return logNumbers.stream().sorted().toList();
     }
 
     /**
-     * Add new annotation to master annotation database.
+     * Add new qcAnnotation to master qcAnnotation database.
      *
-     * @param annotation New user annotation.
+     * @param qcAnnotation New user qcAnnotation.
      */
-    public void addAnnotation(Annotation annotation) {
+    public void addAnnotation(QcAnnotation qcAnnotation) {
 
-        this.annotationDatabase.add(annotation);
+        this.qcAnnotationDatabase.add(qcAnnotation);
     }
 
     /**
@@ -807,25 +807,25 @@ public class QuickQCTask {
      * @param index index of selected entry
      * @return Selected annotation
      */
-    public Annotation getSelectedAnnotation(int index) {
+    public QcAnnotation getSelectedAnnotation(int index) {
 
-        return this.workingAnnotations.get(index);
+        return this.workingQcAnnotations.get(index);
     }
 
     /**
      * Edit selected annotation and replace with user modified version in master annotation database.
      *
-     * @param oldAnnotation Original selected annotation
-     * @param newAnnotation New user modified annotation
+     * @param oldQcAnnotation Original selected annotation
+     * @param newQcAnnotation New user modified annotation
      */
-    public void editAnnotation(Annotation oldAnnotation, Annotation newAnnotation) {
+    public void editAnnotation(QcAnnotation oldQcAnnotation, QcAnnotation newQcAnnotation) {
 
         // Loop through master annotation database and replace with modified annotation
-        for(int i = 0; i < annotationDatabase.size(); i++) {
+        for(int i = 0; i < qcAnnotationDatabase.size(); i++) {
 
-            if(annotationDatabase.get(i).equals(oldAnnotation)) {
+            if(qcAnnotationDatabase.get(i).equals(oldQcAnnotation)) {
 
-                annotationDatabase.set(i, newAnnotation);
+                qcAnnotationDatabase.set(i, newQcAnnotation);
                 break;
             }
         }
@@ -836,17 +836,17 @@ public class QuickQCTask {
      */
     public void sortAnnotations() {
 
-        this.annotationDatabase.sort(Comparator.comparing(Annotation::getDate));
+        this.qcAnnotationDatabase.sort(Comparator.comparing(QcAnnotation::getDate));
     }
 
     /**
-     * Delete annotation from master annotation database.
+     * Delete qcAnnotation from master qcAnnotation database.
      *
-     * @param annotation Selected annotation.
+     * @param qcAnnotation Selected qcAnnotation.
      */
-    public void deleteAnnotation(Annotation annotation) {
+    public void deleteAnnotation(QcAnnotation qcAnnotation) {
 
-        this.annotationDatabase.remove(annotation);
+        this.qcAnnotationDatabase.remove(qcAnnotation);
     }
 
     /**
@@ -891,10 +891,10 @@ public class QuickQCTask {
     }
 
     /**
-     * Get Annotation type of current selection.
+     * Get QcAnnotation type of current selection.
      *
      * @param index index from data entry list
-     * @return Annotation type string
+     * @return QcAnnotation type string
      */
     public String getAnnotationType(int index) {
 

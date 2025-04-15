@@ -41,7 +41,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.quickqc.visualizer.gui.SamplePageController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.quickqc.visualizer.gui.QcEntryPageController">
    <children>
       <SplitPane dividerPositions="0.5" focusTraversable="false" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0">
         <items>

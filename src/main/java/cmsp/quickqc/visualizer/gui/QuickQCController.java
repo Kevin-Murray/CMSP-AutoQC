@@ -2,14 +2,14 @@
 package cmsp.quickqc.visualizer.gui;
 
 import cmsp.quickqc.visualizer.*;
-import cmsp.quickqc.visualizer.datamodel.DataEntry;
-import cmsp.quickqc.visualizer.datamodel.Parameters;
-import cmsp.quickqc.visualizer.datamodel.ReportContext;
+import cmsp.quickqc.visualizer.datamodel.QcAnnotation;
+import cmsp.quickqc.visualizer.datamodel.QcDataEntry;
+import cmsp.quickqc.visualizer.datamodel.QcParameters;
+import cmsp.quickqc.visualizer.datamodel.QcReportContext;
 import cmsp.quickqc.visualizer.enums.*;
 import cmsp.quickqc.visualizer.tasks.QuickQCTask;
 import cmsp.quickqc.visualizer.utils.ContextFilteringUtils;
 import cmsp.quickqc.visualizer.utils.PlotUtils;
-import cmsp.quickqc.visualizer.datamodel.Annotation;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -51,7 +51,7 @@ import java.util.prefs.Preferences;
 /**
  * Controller class for Main Page GUI of QuickQC
  */
-public class MainPageController {
+public class QuickQCController {
 
     @FXML public ChoiceBox<String> instrumentBox;
     @FXML public ChoiceBox<String> configurationBox;
@@ -88,14 +88,14 @@ public class MainPageController {
     @FXML public Label seriesRsdLabel;
     @FXML public Label lastRefreshLabel;
 
-    private Parameters mainParameters;
+    private QcParameters mainQcParameters;
     private QuickQCTask mainTask;
 
     private Path databasePath;
     private Path reportConfigPath;
 
-    private List<ReportContext> reportContexts;
-    private ReportContext selectedContext;
+    private List<QcReportContext> qcReportContexts;
+    private QcReportContext selectedContext;
     private Map<String, Boolean> annotationMap;
 
     private Boolean logScale;
@@ -116,8 +116,8 @@ public class MainPageController {
      */
     public void initialize() {
 
-        mainParameters = new Parameters();
-        mainTask = new QuickQCTask(mainParameters);
+        mainQcParameters = new QcParameters();
+        mainTask = new QuickQCTask(mainQcParameters);
 
         // Set all gui options to default
         setApplicationDefaults();
@@ -126,8 +126,8 @@ public class MainPageController {
         getPreferences();
 
         // Add instrument and date ranges to selections. All other choice boxes are set dynamically.
-        if(reportContexts != null) instrumentBox.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(reportContexts));
-        dateRangeBox.getItems().addAll(DateRangeTypes.getDateRangeNames());
+        if(qcReportContexts != null) instrumentBox.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(qcReportContexts));
+        dateRangeBox.getItems().addAll(QcDateRangeTypes.getDateRangeNames());
 
         // Submit parameters for GUI render
         if(validReportSelection()) submitButtonClick();
@@ -195,21 +195,21 @@ public class MainPageController {
         showExcluded = false;
         showGuideSet = false;
         logScale = false;
-        varType = VariabilityTypes.RSD.getLabel();
+        varType = QcVariabilityTypes.RSD.getLabel();
 
         // No log numbers monitored.
         logNumbers = null;
 
         // All annotation types are visible.
         annotationMap = new HashMap<>();
-        for(AnnotationTypes type : AnnotationTypes.values()) annotationMap.put(type.toString(), true);
+        for(QcAnnotationTypes type : QcAnnotationTypes.values()) annotationMap.put(type.toString(), true);
 
         // On reset, re-initialize values available to user.
-        if(reportContexts != null) {
+        if(qcReportContexts != null) {
 
-            instrumentBox.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(reportContexts));
-            dateRangeBox.getItems().addAll(DateRangeTypes.getDateRangeNames());
-            dateRangeBox.valueProperty().setValue(DateRangeTypes.ALL.toString());
+            instrumentBox.getItems().addAll(ContextFilteringUtils.getUniqueInstruments(qcReportContexts));
+            dateRangeBox.getItems().addAll(QcDateRangeTypes.getDateRangeNames());
+            dateRangeBox.valueProperty().setValue(QcDateRangeTypes.ALL.toString());
         }
 
     }
@@ -231,7 +231,7 @@ public class MainPageController {
         lineChart.getData().clear();
 
         // Current user selected parameters.
-        Parameters selectParams = new Parameters(
+        QcParameters selectParams = new QcParameters(
                 selectedContext,
                 reportBox,
                 dateRangeBox,
@@ -250,17 +250,17 @@ public class MainPageController {
                 databasePath);
 
         // If user selected to visualize a new report, reprocess task. Else, update parameters in existing task.
-        if(mainParameters.diffReportSelection(selectParams) || refresh) {
+        if(mainQcParameters.diffReportSelection(selectParams) || refresh) {
 
-            mainParameters = selectParams;
-            mainTask = new QuickQCTask(mainParameters);
+            mainQcParameters = selectParams;
+            mainTask = new QuickQCTask(mainQcParameters);
             updateLastRefresh();
             refresh = false;
 
         } else {
 
-            mainParameters = selectParams;
-            mainTask.updateParams(mainParameters);
+            mainQcParameters = selectParams;
+            mainTask.updateParams(mainQcParameters);
         }
 
         // Launch main task processing.
@@ -312,8 +312,8 @@ public class MainPageController {
 
                 // Set color and point style.
                 // TODO - Change how styling is handled.
-                String type = AnnotationTypes.getAnnotationType(mainTask.getAnnotationType(i));
-                nodes.get(i).setStyle(AnnotationStyles.valueOf(type).toString());
+                String type = QcAnnotationTypes.getAnnotationType(mainTask.getAnnotationType(i));
+                nodes.get(i).setStyle(QcAnnotationStyles.valueOf(type).toString());
 
             } else {
 
@@ -436,7 +436,7 @@ public class MainPageController {
         reportBox.valueProperty().setValue(null);
 
         // Set new selections
-        if(reportContexts != null) configurationBox.getItems().addAll(ContextFilteringUtils.getUniqueConfigurations(reportContexts, instrument));
+        if(qcReportContexts != null) configurationBox.getItems().addAll(ContextFilteringUtils.getUniqueConfigurations(qcReportContexts, instrument));
     }
 
     /**
@@ -460,7 +460,7 @@ public class MainPageController {
         reportBox.valueProperty().setValue(null);
 
         // Set new selections
-        if(reportContexts != null) matrixBox.getItems().addAll(ContextFilteringUtils.getUniqueMatrices(reportContexts, instrument, config));
+        if(qcReportContexts != null) matrixBox.getItems().addAll(ContextFilteringUtils.getUniqueMatrices(qcReportContexts, instrument, config));
     }
 
 
@@ -486,8 +486,8 @@ public class MainPageController {
         reportBox.valueProperty().setValue(null);
 
         // Set new selections
-        if(reportContexts != null) {
-            standardBox.getItems().addAll(ContextFilteringUtils.getUniqueStandards(reportContexts, instrument, config, matrix));
+        if(qcReportContexts != null) {
+            standardBox.getItems().addAll(ContextFilteringUtils.getUniqueStandards(qcReportContexts, instrument, config, matrix));
         }
     }
 
@@ -508,9 +508,9 @@ public class MainPageController {
         String standard = standardBox.getSelectionModel().getSelectedItem();
 
         // Clear existing selections, but don't set to null for easy switching of standard-report
-        if(reportContexts != null) {
+        if(qcReportContexts != null) {
 
-            selectedContext = ContextFilteringUtils.getSelectedReportContext(reportContexts, instrument, config, matrix, standard);
+            selectedContext = ContextFilteringUtils.getSelectedReportContext(qcReportContexts, instrument, config, matrix, standard);
             List<String> items = selectedContext.variables();
             List<String> setItems = reportBox.getItems();
 
@@ -570,7 +570,7 @@ public class MainPageController {
 
             // Replace Date Picker values with appropriate start and end dates, then enable them.
             LocalDate endDate = LocalDate.now();
-            LocalDate startDate = endDate.minusDays(DateRangeTypes.getDateRange(dateRange));
+            LocalDate startDate = endDate.minusDays(QcDateRangeTypes.getDateRange(dateRange));
 
             startDatePicker.setValue(startDate);
             endDatePicker.setValue(endDate);
@@ -688,7 +688,7 @@ public class MainPageController {
      */
     protected void showSampleInfo(XYChart.Data<String, Number> data) {
 
-        DataEntry selectedEntry = this.mainTask.getDataEntry(data);
+        QcDataEntry selectedEntry = this.mainTask.getDataEntry(data);
 
         if(selectedEntry == null) return;
 
@@ -703,11 +703,11 @@ public class MainPageController {
             try {
 
                 // Get the window design for pop-up.
-                FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("SamplePage.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("QcSamplePage.fxml"));
                 Parent root = fxmlLoader.load();
 
                 // Set sample page controller class.
-                SamplePageController controller = fxmlLoader.<SamplePageController>getController();
+                QcEntryPageController controller = fxmlLoader.<QcEntryPageController>getController();
                 controller.setDataEntry(selectedEntry);
 
                 // Launch pop-up window.
@@ -790,8 +790,8 @@ public class MainPageController {
 
             } else {
 
-                this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());
-                this.reportContexts = readReportConfigs();
+                this.reportConfigPath = this.databasePath.resolve(QcDatabaseTypes.REPORT.getFileName());
+                this.qcReportContexts = readReportConfigs();
                 setApplicationDefaults();
             }
         } catch(Exception e) {
@@ -863,19 +863,19 @@ public class MainPageController {
         prefs = Preferences.userRoot().node(this.getClass().getName());
 
         // To simply preferences, don't allow Custom date range to be a preference.
-        String date = (this.mainParameters.dateRange.equals(DateRangeTypes.CUSTOM.toString())) ?
-                DateRangeTypes.ALL.toString() : this.mainParameters.dateRange;
+        String date = (this.mainQcParameters.dateRange.equals(QcDateRangeTypes.CUSTOM.toString())) ?
+                QcDateRangeTypes.ALL.toString() : this.mainQcParameters.dateRange;
 
         // Assign preferences.
-        prefs.put(ReportTypes.DATABASE.name(), this.mainParameters.databasePath.toString());
-        prefs.put(ReportTypes.INSTRUMENT.name(), this.mainParameters.instrument);
-        prefs.put(ReportTypes.CONFIGURATION.name(), this.mainParameters.configuration);
-        prefs.put(ReportTypes.MATRIX.name(), this.mainParameters.matrix);
-        prefs.put(ReportTypes.STANDARD.name(), this.mainParameters.standard);
-        prefs.put(ReportTypes.REPORT.name(), this.mainParameters.report);
-        prefs.put(ReportTypes.RANGE.name(), date);
-        prefs.put(ReportTypes.GUIDE.name(), this.mainParameters.showGuide.toString());
-        prefs.putBoolean(ReportTypes.EXCLUDED.name(), this.mainParameters.showExcluded);
+        prefs.put(QcReportTypes.DATABASE.name(), this.mainQcParameters.databasePath.toString());
+        prefs.put(QcReportTypes.INSTRUMENT.name(), this.mainQcParameters.instrument);
+        prefs.put(QcReportTypes.CONFIGURATION.name(), this.mainQcParameters.configuration);
+        prefs.put(QcReportTypes.MATRIX.name(), this.mainQcParameters.matrix);
+        prefs.put(QcReportTypes.STANDARD.name(), this.mainQcParameters.standard);
+        prefs.put(QcReportTypes.REPORT.name(), this.mainQcParameters.report);
+        prefs.put(QcReportTypes.RANGE.name(), date);
+        prefs.put(QcReportTypes.GUIDE.name(), this.mainQcParameters.showGuide.toString());
+        prefs.putBoolean(QcReportTypes.EXCLUDED.name(), this.mainQcParameters.showExcluded);
     }
 
     /**
@@ -891,15 +891,15 @@ public class MainPageController {
         prefs = Preferences.userRoot().node(this.getClass().getName());
 
         // Get preference, return default value if none found.
-        String databasePath = prefs.get(ReportTypes.DATABASE.name(), null);
-        String instrument = prefs.get(ReportTypes.INSTRUMENT.name(), null);
-        String config = prefs.get(ReportTypes.CONFIGURATION.name(), null);
-        String matrix = prefs.get(ReportTypes.MATRIX.name(), null);
-        String standard = prefs.get(ReportTypes.STANDARD.name(), null);
-        String report = prefs.get(ReportTypes.REPORT.name(), null);
-        String dateRange = prefs.get(ReportTypes.RANGE.name(), null);
-        showExcluded = prefs.getBoolean(ReportTypes.EXCLUDED.name(), true);
-        showGuideSet = prefs.getBoolean(ReportTypes.GUIDE.name(), false);
+        String databasePath = prefs.get(QcReportTypes.DATABASE.name(), null);
+        String instrument = prefs.get(QcReportTypes.INSTRUMENT.name(), null);
+        String config = prefs.get(QcReportTypes.CONFIGURATION.name(), null);
+        String matrix = prefs.get(QcReportTypes.MATRIX.name(), null);
+        String standard = prefs.get(QcReportTypes.STANDARD.name(), null);
+        String report = prefs.get(QcReportTypes.REPORT.name(), null);
+        String dateRange = prefs.get(QcReportTypes.RANGE.name(), null);
+        showExcluded = prefs.getBoolean(QcReportTypes.EXCLUDED.name(), true);
+        showGuideSet = prefs.getBoolean(QcReportTypes.GUIDE.name(), false);
 
         // Update database path.
         if(databasePath != null) {
@@ -914,25 +914,25 @@ public class MainPageController {
             }
 
             // Format report configs database
-            this.reportConfigPath = this.databasePath.resolve(DatabaseTypes.REPORT.getFileName());
-            this.reportContexts = readReportConfigs();
+            this.reportConfigPath = this.databasePath.resolve(QcDatabaseTypes.REPORT.getFileName());
+            this.qcReportContexts = readReportConfigs();
         }
 
         // Handle choice box options based on instrument setting.
-        if(instrument != null && config != null && matrix != null && standard != null && report != null && reportContexts != null) {
+        if(instrument != null && config != null && matrix != null && standard != null && report != null && qcReportContexts != null) {
 
             instrumentBox.valueProperty().setValue(instrument);
             configurationBox.getItems().clear();
-            configurationBox.getItems().addAll(ContextFilteringUtils.getUniqueConfigurations(reportContexts, instrument));
+            configurationBox.getItems().addAll(ContextFilteringUtils.getUniqueConfigurations(qcReportContexts, instrument));
             configurationBox.valueProperty().setValue(config);
             matrixBox.getItems().clear();
-            matrixBox.getItems().addAll(ContextFilteringUtils.getUniqueMatrices(reportContexts, instrument, config));
+            matrixBox.getItems().addAll(ContextFilteringUtils.getUniqueMatrices(qcReportContexts, instrument, config));
             matrixBox.valueProperty().setValue(matrix);
             standardBox.getItems().clear();
-            standardBox.getItems().addAll(ContextFilteringUtils.getUniqueStandards(reportContexts, instrument, config, matrix));
+            standardBox.getItems().addAll(ContextFilteringUtils.getUniqueStandards(qcReportContexts, instrument, config, matrix));
             standardBox.valueProperty().setValue(standard);
             reportBox.getItems().clear();
-            reportBox.getItems().addAll(ContextFilteringUtils.getSelectedReportContext(reportContexts, instrument, config, matrix, standard).variables());
+            reportBox.getItems().addAll(ContextFilteringUtils.getSelectedReportContext(qcReportContexts, instrument, config, matrix, standard).variables());
             reportBox.valueProperty().setValue(report);
         }
 
@@ -942,7 +942,7 @@ public class MainPageController {
 
             dateRangeBox.setValue(dateRange);
 
-            if(dateRange.equals(DateRangeTypes.ALL.toString())) {
+            if(dateRange.equals(QcDateRangeTypes.ALL.toString())) {
 
                 startDatePicker.setValue(null);
                 endDatePicker.setValue(null);
@@ -950,7 +950,7 @@ public class MainPageController {
                 startDatePicker.setDisable(true);
                 endDatePicker.setDisable(true);
 
-            } else if (dateRange.equals(DateRangeTypes.CUSTOM.toString())) {
+            } else if (dateRange.equals(QcDateRangeTypes.CUSTOM.toString())) {
 
                 startDatePicker.setValue(null);
                 endDatePicker.setValue(null);
@@ -961,7 +961,7 @@ public class MainPageController {
             } else {
 
                 LocalDate endDate = LocalDate.now();
-                LocalDate startDate = endDate.minusDays(DateRangeTypes.getDateRange(dateRange));
+                LocalDate startDate = endDate.minusDays(QcDateRangeTypes.getDateRange(dateRange));
 
                 startDatePicker.setDisable(true);
                 endDatePicker.setDisable(true);
@@ -1162,13 +1162,13 @@ public class MainPageController {
 
             // Context menu options.
             // TODO - change to Enum?
-            MenuItem menuItem1 = new MenuItem("Export Annotation Table");
-            MenuItem menuItem2 = new MenuItem("Add Annotation");
-            MenuItem menuItem3 = new MenuItem("Edit Annotation");
-            MenuItem menuItem4 = new MenuItem("Delete Annotation");
+            MenuItem menuItem1 = new MenuItem("Export QcAnnotation Table");
+            MenuItem menuItem2 = new MenuItem("Add QcAnnotation");
+            MenuItem menuItem3 = new MenuItem("Edit QcAnnotation");
+            MenuItem menuItem4 = new MenuItem("Delete QcAnnotation");
 
             // Get selected annotation. If no row selected, returns -1 -> set to null.
-            Annotation selectedAnnotation = (index < 0) ? null : mainTask.getSelectedAnnotation(index);
+            QcAnnotation selectedQcAnnotation = (index < 0) ? null : mainTask.getSelectedAnnotation(index);
 
             // If selected row or table is empty, disable edit and delete options.
             if(annotationTable.getSelectionModel().isEmpty()) {
@@ -1188,8 +1188,8 @@ public class MainPageController {
             // TODO - handle export action.
             menuItem1.setOnAction((ActionEvent e) -> System.out.println("Action 1"));
             menuItem2.setOnAction((ActionEvent e) -> addAnnotation());
-            menuItem3.setOnAction((ActionEvent e) -> editAnnotation(selectedAnnotation));
-            menuItem4.setOnAction((ActionEvent e) -> deleteAnnotation(selectedAnnotation));
+            menuItem3.setOnAction((ActionEvent e) -> editAnnotation(selectedQcAnnotation));
+            menuItem4.setOnAction((ActionEvent e) -> deleteAnnotation(selectedQcAnnotation));
 
             annotationTable.setContextMenu(contextMenu);
         }
@@ -1205,15 +1205,15 @@ public class MainPageController {
         try {
 
             // Get annotation page window design.
-            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("AnnotationPage.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("QcAnnotationPage.fxml"));
             Parent root = fxmlLoader.load();
-            AnnotationPageController controller = fxmlLoader.getController();
-            controller.setContext(reportContexts, selectedContext);
+            QcAnnotationPageController controller = fxmlLoader.getController();
+            controller.setContext(qcReportContexts, selectedContext);
 
             // Launch pop-up window.
             Stage stage = new Stage();
             stage.setResizable(false);
-            stage.setTitle("Add Annotation");
+            stage.setTitle("Add QcAnnotation");
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
@@ -1237,35 +1237,35 @@ public class MainPageController {
     }
 
     /**
-     * Handle request to edit existing annotation.
-     * Replaces existing values with new values and updates master annotation database.
+     * Handle request to edit existing qcAnnotation.
+     * Replaces existing values with new values and updates master qcAnnotation database.
      *
-     * @param annotation selected annotation.
+     * @param qcAnnotation selected qcAnnotation.
      */
     @FXML
-    private void editAnnotation(Annotation annotation) {
+    private void editAnnotation(QcAnnotation qcAnnotation) {
 
         try {
 
-            // Get annotation page window design.
-            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("AnnotationPage.fxml"));
+            // Get qcAnnotation page window design.
+            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("QcAnnotationPage.fxml"));
             Parent root = fxmlLoader.load();
 
-            // Initialize page with selected annotation.
-            AnnotationPageController controller = fxmlLoader.getController();
-            controller.setAnnotation(reportContexts, annotation);
+            // Initialize page with selected qcAnnotation.
+            QcAnnotationPageController controller = fxmlLoader.getController();
+            controller.setAnnotation(qcReportContexts, qcAnnotation);
 
             // Launch pop-up window.
             Stage stage = new Stage();
             stage.setResizable(false);
-            stage.setTitle("Edit Annotation");
+            stage.setTitle("Edit QcAnnotation");
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
             if(!controller.wasCanceled()) {
 
-                // Update annotation entry with new input and update master annotation database.
-                mainTask.editAnnotation(annotation, controller.getAnnotation());
+                // Update qcAnnotation entry with new input and update master qcAnnotation database.
+                mainTask.editAnnotation(qcAnnotation, controller.getAnnotation());
                 mainTask.sortAnnotations();
                 mainTask.writeAnnotationReport();
 
@@ -1281,16 +1281,16 @@ public class MainPageController {
     }
 
     /**
-     * Handle request to delete selected annotation.
-     * Deletes annotation from series and updates master annotation database.
+     * Handle request to delete selected qcAnnotation.
+     * Deletes qcAnnotation from series and updates master qcAnnotation database.
      *
-     * @param annotation Selected annotation.
+     * @param qcAnnotation Selected qcAnnotation.
      */
     @FXML
-    private void deleteAnnotation(Annotation annotation){
+    private void deleteAnnotation(QcAnnotation qcAnnotation){
 
-        // Delete annotation from annotation list and overwrite master database file.
-        mainTask.deleteAnnotation(annotation);
+        // Delete qcAnnotation from qcAnnotation list and overwrite master database file.
+        mainTask.deleteAnnotation(qcAnnotation);
         mainTask.writeAnnotationReport();
 
         // Refresh application.
@@ -1300,9 +1300,9 @@ public class MainPageController {
     /**
      *
      */
-    private List<ReportContext> readReportConfigs() {
+    private List<QcReportContext> readReportConfigs() {
 
-        List<ReportContext> contextList = new ArrayList<>();
+        List<QcReportContext> contextList = new ArrayList<>();
 
         // Create an instance of BufferedReader
         try (BufferedReader br = Files.newBufferedReader(this.reportConfigPath, StandardCharsets.US_ASCII)) {
@@ -1331,8 +1331,8 @@ public class MainPageController {
 
                 Path reportPath = this.databasePath.resolve(attributes[5]);
 
-                // Make ReportContext Object
-                contextList.add(new ReportContext(attributes[0], attributes[1], attributes[2], attributes[3], reportPath, varArray));
+                // Make QcReportContext Object
+                contextList.add(new QcReportContext(attributes[0], attributes[1], attributes[2], attributes[3], reportPath, varArray));
 
                 line = br.readLine();
             }

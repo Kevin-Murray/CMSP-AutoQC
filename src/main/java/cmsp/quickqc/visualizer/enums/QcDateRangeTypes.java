@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Enumeration of QC report context date range types.
  * Date ranges correspond to specific number of day since now.
  */
-public enum DateRangeTypes {
+public enum QcDateRangeTypes {
 
     ALL("All Dates", 0),
     LAST7("Last 7 Days", 7),
@@ -24,7 +24,7 @@ public enum DateRangeTypes {
     /**
      * Constructor for enum.
      */
-    DateRangeTypes(String rangeName, int daysInt) {
+    QcDateRangeTypes(String rangeName, int daysInt) {
 
         this.label = rangeName;
         this.range = daysInt;
@@ -45,7 +45,7 @@ public enum DateRangeTypes {
      */
     public static int getDateRange(String dateRange) {
 
-        for(DateRangeTypes i : values()) {
+        for(QcDateRangeTypes i : values()) {
 
             if(i.label.equals(dateRange)) return i.range;
         }
@@ -60,7 +60,7 @@ public enum DateRangeTypes {
 
         ArrayList<String> values = new ArrayList<>();
 
-        for(DateRangeTypes i : DateRangeTypes.values()) values.add(i.label);
+        for(QcDateRangeTypes i : QcDateRangeTypes.values()) values.add(i.label);
 
         return values;
     }

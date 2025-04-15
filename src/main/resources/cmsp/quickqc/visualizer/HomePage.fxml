@@ -75,7 +75,7 @@
                            <children>
                               <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="46.0" nodeOrientation="INHERIT" onMouseClicked="#launchModule_QQC" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);">
                                  <image>
-                                    <Image url="@homeIcon-quickQC.png" />
+                                    <Image url="@icons/homeIcon-quickQC.png" />
                                  </image>
                               </ImageView>
                               <Label alignment="BOTTOM_CENTER" layoutX="3.0" layoutY="195.0" prefHeight="48.0" prefWidth="300.0" text="QC Visualizer" underline="true">
@@ -92,7 +92,7 @@
                            <children>
                               <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="46.0" nodeOrientation="INHERIT" onMouseClicked="#launchModule_targetedReports" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);">
                                  <image>
-                                    <Image url="@homeIcon-reportGen.png" />
+                                    <Image url="@icons/homeIcon-reportGen.png" />
                                  </image>
                               </ImageView>
                               <Label alignment="BOTTOM_CENTER" layoutY="195.0" prefHeight="48.0" prefWidth="300.0" text="Targeted Reports" underline="true">
@@ -108,7 +108,7 @@
                            <children>
                               <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="44.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);">
                                  <image>
-                                    <Image url="@homeIcon-reportDiscovery.png" />
+                                    <Image url="@icons/homeIcon-reportDiscovery.png" />
                                  </image>
                               </ImageView>
                               <Label alignment="BOTTOM_CENTER" layoutY="194.0" prefHeight="48.0" prefWidth="300.0" text="Discovery Reports" underline="true">
@@ -141,7 +141,7 @@
             <Button alignment="CENTER" mnemonicParsing="false" prefHeight="37.0" prefWidth="40">
                 <graphic>
                     <ImageView fitHeight="25" fitWidth="25" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@home-icon.png" />
+                        <Image url="@icons/home-icon.png" />
                     </ImageView>
                 </graphic>
             </Button>

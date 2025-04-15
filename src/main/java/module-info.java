@@ -1,4 +1,4 @@
-module cmsp.quickqc.visualizer {
+module cmsp.tool.box {
 
     requires javafx.controls;
     requires javafx.fxml;

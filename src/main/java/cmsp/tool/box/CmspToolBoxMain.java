@@ -30,7 +30,7 @@ public class CmspToolBoxMain extends Application {
         main.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styleGuide.css")).toString());
 
         // Set application icon.
-        Image image = new Image("cmsp/tool/box/icons/quickQC-icon.png");
+        Image image = new Image("cmsp/tool/box/icons/application-icon.png");
         stage.getIcons().add(image);
 
         // Open gui.

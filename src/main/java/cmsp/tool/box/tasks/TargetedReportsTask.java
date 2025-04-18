@@ -1010,10 +1010,17 @@ public class TargetedReportsTask {
      */
     public ErrorTypes validDocument() {
 
+        // No blank entries in document, can't compute LOD
         List<TargetedRatioEntry> blankReplicates = resultRatios.stream().filter(e -> e.getSampleType().equals(TargetedSampleTypes.BLANK.getLabel())).toList();
-
         if (blankReplicates.isEmpty()) {
             return ErrorTypes.TARGETBLANK;
+        }
+
+        // Duplicate molecule names detected
+        List<String> moleculeNames = resultMolecules.stream().map(TargetedMoleculeEntry::getName).toList();
+        Set<String> uniqueNames = new TreeSet<>(moleculeNames);
+        if (uniqueNames.size() < moleculeNames.size()) {
+            return ErrorTypes.TARGETUNIQUE;
         }
 
         return null;
